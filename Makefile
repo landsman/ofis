@@ -16,7 +16,7 @@ ifeq ($(OS),Darwin)
 endif
 
 # Shortcut for gradlew
-GRADLE := @./gradlew
+GRADLE := ./gradlew
 
 ifeq ($(OS),Darwin)
     ifeq ($(ARCH),arm64)
@@ -41,6 +41,7 @@ debug: generate-icon
 
 # GUI mode for macOS (Debug, fast)
 gui: generate-icon
+	@echo "Starting GUI application..."
 	$(GRADLE) -q runDebugExecutable$(BIN_PATH_SUFFIX) -Pargs="--gui" \
 		-x convertXmlValueResourcesForCommonMain \
 		-x convertXmlValueResourcesForMacosArm64Main \
