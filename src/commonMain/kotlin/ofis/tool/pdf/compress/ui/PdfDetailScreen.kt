@@ -119,6 +119,7 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
                     placeholder = "Tap to select a PDF",
                     onSelect = {
                         scope.launch {
+                            kotlinx.coroutines.yield() // Ensure UI updates (ripple) before modal/native activity
                             pickFile(listOf("pdf"))?.let {
                                 selectedFilePath = it
                                 selectedFileSize = fileSystem.metadataOrNull(it.toPath())?.size
@@ -194,6 +195,7 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
                         AppButton(
                             onClick = {
                                 scope.launch {
+                                    kotlinx.coroutines.yield()
                                     val dest = saveFile(suggestedSaveName ?: "compressed.pdf")
                                     if (dest != null && outputFilePath != null) {
                                         withContext(Dispatchers.Default) {

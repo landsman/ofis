@@ -1,4 +1,4 @@
-import org.gradle.api.tasks.Exec
+
 import io.gitlab.arturbosch.detekt.Detekt
 
 plugins {
@@ -39,7 +39,6 @@ repositories {
 }
 
 kotlin {
-    applyDefaultHierarchyTemplate()
     linuxX64 {
         binaries.executable {
             baseName = "Ofis"
@@ -94,50 +93,37 @@ kotlin {
             dependsOn(commonTest)
         }
 
-        val posixMain by creating {
+        val macosMain by creating {
             dependsOn(nativeMain)
         }
-
-        val macosMain by creating {
-            dependsOn(posixMain)
-        }
         val linuxMain by creating {
-            dependsOn(posixMain)
+            dependsOn(nativeMain)
         }
         val mingwMain by creating {
             dependsOn(nativeMain)
         }
 
-        val linuxX64Main by getting {
-            kotlin.srcDir("src/posixMain/kotlin")
-        }
-        val macosX64Main by getting {
-            kotlin.srcDir("src/posixMain/kotlin")
-        }
-        val macosArm64Main by getting {
-            kotlin.srcDir("src/posixMain/kotlin")
-        }
+        val linuxX64Main by getting { dependsOn(linuxMain) }
+        val macosX64Main by getting { dependsOn(macosMain) }
+        val macosArm64Main by getting { dependsOn(macosMain) }
         val mingwX64Main by getting { dependsOn(mingwMain) }
 
         val linuxX64Test by getting { dependsOn(nativeTest) }
         val macosX64Test by getting { dependsOn(nativeTest) }
         val macosArm64Test by getting { dependsOn(nativeTest) }
         val mingwX64Test by getting { dependsOn(nativeTest) }
-        val wasmJsMain by creating {
-            dependsOn(commonMain)
-        }
-    }
 
-    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().all {
-        binaries.all {
-            if (this is org.jetbrains.kotlin.gradle.plugin.mpp.Executable) {
-                val runTaskName = "run${name.replaceFirstChar { it.uppercase() }}${targetName.replaceFirstChar { it.uppercase() }}"
-                tasks.matching { it.name == runTaskName }.configureEach {
-                    val runTask = this as? Exec
-                    runTask?.let {
-                        val argsProperty = project.findProperty("args") as? String
-                        if (argsProperty != null) {
-                            it.args(*argsProperty.split(" ").toTypedArray())
+        targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().all {
+            binaries.all {
+                if (this is org.jetbrains.kotlin.gradle.plugin.mpp.Executable) {
+                    val runTaskName = "run${name.replaceFirstChar { it.uppercase() }}${targetName.replaceFirstChar { it.uppercase() }}"
+                    tasks.matching { it.name == runTaskName }.configureEach {
+                        val runTask = this as? Exec
+                        runTask?.let {
+                            val argsProperty = project.findProperty("args") as? String
+                            if (argsProperty != null) {
+                                it.args(*argsProperty.split(" ").toTypedArray())
+                            }
                         }
                     }
                 }
