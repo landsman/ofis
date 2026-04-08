@@ -9,7 +9,8 @@ import okio.Path.Companion.toPath
 
 class PdfCompressor : Tool {
     override val name = ToolBox.PDF_COMPRESSOR
-    override val description = "Compresses PDF files"
+    override val displayName = "Compress PDF"
+    override val description = "Reduce file size while keeping your document readable."
 
     private val service = PdfCompressionService()
 

@@ -59,7 +59,7 @@ fun ToolCard(tool: Tool, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = tool.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(text = tool.displayName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text(text = tool.description, color = Color.Gray, fontSize = 14.sp)
         }
         

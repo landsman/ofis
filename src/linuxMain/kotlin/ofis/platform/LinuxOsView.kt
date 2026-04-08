@@ -1,5 +1,6 @@
 package ofis.platform
 
+actual fun availableDiskSpace(dirPath: String): Long = Long.MAX_VALUE // TODO: statvfs
 
 actual fun platformGui() {
     println("GUI is not supported on Linux yet.")

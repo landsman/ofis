@@ -31,7 +31,7 @@ run:
 	$(GRADLE) runDebugExecutable$(TARGET_SUFFIX) -Pargs="$(ARGS)"
 
 # GUI mode
-gui:
+gui: icon
 	$(GRADLE) runDebugExecutable$(TARGET_SUFFIX) -Pargs="--gui"
 
 # Debug mode (verbose logging)

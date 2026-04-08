@@ -12,17 +12,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ofis.components.detail.*
 import ofis.config.Logger
+import ofis.platform.availableDiskSpace
 import ofis.platform.fileSystem
 import ofis.platform.pickFile
 import ofis.platform.saveFile
 import ofis.tool.Tool
 import ofis.tool.pdf.compress.CompressionProfile
+import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
 
 @Composable
 fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
+    val scope = rememberCoroutineScope()
+
     var logs by remember { mutableStateOf("") }
     var showLogs by remember { mutableStateOf(false) }
     var selectedFilePath by remember { mutableStateOf<String?>(null) }
@@ -32,21 +39,26 @@ fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
     var suggestedSaveName by remember { mutableStateOf<String?>(null) }
     var isRunning by remember { mutableStateOf(false) }
     var selectedProfile by remember { mutableStateOf(CompressionProfile.BALANCED) }
+    var toast by remember { mutableStateOf<ToastData?>(null) }
 
+    // Logger listener — posts all state updates back to Main so Compose sees them
     DisposableEffect(tool) {
         val listener: (String) -> Unit = { msg ->
-            when {
-                msg.startsWith("RESIZE_INFO: ")    -> { resizeInfo = msg.substringAfter("RESIZE_INFO: "); isRunning = false }
-                msg.startsWith("OUTPUT_PATH: ")    -> outputFilePath = msg.substringAfter("OUTPUT_PATH: ")
-                msg.startsWith("SUGGESTED_NAME: ") -> suggestedSaveName = msg.substringAfter("SUGGESTED_NAME: ")
-                msg.startsWith("Error: ")          -> isRunning = false
+            scope.launch(Dispatchers.Main) {
+                when {
+                    msg.startsWith("RESIZE_INFO: ")    -> { resizeInfo = msg.substringAfter("RESIZE_INFO: "); isRunning = false }
+                    msg.startsWith("OUTPUT_PATH: ")    -> outputFilePath = msg.substringAfter("OUTPUT_PATH: ")
+                    msg.startsWith("SUGGESTED_NAME: ") -> suggestedSaveName = msg.substringAfter("SUGGESTED_NAME: ")
+                    msg.startsWith("Error: ")          -> isRunning = false
+                }
+                logs += msg + "\n"
             }
-            logs += msg + "\n"
         }
         Logger.onLog = listener
         onDispose { if (Logger.onLog == listener) Logger.onLog = null }
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Column(modifier = Modifier.fillMaxSize()) {
 
         // ── header ─────────────────────────────────────────────────────────
@@ -57,7 +69,7 @@ fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
                 color = Color(0xFF4A90E2),
                 fontWeight = FontWeight.Bold
             )
-            Text(text = tool.name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(text = tool.displayName, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = { showLogs = !showLogs }) {
                 Icon(
@@ -109,7 +121,7 @@ fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // ── action button ──────────────────────────────────────────────
+            // ── action buttons ─────────────────────────────────────────────
             if (resizeInfo == null) {
                 Button(
                     onClick = {
@@ -122,7 +134,12 @@ fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
                                 CompressionProfile.BALANCED     -> "balanced"
                                 CompressionProfile.MAXIMUM      -> "max"
                             }
-                            tool.run(listOf(path, "--profile", profileArg))
+                            // Run compression on background thread — keeps UI responsive
+                            scope.launch {
+                                withContext(Dispatchers.Default) {
+                                    tool.run(listOf(path, "--profile", profileArg))
+                                }
+                            }
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(48.dp),
@@ -137,20 +154,57 @@ fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
                     Text("Compress PDF", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             } else {
-                // Save button — only shown when there's an actual smaller output
+                // Save — only shown when there is an actual smaller output file
                 if (outputFilePath != null) {
                     Button(
                         onClick = {
                             val dest = saveFile(suggestedSaveName ?: "compressed.pdf")
                             if (dest != null && outputFilePath != null) {
-                                try {
-                                    fileSystem.atomicMove(outputFilePath!!.toPath(), dest.toPath())
-                                    outputFilePath = dest
-                                } catch (_: Exception) {
-                                    // atomicMove may fail across volumes — copy+delete
-                                    fileSystem.copy(outputFilePath!!.toPath(), dest.toPath())
-                                    fileSystem.delete(outputFilePath!!.toPath())
-                                    outputFilePath = dest
+                                scope.launch {
+                                    withContext(Dispatchers.Default) {
+                                        val srcPath = outputFilePath!!.toPath()
+                                        val destPath = dest.toPath()
+                                        val destDir = destPath.parent?.toString() ?: "/"
+
+                                        // Proactive disk space check
+                                        val fileSize = fileSystem.metadataOrNull(srcPath)?.size ?: 0L
+                                        val freeSpace = availableDiskSpace(destDir)
+                                        if (freeSpace < fileSize) {
+                                            withContext(Dispatchers.Main) {
+                                                toast = ToastData(
+                                                    "Not enough disk space. Need ${formatSize(fileSize)}, only ${formatSize(freeSpace)} available.",
+                                                    isSuccess = false
+                                                )
+                                            }
+                                            return@withContext
+                                        }
+
+                                        try {
+                                            try {
+                                                fileSystem.atomicMove(srcPath, destPath)
+                                            } catch (_: Exception) {
+                                                // atomicMove fails across volumes — copy + delete
+                                                fileSystem.copy(srcPath, destPath)
+                                                fileSystem.delete(srcPath)
+                                            }
+                                            withContext(Dispatchers.Main) {
+                                                outputFilePath = dest
+                                                toast = ToastData("File saved successfully.", isSuccess = true)
+                                            }
+                                        } catch (e: Exception) {
+                                            val reason = when {
+                                                e.message?.contains("No space left", ignoreCase = true) == true ||
+                                                e.message?.contains("ENOSPC", ignoreCase = true) == true ->
+                                                    "Not enough disk space."
+                                                e.message?.contains("Permission", ignoreCase = true) == true ->
+                                                    "Permission denied."
+                                                else -> e.message ?: "Unknown error."
+                                            }
+                                            withContext(Dispatchers.Main) {
+                                                toast = ToastData("Failed to save: $reason", isSuccess = false)
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -182,5 +236,9 @@ fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
                 }
             }
         }
-    }
+    } // Column
+
+    ToastHost(toast = toast, onDismiss = { toast = null })
+
+    } // Box
 }
