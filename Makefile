@@ -1,4 +1,4 @@
-.PHONY: build test test-all clean run-native run-wasm help debug gui generate-icon lint format
+.PHONY: build test test-all clean run-native run-wasm help debug gui generate-icon lint format deps-outdated sec-vulns sec-osv sec-all
 
 # Detect OS and Architecture for fast testing
 OS := $(shell uname -s)
@@ -85,6 +85,23 @@ test-all:
 lint: semgrep
 	$(GRADLE) detekt ktlintCheck
 
+# Dependency updates report
+deps-outdated:
+	$(GRADLE) dependencyUpdates
+
+# Vulnerability scan via OWASP Dependency-Check (Gradle)
+sec-vulns:
+	$(GRADLE) dependencyCheckAnalyze
+	@echo "Report: build/reports/dependency-check-report.html"
+
+# Vulnerability scan via OSV-Scanner (source + Yarn lockfile) — requires `brew install osv-scanner`
+sec-osv:
+	@command -v osv-scanner >/dev/null 2>&1 || { echo "OSV-Scanner not found. Install: brew install osv-scanner"; exit 0; }
+	@osv-scanner scan source -r --lockfile kotlin-js-store/yarn.lock .
+
+# Aggregate security check (Semgrep + OWASP + OSV)
+sec-all: semgrep sec-vulns sec-osv
+
 # Semgrep (runs in Docker)
 semgrep:
 	@echo "Running Semgrep in Docker..."
@@ -120,6 +137,10 @@ help:
 	@echo "  make generate-icon        - Convert SVG icon to PNG for the application"
 	@echo "  make lint                 - Run static analysis (including Semgrep), and style checks"
 	@echo "  make semgrep              - Run Semgrep analysis in Docker"
+	@echo "  make deps-outdated        - Check for outdated dependencies"
+	@echo "  make sec-vulns            - Run OWASP Dependency-Check for vulnerabilities"
+	@echo "  make sec-osv              - Run Google OSV-Scanner for vulnerabilities"
+	@echo "  make sec-all              - Run all security checks (Semgrep, OWASP, OSV)"
 	@echo "  make format               - Automatically fix code style issues"
 	@echo "  make run-wasm             - Run the Wasm browser version"
 	@echo "  make help                 - Show this help message"

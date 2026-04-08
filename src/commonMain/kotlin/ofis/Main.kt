@@ -1,76 +1,9 @@
 package ofis
 
-import okio.FileSystem
-
-interface Tool {
-    val name: String
-    val description: String
-
-    fun run(args: List<String>)
-}
-
-object ToolRegistry {
-    private val tools = mutableMapOf<String, Tool>()
-    private var initialized = false
-
-    private fun ensureInitialized() {
-        if (!initialized) {
-            registerPdfTool()
-            initialized = true
-        }
-    }
-
-    fun register(tool: Tool) {
-        tools[tool.name] = tool
-    }
-
-    fun get(name: String): Tool? {
-        ensureInitialized()
-        return tools[name]
-    }
-
-    fun list(): List<Tool> {
-        ensureInitialized()
-        return tools.values.toList()
-    }
-}
-
-expect val fileSystem: FileSystem
-
-expect fun platformMain(args: List<String>)
-
-expect fun platformGui()
-
-interface GuiNavigator {
-    fun showToolSelection()
-    fun showTool(tool: Tool)
-}
-
-expect fun getGuiNavigator(): GuiNavigator
-
-expect fun exitProcess(status: Int)
-
-expect fun pickFile(allowedExtensions: List<String>): String?
-
-object GlobalConfig {
-    var debug: Boolean = false
-}
-
-object Logger {
-    var onLog: ((String) -> Unit)? = null
-
-    fun info(msg: String) {
-        println(msg)
-        onLog?.invoke(msg)
-    }
-
-    fun debug(msg: String) {
-        if (GlobalConfig.debug) {
-            println("[DEBUG] $msg")
-            onLog?.invoke("[DEBUG] $msg")
-        }
-    }
-}
+import ofis.config.GlobalConfig
+import ofis.config.Logger
+import ofis.platform.exitProcess
+import ofis.platform.platformGui
 
 fun commonMain(argList: List<String>) {
     val debugFlag = "--debug"

@@ -1,15 +1,15 @@
-package ofis
+package ofis.platform
 
 import androidx.compose.ui.window.Window
 import kotlinx.cinterop.BetaInteropApi
+import ofis.App
+import ofis.tool.Tool
 import platform.AppKit.NSApplication
 import platform.AppKit.NSApplicationActivationPolicy
 import platform.AppKit.NSImage
 import platform.AppKit.NSOpenPanel
 import platform.AppKit.NSApplicationDelegateProtocol
-import platform.AppKit.NSModalResponseOK
 import platform.darwin.NSObject
-import platform.Foundation.NSURL
 
 actual fun getGuiNavigator(): GuiNavigator = object : GuiNavigator {
     override fun showToolSelection() {}

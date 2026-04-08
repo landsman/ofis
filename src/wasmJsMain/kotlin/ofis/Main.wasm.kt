@@ -1,5 +1,7 @@
 package ofis
 
+import ofis.platform.GuiNavigator
+import ofis.platform.platformMain
 import okio.*
 
 actual val fileSystem: FileSystem =

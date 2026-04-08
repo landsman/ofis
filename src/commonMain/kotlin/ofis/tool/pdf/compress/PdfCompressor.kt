@@ -1,4 +1,12 @@
-package ofis
+package ofis.tool.pdf.compress
+
+import ofis.config.Logger
+import ofis.PdfParser
+import ofis.ToolRegistry
+import ofis.platform.fileSystem
+import ofis.utils.format.formatSize
+import ofis.tool.Tool
+import ofis.tool.ToolBox
 
 import okio.Path.Companion.toPath
 import okio.buffer
@@ -24,7 +32,7 @@ class PdfCompressor : Tool {
 
         Logger.info("Compressing $input to $output with level $level...")
 
-        compressPdf(input, output, level)
+        compressPdf(input, output)
     }
 
     internal fun getOutputPath(
@@ -44,7 +52,6 @@ class PdfCompressor : Tool {
     private fun compressPdf(
         input: String,
         output: String,
-        level: Int,
     ) {
         val fs = fileSystem
         val inputPath = input.toPath()
@@ -65,6 +72,8 @@ class PdfCompressor : Tool {
                 source.close()
             }
 
+            val inputSize = fs.metadata(inputPath).size ?: 0L
+
             // 2. Compress/Write (For now just copy)
             val sink = fs.sink(outputPath).buffer()
             try {
@@ -79,7 +88,16 @@ class PdfCompressor : Tool {
                 sink.close()
             }
 
+            val outputSize = fs.metadata(outputPath).size ?: 0L
+            val reduction = if (inputSize > 0) {
+                ((inputSize - outputSize).toDouble() / inputSize.toDouble() * 100).toInt()
+            } else {
+                0
+            }
+
+
             Logger.info("Saved compressed (not really) PDF to $output")
+            Logger.info("RESIZE_INFO: ${formatSize(inputSize)} -> ${formatSize(outputSize)} ($reduction%)")
         } catch (e: Exception) {
             Logger.info("Error during compression: ${e.message}")
         }

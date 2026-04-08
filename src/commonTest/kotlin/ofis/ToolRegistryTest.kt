@@ -3,7 +3,7 @@ package ofis
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import ofis.ToolBox
+import ofis.tool.ToolBox
 
 class ToolRegistryTest {
     @Test

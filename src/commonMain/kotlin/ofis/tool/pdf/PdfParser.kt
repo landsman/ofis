@@ -1,5 +1,6 @@
 package ofis
 
+import ofis.config.Logger
 import okio.BufferedSource
 import okio.ByteString
 import okio.ByteString.Companion.encodeUtf8
@@ -17,7 +18,7 @@ class PdfParser(
         Logger.debug("Analyzing PDF content (${bytes.size} bytes)...")
 
         if (bytes.size < 10) {
-            Logger.info("File too small to be a PDF")
+            Logger.warn("File too small to be a PDF")
             return
         }
 

@@ -1,4 +1,4 @@
-package ofis
+package ofis.platform
 
 import okio.FileSystem
 import platform.posix.exit

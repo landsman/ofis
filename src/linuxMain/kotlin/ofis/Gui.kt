@@ -1,4 +1,5 @@
-package ofis
+package ofis.platform
+
 
 actual fun platformGui() {
     println("GUI is not supported on Linux yet.")
