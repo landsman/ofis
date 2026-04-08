@@ -3,6 +3,7 @@ package ofis
 import ofis.config.GlobalConfig
 import ofis.config.Logger
 import ofis.platform.platformGui
+import ofis.tool.ToolRegistry
 
 fun commonMain(argList: List<String>): Int {
     val debugFlag = "--debug"

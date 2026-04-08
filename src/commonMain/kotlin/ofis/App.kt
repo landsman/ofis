@@ -6,10 +6,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ofis.components.ui.DotGridBackground
-import ofis.tool.pdf.compress.ui.PdfDetailScreen
 import ofis.components.ToolSelectionScreen
 import ofis.tool.Tool
-import ofis.tool.ToolRegistry
 
 @Composable
 fun App() {
@@ -23,7 +21,7 @@ fun App() {
                 if (currentTool == null) {
                     ToolSelectionScreen(onToolSelect = { currentTool = it })
                 } else {
-                    PdfDetailScreen(tool = currentTool!!, onBack = { currentTool = null })
+                    currentTool!!.Screen(onBack = { currentTool = null })
                 }
             }
         }

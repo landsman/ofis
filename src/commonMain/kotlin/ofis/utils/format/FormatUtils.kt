@@ -1,6 +1,8 @@
 package ofis.utils.format
 
 fun formatSize(size: Long): String {
-    val tenths = size * 10 / (1024 * 1024)
-    return "${tenths / 10}.${tenths % 10} MB"
+    if (size < 1024) return "$size B"
+    if (size < 1024 * 1024) return "${size / 1024} KB"
+    if (size < 1024 * 1024 * 1024) return "${size / (1024 * 1024)} MB"
+    return "${size / (1024 * 1024 * 1024)} GB"
 }

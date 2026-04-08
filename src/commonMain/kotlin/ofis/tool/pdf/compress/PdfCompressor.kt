@@ -1,7 +1,9 @@
 package ofis.tool.pdf.compress
 import ofis.tool.pdf.compress.model.*
 import ofis.tool.pdf.compress.service.PdfCompressionService
+import ofis.tool.pdf.compress.ui.PdfDetailScreen
 
+import androidx.compose.runtime.Composable
 import ofis.tool.ToolRegistry
 import ofis.config.Logger
 import ofis.tool.Tool
@@ -15,6 +17,15 @@ class PdfCompressor : Tool {
     override val description = "Reduce file size while keeping your document readable."
 
     private val service = PdfCompressionService()
+
+    @Composable
+    override fun Screen(onBack: () -> Unit) {
+        PdfDetailScreen(tool = this, onBack = onBack)
+    }
+
+    override fun register() {
+        ToolRegistry.register(this)
+    }
 
     override fun run(args: List<String>) {
         if (args.isEmpty()) {
@@ -83,6 +94,3 @@ class PdfCompressor : Tool {
     }
 }
 
-fun registerPdfTool() {
-    ToolRegistry.register(PdfCompressor())
-}

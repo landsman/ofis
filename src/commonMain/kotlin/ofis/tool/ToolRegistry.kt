@@ -1,5 +1,5 @@
 package ofis.tool
-import ofis.tool.pdf.compress.registerPdfTool
+import ofis.tool.pdf.compress.PdfCompressor
 
 object ToolRegistry {
     private val tools = mutableMapOf<String, Tool>()
@@ -7,7 +7,7 @@ object ToolRegistry {
 
     private fun ensureInitialized() {
         if (!initialized) {
-            registerPdfTool()
+            PdfCompressor().register()
             initialized = true
         }
     }
