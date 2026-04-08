@@ -6,3 +6,5 @@ actual fun platformGui() {
 }
 
 actual fun pickFile(allowedExtensions: List<String>): String? = null
+
+actual fun saveFile(suggestedName: String): String? = null

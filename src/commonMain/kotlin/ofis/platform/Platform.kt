@@ -11,3 +11,5 @@ expect fun platformGui()
 expect fun exitProcess(status: Int)
 
 expect fun pickFile(allowedExtensions: List<String>): String?
+
+expect fun saveFile(suggestedName: String): String?

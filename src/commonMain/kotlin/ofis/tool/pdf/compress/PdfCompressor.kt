@@ -1,106 +1,82 @@
 package ofis.tool.pdf.compress
 
-import ofis.PdfParser
 import ofis.ToolRegistry
 import ofis.config.Logger
-import ofis.platform.fileSystem
 import ofis.tool.Tool
 import ofis.tool.ToolBox
 import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
-import okio.buffer
 
 class PdfCompressor : Tool {
     override val name = ToolBox.PDF_COMPRESSOR
     override val description = "Compresses PDF files"
 
+    private val service = PdfCompressionService()
+
     override fun run(args: List<String>) {
         if (args.isEmpty()) {
-            Logger.info("Usage: ${ToolBox.PDF_COMPRESSOR} <input.pdf> [output.pdf] [--level <1-9>]")
-            return
-        }
-        val input = args[0]
-        val output = getOutputPath(input, args.getOrNull(1))
-
-        val levelIndex = args.indexOf("--level")
-        val level =
-            if (levelIndex != -1 && levelIndex + 1 < args.size) {
-                args[levelIndex + 1].toIntOrNull() ?: 5
-            } else {
-                5
-            }
-
-        Logger.info("Compressing $input to $output with level $level...")
-
-        compressPdf(input, output)
-    }
-
-    internal fun getOutputPath(
-        input: String,
-        providedOutput: String?,
-    ): String {
-        if (providedOutput != null) return providedOutput
-        val inputPath = input.toPath()
-        val parent = inputPath.parent
-        return if (parent != null) {
-            (parent / "compressed_${inputPath.name}").toString()
-        } else {
-            "compressed_${inputPath.name}"
-        }
-    }
-
-    private fun compressPdf(
-        input: String,
-        output: String,
-    ) {
-        val fs = fileSystem
-        val inputPath = input.toPath()
-        val outputPath = output.toPath()
-
-        if (!fs.exists(inputPath)) {
-            Logger.info("Error: Input file $input not found.")
+            Logger.info("Usage: ${ToolBox.PDF_COMPRESSOR} <input.pdf> [output.pdf] [--profile high|balanced|max]")
             return
         }
 
-        try {
-            // 1. Analyze
-            val source = fs.source(inputPath).buffer()
-            try {
-                val parser = PdfParser(source)
-                parser.analyze()
-            } finally {
-                source.close()
-            }
+        val inputStr = args[0]
+        val outputStr = args.getOrNull(1)?.takeIf { !it.startsWith("--") } ?: defaultOutput(inputStr)
+        val profile = parseProfile(args)
 
-            val inputSize = fs.metadata(inputPath).size ?: 0L
+        val request = CompressionRequest(
+            inputPath = inputStr.toPath(),
+            outputPath = outputStr.toPath(),
+            profile = profile,
+        )
 
-            // 2. Compress/Write (For now just copy)
-            val sink = fs.sink(outputPath).buffer()
-            try {
-                val source = fs.source(inputPath).buffer()
-                try {
-                    sink.writeAll(source)
-                } finally {
-                    source.close()
-                }
-                sink.flush()
-            } finally {
-                sink.close()
-            }
+        Logger.info("Compressing $inputStr → $outputStr [${profile.label}]")
 
-            val outputSize = fs.metadata(outputPath).size ?: 0L
-            val reduction =
-                if (inputSize > 0) {
-                    ((inputSize - outputSize).toDouble() / inputSize.toDouble() * 100).toInt()
+        when (val result = service.compress(request)) {
+            is CompressionResult.Success -> {
+                result.warnings.forEach { Logger.warn(it) }
+                if (result.alreadyOptimal) {
+                    Logger.info("Already optimized — compressed file is not smaller")
                 } else {
-                    0
+                    Logger.info("Done. Saved ${formatSize(result.savedBytes)} (${result.savedPercent}%)")
+                    Logger.info("OUTPUT_PATH: ${result.outputPath}")
+                    Logger.info("SUGGESTED_NAME: ${suggestedName(inputStr, profile)}")
                 }
-
-            Logger.info("Saved compressed (not really) PDF to $output")
-            Logger.info("RESIZE_INFO: ${formatSize(inputSize)} -> ${formatSize(outputSize)} ($reduction%)")
-        } catch (e: Exception) {
-            Logger.info("Error during compression: ${e.message}")
+                Logger.info("RESIZE_INFO: ${formatSize(result.originalBytes)} → ${formatSize(result.compressedBytes)} (${result.savedPercent}%)")
+            }
+            is CompressionResult.Failure -> {
+                Logger.info("Error: ${result.reason}")
+            }
         }
+    }
+
+    private fun suggestedName(input: String, profile: CompressionProfile): String {
+        val name = input.toPath().name
+        val base = name.substringBeforeLast(".")
+        val suffix = when (profile) {
+            CompressionProfile.HIGH_QUALITY -> "high-quality"
+            CompressionProfile.BALANCED     -> "balanced"
+            CompressionProfile.MAXIMUM      -> "maximum"
+        }
+        return "$base-ofis-compressed-$suffix.pdf"
+    }
+
+    private fun defaultOutput(input: String): String {
+        val p = input.toPath()
+        val parent = p.parent
+        return if (parent != null) (parent / "compressed_${p.name}").toString()
+        else "compressed_${p.name}"
+    }
+
+    private fun parseProfile(args: List<String>): CompressionProfile {
+        val idx = args.indexOf("--profile")
+        if (idx != -1 && idx + 1 < args.size) {
+            return when (args[idx + 1].lowercase()) {
+                "high" -> CompressionProfile.HIGH_QUALITY
+                "max", "maximum" -> CompressionProfile.MAXIMUM
+                else -> CompressionProfile.BALANCED
+            }
+        }
+        return CompressionProfile.BALANCED
     }
 }
 
