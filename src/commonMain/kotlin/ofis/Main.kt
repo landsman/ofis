@@ -82,7 +82,7 @@ fun commonMain(argList: List<String>) {
     }
 
     if (argList.isEmpty()) {
-        println("Welcome to Ofis - Multiplatform Tooling")
+        println("Welcome to Ofis!")
         println("Available tools:")
         ToolRegistry.list().forEach { println("- ${it.name}: ${it.description}") }
         return

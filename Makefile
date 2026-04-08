@@ -4,6 +4,17 @@
 OS := $(shell uname -s)
 ARCH := $(shell uname -m)
 
+# Architecture specific paths and suffixes
+ifeq ($(OS),Darwin)
+    ifeq ($(ARCH),arm64)
+        BIN_PATH := macosArm64
+        BIN_PATH_SUFFIX := MacosArm64
+    else
+        BIN_PATH := macosX64
+        BIN_PATH_SUFFIX := MacosX64
+    endif
+endif
+
 # Shortcut for gradlew
 GRADLE := @./gradlew
 
@@ -26,11 +37,17 @@ build: lint
 
 # Debug mode for macOS
 debug: generate-icon
-	$(GRADLE) -q runReleaseExecutableMacosArm64 -Pargs="--debug $(ARGS)"
+	$(GRADLE) -q runDebugExecutable$(BIN_PATH_SUFFIX) -Pargs="--debug $(ARGS)"
 
-# GUI mode for macOS
+# GUI mode for macOS (Release)
 gui: generate-icon prepare-macos-bin
-	./build/bin/macosArm64/releaseExecutable/Ofis --gui
+	./build/bin/$(BIN_PATH)/releaseExecutable/Ofis --gui
+
+# Fast GUI mode for development (Debug)
+gui-dev: generate-icon
+	$(GRADLE) linkDebugExecutable$(BIN_PATH_SUFFIX)
+	@ln -sf Ofis.kexe build/bin/$(BIN_PATH)/debugExecutable/Ofis
+	./build/bin/$(BIN_PATH)/debugExecutable/Ofis --gui
 
 # Icon generation
 generate-icon:
@@ -39,8 +56,8 @@ generate-icon:
 
 # Prepare macOS executable name (symlink without .kexe for proper Dock title)
 prepare-macos-bin:
-	$(GRADLE) -q linkReleaseExecutableMacosArm64
-	@ln -sf Ofis.kexe build/bin/macosArm64/releaseExecutable/Ofis
+	$(GRADLE) -q linkReleaseExecutable$(BIN_PATH_SUFFIX)
+	@ln -sf Ofis.kexe build/bin/$(BIN_PATH)/releaseExecutable/Ofis
 
 # Testing (host platform only for speed)
 test:
@@ -63,9 +80,9 @@ clean:
 	$(GRADLE) clean
 	@rm -f build/mac_os_app_icon.png
 
-# Run native (assuming macosArm64 as primary on Apple Silicon)
+# Run native (assuming host as primary)
 run-native:
-	$(GRADLE) -q runReleaseExecutableMacosArm64 -Pargs="$(ARGS)"
+	$(GRADLE) -q runDebugExecutable$(BIN_PATH_SUFFIX) -Pargs="$(ARGS)"
 
 # Run wasm (node.js required for console run)
 run-wasm:
@@ -80,7 +97,8 @@ help:
 	@echo "  make clean       - Clean build artifacts"
 	@echo "  make run-native  - Run the native desktop tool (usage: make run-native ARGS='pdf-compress input.pdf')"
 	@echo "  make debug [ARGS=\"...\"]  - Run the native macOS tool with verbose logging"
-	@echo "  make gui                  - Run the native macOS tool with a minimalistic GUI"
+	@echo "  make gui                  - Run the native macOS tool with a minimalistic GUI (Release)"
+	@echo "  make gui-dev              - Run the native macOS tool with a minimalistic GUI (Debug, fast)"
 	@echo "  make generate-icon        - Convert SVG icon to PNG for the application"
 	@echo "  make lint                 - Run static analysis and style checks"
 	@echo "  make format               - Automatically fix code style issues"

@@ -2,6 +2,8 @@ import org.gradle.api.tasks.Exec
 
 plugins {
     kotlin("multiplatform") version "2.1.10"
+    id("org.jetbrains.compose") version "1.7.3"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
 }
@@ -21,6 +23,8 @@ ktlint {
 
 repositories {
     mavenCentral()
+    google()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/stable")
 }
 
 kotlin {
@@ -65,6 +69,12 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("com.squareup.okio:okio:3.9.1")
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                implementation(compose.components.resources)
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.components.uiToolingPreview)
             }
         }
         val commonTest by getting {
