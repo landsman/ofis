@@ -1,0 +1,34 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Shadow (Cleaner, less aggressive) -->
+    <filter id="folderShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feOffset in="SourceAlpha" dx="0" dy="12" result="offset" />
+      <feGaussianBlur in="offset" stdDeviation="10" result="blur" />
+      <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.15 0" result="softShadow"/>
+      <feMerge>
+        <feMergeNode in="softShadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Glossy Highlight -->
+    <linearGradient id="folderGloss" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.5" />
+      <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0" />
+    </linearGradient>
+  </defs>
+
+  <!-- macOS Squircle Background -->
+  <rect x="0" y="0" width="1024" height="1024" rx="225" fill="#F0F0F0"/>
+  
+  <g filter="url(#folderShadow)">
+    <!-- Back Flap and Tab -->
+    <path d="M160 300 Q160 260 200 260 H400 Q440 260 440 220 V200 Q440 160 480 160 H860 Q900 160 900 200 V860 Q900 900 860 900 H200 Q160 900 160 860 Z" fill="#FFCC66"/>
+    
+    <!-- Front Flap (Lowered for 3D look) -->
+    <rect x="160" y="360" width="740" height="540" rx="40" fill="#FFBB33" stroke="#CC9933" stroke-width="4"/>
+    
+    <!-- Glossy Overlay -->
+    <rect x="200" y="380" width="660" height="200" rx="40" fill="url(#folderGloss)"/>
+  </g>
+</svg>
