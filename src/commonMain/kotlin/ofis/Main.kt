@@ -36,7 +36,7 @@ object ToolRegistry {
 
 expect val fileSystem: FileSystem
 
-expect fun platformMain(args: Array<String>)
+expect fun platformMain(args: List<String>)
 expect fun platformGui()
 expect fun exitProcess(status: Int)
 
@@ -58,25 +58,25 @@ object Logger {
     }
 }
 
-fun commonMain(args: Array<String>) {
+fun commonMain(argList: List<String>) {
     val debugFlag = "--debug"
-    val hasDebug = args.contains(debugFlag)
+    val hasDebug = argList.contains(debugFlag)
     GlobalConfig.debug = hasDebug
     
     val guiFlag = "--gui"
-    if (args.contains(guiFlag)) {
+    if (argList.contains(guiFlag)) {
         platformGui()
         return
     }
 
-    if (args.isEmpty()) {
+    if (argList.isEmpty()) {
         println("Welcome to Ofis - Multiplatform Tooling")
         println("Available tools:")
         ToolRegistry.list().forEach { println("- ${it.name}: ${it.description}") }
         return
     }
     
-    val filteredArgs = args.filter { it != debugFlag && it != guiFlag }
+    val filteredArgs = argList.filter { it != debugFlag && it != guiFlag }
 
     if (filteredArgs.isEmpty()) {
         println("Error: No tool specified.")

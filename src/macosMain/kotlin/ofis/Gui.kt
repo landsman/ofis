@@ -37,12 +37,12 @@ class WindowDelegate : NSObject(), NSWindowDelegateProtocol {
 }
 
 private fun setAppIcon() {
-    // Load from generated PNG
-    val loadedImage = NSImage(contentsOfFile = "AppIcon.png")
-    if (loadedImage != null) {
+    val iconPath = "build/mac_os_app_icon.png"
+    if (NSFileManager.defaultManager.fileExistsAtPath(iconPath)) {
+        val loadedImage = NSImage(contentsOfFile = iconPath)
         NSApplication.sharedApplication().setApplicationIconImage(loadedImage)
     } else {
-        Logger.info("Error: AppIcon.png not found. Please run 'make generate-icon' to convert the SVG icon.")
+        Logger.info("Error: build/mac_os_app_icon.png not found. Please run 'make generate-icon' to convert the SVG icon.")
     }
 }
 

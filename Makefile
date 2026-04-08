@@ -1,7 +1,7 @@
-.PHONY: build test clean run-native run-wasm help debug gui generate-icon
+.PHONY: build test clean run-native run-wasm help debug gui generate-icon prepare-macos-bin lint format
 
 # Default target
-build:
+build: lint
 	./gradlew build
 
 # Debug mode for macOS
@@ -9,21 +9,35 @@ debug: generate-icon
 	./gradlew runReleaseExecutableMacosArm64 -Pargs="--debug $(ARGS)"
 
 # GUI mode for macOS
-gui: generate-icon
-	./gradlew runReleaseExecutableMacosArm64 -Pargs="--gui"
+gui: generate-icon prepare-macos-bin
+	./build/bin/macosArm64/releaseExecutable/Ofis --gui
 
 # Icon generation
 generate-icon:
-	@rsvg-convert -w 1024 -h 1024 src/macosMain/resources/icon.svg -o AppIcon.png || echo "Warning: rsvg-convert not found. Application will lack an icon."
+	@mkdir -p build
+	@rsvg-convert -w 1024 -h 1024 src/macosMain/resources/icon.svg -o build/mac_os_app_icon.png || echo "Warning: rsvg-convert not found. Application will lack an icon."
+
+# Prepare macOS executable name (symlink without .kexe for proper Dock title)
+prepare-macos-bin:
+	./gradlew linkReleaseExecutableMacosArm64
+	ln -sf Ofis.kexe build/bin/macosArm64/releaseExecutable/Ofis
 
 # Testing
 test:
 	gradle allTests
 
+# Linting
+lint:
+	./gradlew detekt ktlintCheck
+
+# Formatting
+format:
+	./gradlew ktlintFormat
+
 # Cleanup
 clean:
 	gradle clean
-	rm -f AppIcon.png
+	rm -f build/mac_os_app_icon.png
 
 # Run native (assuming macosArm64 as primary on Apple Silicon)
 run-native:
@@ -43,5 +57,7 @@ help:
 	@echo "  make debug [ARGS=\"...\"]  - Run the native macOS tool with verbose logging"
 	@echo "  make gui                  - Run the native macOS tool with a minimalistic GUI"
 	@echo "  make generate-icon        - Convert SVG icon to PNG for the application"
+	@echo "  make lint                 - Run static analysis and style checks"
+	@echo "  make format               - Automatically fix code style issues"
 	@echo "  make run-wasm             - Run the Wasm browser version"
 	@echo "  make help                 - Show this help message"

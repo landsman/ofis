@@ -19,7 +19,7 @@ actual val fileSystem: FileSystem = object : FileSystem() {
     override fun listOrNull(dir: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
 }
 
-actual fun platformMain(args: Array<String>) {
+actual fun platformMain(args: List<String>) {
     commonMain(args)
 }
 
@@ -37,5 +37,5 @@ fun main() {
     // In wasmJs, args are usually not available from command line in browser.
     // However, if we run in Node.js, we can get them.
     // For now, let's just call commonMain with empty args or simulate.
-    platformMain(emptyArray())
+    platformMain(emptyList())
 }

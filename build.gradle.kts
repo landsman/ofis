@@ -1,5 +1,20 @@
 plugins {
     kotlin("multiplatform") version "2.1.10"
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom(files("$projectDir/config/detekt/detekt.yml"))
+}
+
+ktlint {
+    version.set("1.5.0")
+    verbose.set(true)
+    outputToConsole.set(true)
+    enableExperimentalRules.set(true)
 }
 
 repositories {
@@ -72,27 +87,20 @@ kotlin {
             dependsOn(nativeMain)
         }
 
-        listOf(
-            linuxX64(),
-            macosX64(),
-            macosArm64(),
-            mingwX64()
-        ).forEach { target ->
-            val mainSourceSet = target.compilations.getByName("main").defaultSourceSet
-            mainSourceSet.dependsOn(nativeMain)
-            target.compilations.getByName("test").defaultSourceSet.dependsOn(nativeTest)
+        val linuxX64Main by getting { dependsOn(linuxMain) }
+        val macosX64Main by getting { dependsOn(macosMain) }
+        val macosArm64Main by getting { dependsOn(macosMain) }
+        val mingwX64Main by getting { dependsOn(mingwMain) }
 
-            if (target.name.startsWith("macos")) {
-                mainSourceSet.dependsOn(macosMain)
-            } else if (target.name.startsWith("linux")) {
-                mainSourceSet.dependsOn(linuxMain)
-            } else if (target.name.startsWith("mingw")) {
-                mainSourceSet.dependsOn(mingwMain)
-            }
-            
-            target.binaries.all {
+        val linuxX64Test by getting { dependsOn(nativeTest) }
+        val macosX64Test by getting { dependsOn(nativeTest) }
+        val macosArm64Test by getting { dependsOn(nativeTest) }
+        val mingwX64Test by getting { dependsOn(nativeTest) }
+
+        targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().all {
+            binaries.all {
                 if (this is org.jetbrains.kotlin.gradle.plugin.mpp.Executable) {
-                    val runTaskName = "run${name.replaceFirstChar { it.uppercase() }}${target.name.replaceFirstChar { it.uppercase() }}"
+                    val runTaskName = "run${name.replaceFirstChar { it.uppercase() }}${targetName.replaceFirstChar { it.uppercase() }}"
                     tasks.matching { it.name == runTaskName }.configureEach {
                         val runTask = this as? org.gradle.api.tasks.Exec
                         runTask?.let {

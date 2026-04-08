@@ -6,7 +6,7 @@ import platform.posix.exit
 
 actual val fileSystem: FileSystem = FileSystem.SYSTEM
 
-actual fun platformMain(args: Array<String>) {
+actual fun platformMain(args: List<String>) {
     commonMain(args)
 }
 
@@ -15,5 +15,5 @@ actual fun exitProcess(status: Int) {
 }
 
 fun main(args: Array<String>) {
-    platformMain(args)
+    platformMain(args.toList())
 }
