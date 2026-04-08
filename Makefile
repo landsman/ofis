@@ -1,12 +1,32 @@
-.PHONY: build test clean run-native run-wasm help debug gui generate-icon prepare-macos-bin lint format
+.PHONY: build test test-all clean run-native run-wasm help debug gui generate-icon prepare-macos-bin lint format
+
+# Detect OS and Architecture for fast testing
+OS := $(shell uname -s)
+ARCH := $(shell uname -m)
+
+# Shortcut for gradlew
+GRADLE := @./gradlew
+
+ifeq ($(OS),Darwin)
+    ifeq ($(ARCH),arm64)
+        HOST_TEST_TASK := macosArm64Test
+    else
+        HOST_TEST_TASK := macosX64Test
+    endif
+else ifeq ($(OS),Linux)
+    HOST_TEST_TASK := linuxX64Test
+else
+    # Fallback to allTests if OS is not detected or supported for specific task
+    HOST_TEST_TASK := allTests
+endif
 
 # Default target
 build: lint
-	@./gradlew --console=plain build
+	$(GRADLE) build
 
 # Debug mode for macOS
 debug: generate-icon
-	@./gradlew --console=plain -q runReleaseExecutableMacosArm64 -Pargs="--debug $(ARGS)"
+	$(GRADLE) -q runReleaseExecutableMacosArm64 -Pargs="--debug $(ARGS)"
 
 # GUI mode for macOS
 gui: generate-icon prepare-macos-bin
@@ -19,39 +39,44 @@ generate-icon:
 
 # Prepare macOS executable name (symlink without .kexe for proper Dock title)
 prepare-macos-bin:
-	@./gradlew --console=plain -q linkReleaseExecutableMacosArm64
+	$(GRADLE) -q linkReleaseExecutableMacosArm64
 	@ln -sf Ofis.kexe build/bin/macosArm64/releaseExecutable/Ofis
 
-# Testing
+# Testing (host platform only for speed)
 test:
-	@./gradlew --console=plain allTests
+	$(GRADLE) $(HOST_TEST_TASK)
+
+# Run tests for all targets
+test-all:
+	$(GRADLE) allTests
 
 # Linting
 lint:
-	@./gradlew --console=plain detekt ktlintCheck
+	$(GRADLE) detekt ktlintCheck
 
 # Formatting
 format:
-	@./gradlew --console=plain ktlintFormat
+	$(GRADLE) ktlintFormat
 
 # Cleanup
 clean:
-	@./gradlew --console=plain clean
+	$(GRADLE) clean
 	@rm -f build/mac_os_app_icon.png
 
 # Run native (assuming macosArm64 as primary on Apple Silicon)
 run-native:
-	@./gradlew --console=plain -q runReleaseExecutableMacosArm64 -Pargs="$(ARGS)"
+	$(GRADLE) -q runReleaseExecutableMacosArm64 -Pargs="$(ARGS)"
 
 # Run wasm (node.js required for console run)
 run-wasm:
-	@./gradlew --console=plain wasmJsBrowserRun
+	$(GRADLE) wasmJsBrowserRun
 
 # Help message
 help:
 	@echo "Available commands:"
 	@echo "  make build       - Build the project"
-	@echo "  make test        - Run all tests"
+	@echo "  make test        - Run tests for the current host platform (fastest)"
+	@echo "  make test-all    - Run tests for all targets (multiplatform)"
 	@echo "  make clean       - Clean build artifacts"
 	@echo "  make run-native  - Run the native desktop tool (usage: make run-native ARGS='pdf-compress input.pdf')"
 	@echo "  make debug [ARGS=\"...\"]  - Run the native macOS tool with verbose logging"
