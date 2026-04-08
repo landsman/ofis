@@ -1,4 +1,4 @@
-package ofis.components
+package ofis.components.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -15,7 +15,7 @@ fun DotGridBackground() {
         val spacing = 20.dp.toPx()
         val dotSize = 2.dp.toPx()
         val dotColor = Color(0xFFD9D9D9)
-        
+
         for (x in 0..(size.width / spacing).toInt()) {
             for (y in 0..(size.height / spacing).toInt()) {
                 drawCircle(

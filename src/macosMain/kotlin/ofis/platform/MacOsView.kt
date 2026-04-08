@@ -1,10 +1,13 @@
 package ofis.platform
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.window.Window
 import ofis.App
 import platform.AppKit.NSApplication
+import platform.AppKit.NSFloatingWindowLevel
 import platform.AppKit.NSImage
 import platform.AppKit.NSOpenPanel
+import platform.AppKit.NSWindow
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileSystemFreeSize
 import platform.Foundation.NSNumber
@@ -44,7 +47,16 @@ actual fun platformGui() {
     }
 
     // Sets up a Compose-backed NSWindow (non-blocking)
-    Window("Ofis") { App() }
+    Window("Ofis") {
+        App()
+        LaunchedEffect(Unit) {
+            app.activateIgnoringOtherApps(true)
+            app.windows.forEach { window ->
+                (window as? NSWindow)?.makeKeyAndOrderFront(null)
+                (window as? NSWindow)?.setLevel(NSFloatingWindowLevel)
+            }
+        }
+    }
 
     app.activateIgnoringOtherApps(true)
     app.run() // AppKit event loop — blocks until app quits

@@ -1,6 +1,6 @@
 package ofis.tool.pdf.compress
 
-import ofis.ToolRegistry
+import ofis.tool.ToolRegistry
 import ofis.config.Logger
 import ofis.tool.Tool
 import ofis.tool.ToolBox

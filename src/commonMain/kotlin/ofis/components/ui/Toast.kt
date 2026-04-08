@@ -1,4 +1,4 @@
-package ofis.components.detail
+package ofis.components.ui
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background

@@ -5,10 +5,11 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ofis.components.DotGridBackground
-import ofis.components.ToolDetailScreen
+import ofis.components.ui.DotGridBackground
+import ofis.components.pdf.PdfDetailScreen
 import ofis.components.ToolSelectionScreen
 import ofis.tool.Tool
+import ofis.tool.ToolRegistry
 
 @Composable
 fun App() {
@@ -22,7 +23,7 @@ fun App() {
                 if (currentTool == null) {
                     ToolSelectionScreen(onToolSelect = { currentTool = it })
                 } else {
-                    ToolDetailScreen(tool = currentTool!!, onBack = { currentTool = null })
+                    PdfDetailScreen(tool = currentTool!!, onBack = { currentTool = null })
                 }
             }
         }

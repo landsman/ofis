@@ -1,4 +1,4 @@
-package ofis.components.detail
+package ofis.components.pdf
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ofis.components.detail.Badge
+import ofis.components.ui.Badge
 import ofis.tool.pdf.compress.CompressionProfile
 
 @Composable
@@ -31,11 +31,7 @@ fun ProfileSelector(
     )
     Spacer(modifier = Modifier.height(12.dp))
     CompressionProfile.entries.forEach { profile ->
-        ProfileOption(
-            profile = profile,
-            selected = profile == selected,
-            onClick = { onSelect(profile) }
-        )
+        ProfileOption(profile = profile, selected = profile == selected, onClick = { onSelect(profile) })
         Spacer(modifier = Modifier.height(12.dp))
     }
 }
@@ -75,12 +71,7 @@ private fun ProfileOption(
                     Badge(text = "Recommended")
                 }
             }
-            Text(
-                text = profile.description,
-                color = Color.Gray,
-                fontSize = 14.sp,
-                lineHeight = 20.sp
-            )
+            Text(text = profile.description, color = Color.Gray, fontSize = 14.sp, lineHeight = 20.sp)
         }
     }
 }

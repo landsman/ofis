@@ -19,7 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ofis.tool.Tool
-import ofis.ToolRegistry
+import ofis.tool.ToolRegistry
+import ofis.components.ui.AppButton
 
 @Composable
 fun ToolSelectionScreen(onToolSelect: (Tool) -> Unit) {

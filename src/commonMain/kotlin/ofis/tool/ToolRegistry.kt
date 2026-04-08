@@ -1,6 +1,4 @@
-package ofis
-
-import ofis.tool.Tool
+package ofis.tool
 import ofis.tool.pdf.compress.registerPdfTool
 
 object ToolRegistry {
