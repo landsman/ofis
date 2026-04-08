@@ -1,4 +1,6 @@
 package ofis.tool.pdf.compress
+import ofis.tool.pdf.compress.model.*
+import ofis.tool.pdf.compress.service.PdfCompressionService
 
 import ofis.tool.ToolRegistry
 import ofis.config.Logger

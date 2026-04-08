@@ -1,4 +1,4 @@
-package ofis.components.pdf
+package ofis.tool.pdf.compress.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -28,7 +28,7 @@ import ofis.platform.fileSystem
 import ofis.platform.pickFile
 import ofis.platform.saveFile
 import ofis.tool.Tool
-import ofis.tool.pdf.compress.CompressionProfile
+import ofis.tool.pdf.compress.model.CompressionProfile
 import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
 

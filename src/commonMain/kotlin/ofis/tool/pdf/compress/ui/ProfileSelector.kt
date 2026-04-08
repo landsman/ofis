@@ -1,4 +1,4 @@
-package ofis.components.pdf
+package ofis.tool.pdf.compress.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ofis.components.ui.Badge
-import ofis.tool.pdf.compress.CompressionProfile
+import ofis.tool.pdf.compress.model.CompressionProfile
 
 @Composable
 fun ProfileSelector(

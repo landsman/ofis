@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val TOAST_DURATION_MS = 3_500L
 
@@ -22,7 +23,7 @@ data class ToastData(val message: String, val isSuccess: Boolean)
 fun ToastHost(toast: ToastData?, onDismiss: () -> Unit) {
     LaunchedEffect(toast) {
         if (toast != null) {
-            delay(TOAST_DURATION_MS)
+            delay(TOAST_DURATION_MS.milliseconds)
             onDismiss()
         }
     }

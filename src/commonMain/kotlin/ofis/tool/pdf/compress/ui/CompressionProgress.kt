@@ -1,4 +1,4 @@
-package ofis.components.pdf
+package ofis.tool.pdf.compress.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

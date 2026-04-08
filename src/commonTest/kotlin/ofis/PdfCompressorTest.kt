@@ -11,7 +11,7 @@ class PdfCompressorTest {
     fun testPdfCompressorProperties() {
         val compressor = PdfCompressor()
         assertEquals(ToolBox.PDF_COMPRESSOR, compressor.name)
-        assertEquals("Compresses PDF files", compressor.description)
+        assertEquals("Reduce file size while keeping your document readable.", compressor.description)
     }
 
     @Test

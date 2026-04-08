@@ -6,7 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ofis.components.ui.DotGridBackground
-import ofis.components.pdf.PdfDetailScreen
+import ofis.tool.pdf.compress.ui.PdfDetailScreen
 import ofis.components.ToolSelectionScreen
 import ofis.tool.Tool
 import ofis.tool.ToolRegistry
