@@ -2,12 +2,13 @@ package ofis
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import ofis.ToolBox
 
 class PdfCompressorTest {
     @Test
     fun testPdfCompressorProperties() {
         val compressor = PdfCompressor()
-        assertEquals("pdf-compress", compressor.name)
+        assertEquals(ToolBox.PDF_COMPRESSOR, compressor.name)
         assertEquals("Compresses PDF files", compressor.description)
     }
 

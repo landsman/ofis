@@ -4,12 +4,12 @@ import okio.Path.Companion.toPath
 import okio.buffer
 
 class PdfCompressor : Tool {
-    override val name = "pdf-compress"
+    override val name = ToolBox.PDF_COMPRESSOR
     override val description = "Compresses PDF files"
 
     override fun run(args: List<String>) {
         if (args.isEmpty()) {
-            Logger.info("Usage: pdf-compress <input.pdf> [output.pdf] [--level <1-9>]")
+            Logger.info("Usage: ${ToolBox.PDF_COMPRESSOR} <input.pdf> [output.pdf] [--level <1-9>]")
             return
         }
         val input = args[0]

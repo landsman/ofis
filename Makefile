@@ -2,7 +2,7 @@
 
 # Default target
 build: lint
-	./gradlew build
+	@./gradlew --console=plain build
 
 # Debug mode for macOS
 debug: generate-icon
@@ -24,20 +24,20 @@ prepare-macos-bin:
 
 # Testing
 test:
-	gradle allTests
+	@./gradlew --console=plain allTests
 
 # Linting
 lint:
-	./gradlew detekt ktlintCheck
+	@./gradlew --console=plain detekt ktlintCheck
 
 # Formatting
 format:
-	./gradlew ktlintFormat
+	@./gradlew --console=plain ktlintFormat
 
 # Cleanup
 clean:
-	gradle clean
-	rm -f build/mac_os_app_icon.png
+	@./gradlew --console=plain clean
+	@rm -f build/mac_os_app_icon.png
 
 # Run native (assuming macosArm64 as primary on Apple Silicon)
 run-native:
@@ -45,7 +45,7 @@ run-native:
 
 # Run wasm (node.js required for console run)
 run-wasm:
-	gradle wasmJsBrowserRun
+	@./gradlew --console=plain wasmJsBrowserRun
 
 # Help message
 help:
