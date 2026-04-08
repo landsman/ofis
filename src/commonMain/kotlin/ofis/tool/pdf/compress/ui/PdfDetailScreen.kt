@@ -1,11 +1,27 @@
 package ofis.tool.pdf.compress.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,11 +33,6 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ofis.components.ui.AppButton
-import ofis.components.ui.FileDropZone
-import ofis.components.ui.LogView
-import ofis.components.ui.ToastData
-import ofis.components.ui.ToastHost
 import ofis.config.Logger
 import ofis.platform.availableDiskSpace
 import ofis.platform.fileSystem
@@ -29,6 +40,11 @@ import ofis.platform.pickFile
 import ofis.platform.saveFile
 import ofis.tool.Tool
 import ofis.tool.pdf.compress.model.CompressionProfile
+import ofis.ui.system.AppButton
+import ofis.ui.system.FileDropZone
+import ofis.ui.system.LogView
+import ofis.ui.system.ToastData
+import ofis.ui.system.ToastHost
 import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
 
@@ -100,6 +116,7 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
                 FileDropZone(
                     selectedFilePath = selectedFilePath,
                     selectedFileSize = selectedFileSize,
+                    placeholder = "Tap to select a PDF",
                     onSelect = {
                         pickFile(listOf("pdf"))?.let {
                             selectedFilePath = it

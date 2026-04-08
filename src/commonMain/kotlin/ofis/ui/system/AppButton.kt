@@ -1,4 +1,4 @@
-package ofis.components.ui
+package ofis.ui.system
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.RowScope

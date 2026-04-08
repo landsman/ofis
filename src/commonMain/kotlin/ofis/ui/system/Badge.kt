@@ -1,4 +1,4 @@
-package ofis.components.ui
+package ofis.ui.system
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding

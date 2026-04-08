@@ -5,8 +5,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ofis.components.ui.DotGridBackground
-import ofis.components.ToolSelectionScreen
+import ofis.ui.system.DotGridBackground
+import ofis.ui.view.tool_selection.ToolSelectionView
 import ofis.tool.Tool
 
 @Composable
@@ -19,7 +19,7 @@ fun App() {
             
             Column(modifier = Modifier.fillMaxSize().padding(40.dp)) {
                 if (currentTool == null) {
-                    ToolSelectionScreen(onToolSelect = { currentTool = it })
+                    ToolSelectionView(onToolSelect = { currentTool = it })
                 } else {
                     currentTool!!.Screen(onBack = { currentTool = null })
                 }

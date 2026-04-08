@@ -1,9 +1,17 @@
-package ofis.components.ui
+package ofis.ui.system
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -24,6 +32,7 @@ import ofis.utils.format.formatSize
 fun FileDropZone(
     selectedFilePath: String?,
     selectedFileSize: Long?,
+    placeholder: String,
     onSelect: () -> Unit,
     onClear: () -> Unit,
 ) {
@@ -41,7 +50,7 @@ fun FileDropZone(
         if (selectedFilePath == null) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = "📄", fontSize = 40.sp, modifier = Modifier.padding(bottom = 8.dp))
-                Text("Tap to select a PDF", color = Color(0xFF555555), fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                Text(placeholder, color = Color(0xFF555555), fontSize = 15.sp, fontWeight = FontWeight.Medium)
                 Text("or drag and drop here", color = Color(0xFFAAAAAA), fontSize = 13.sp)
             }
         } else {

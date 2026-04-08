@@ -42,7 +42,7 @@ actual fun platformGui() {
     val app = NSApplication.sharedApplication()
 
     // Set dock icon from generated PNG (produced by `make icon`)
-    NSImage(contentsOfFile = "build/mac_os_app_icon.png")?.let {
+    NSImage(contentsOfFile = "build/mac_os_app_icon.png").let {
         app.setApplicationIconImage(it)
     }
 
