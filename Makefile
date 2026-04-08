@@ -1,4 +1,4 @@
-.PHONY: build test test-all clean run-native run-wasm help debug gui generate-icon prepare-macos-bin lint format
+.PHONY: build test test-all clean run-native run-wasm help debug gui generate-icon lint format
 
 # Detect OS and Architecture for fast testing
 OS := $(shell uname -s)
@@ -39,25 +39,38 @@ build: lint
 debug: generate-icon
 	$(GRADLE) -q runDebugExecutable$(BIN_PATH_SUFFIX) -Pargs="--debug $(ARGS)"
 
-# GUI mode for macOS (Release)
-gui: generate-icon prepare-macos-bin
-	./build/bin/$(BIN_PATH)/releaseExecutable/Ofis --gui
-
-# Fast GUI mode for development (Debug)
-gui-dev: generate-icon
-	$(GRADLE) linkDebugExecutable$(BIN_PATH_SUFFIX)
-	@ln -sf Ofis.kexe build/bin/$(BIN_PATH)/debugExecutable/Ofis
-	./build/bin/$(BIN_PATH)/debugExecutable/Ofis --gui
+# GUI mode for macOS (Debug, fast)
+gui: generate-icon
+	$(GRADLE) -q runDebugExecutable$(BIN_PATH_SUFFIX) -Pargs="--gui" \
+		-x convertXmlValueResourcesForCommonMain \
+		-x convertXmlValueResourcesForMacosArm64Main \
+		-x convertXmlValueResourcesForMacosX64Main \
+		-x convertXmlValueResourcesForMacosMain \
+		-x convertXmlValueResourcesForNativeMain \
+		-x copyNonXmlValueResourcesForCommonMain \
+		-x copyNonXmlValueResourcesForMacosArm64Main \
+		-x copyNonXmlValueResourcesForMacosX64Main \
+		-x copyNonXmlValueResourcesForMacosMain \
+		-x copyNonXmlValueResourcesForNativeMain \
+		-x generateExpectResourceCollectorsForCommonMain \
+		-x generateComposeResClass \
+		-x prepareComposeResourcesTaskForCommonMain \
+		-x prepareComposeResourcesTaskForMacosArm64Main \
+		-x prepareComposeResourcesTaskForMacosX64Main \
+		-x prepareComposeResourcesTaskForMacosMain \
+		-x prepareComposeResourcesTaskForNativeMain \
+		-x generateResourceAccessorsForCommonMain \
+		-x generateResourceAccessorsForMacosArm64Main \
+		-x generateResourceAccessorsForMacosX64Main \
+		-x generateResourceAccessorsForMacosMain \
+		-x generateResourceAccessorsForNativeMain \
+		-x generateActualResourceCollectorsForMacosArm64Main \
+		-x generateActualResourceCollectorsForMacosX64Main
 
 # Icon generation
 generate-icon:
 	@mkdir -p build
 	@rsvg-convert -w 1024 -h 1024 src/macosMain/resources/icon.svg -o build/mac_os_app_icon.png || echo "Warning: rsvg-convert not found. Application will lack an icon."
-
-# Prepare macOS executable name (symlink without .kexe for proper Dock title)
-prepare-macos-bin:
-	$(GRADLE) -q linkReleaseExecutable$(BIN_PATH_SUFFIX)
-	@ln -sf Ofis.kexe build/bin/$(BIN_PATH)/releaseExecutable/Ofis
 
 # Testing (host platform only for speed)
 test:
@@ -97,8 +110,7 @@ help:
 	@echo "  make clean       - Clean build artifacts"
 	@echo "  make run-native  - Run the native desktop tool (usage: make run-native ARGS='pdf-compress input.pdf')"
 	@echo "  make debug [ARGS=\"...\"]  - Run the native macOS tool with verbose logging"
-	@echo "  make gui                  - Run the native macOS tool with a minimalistic GUI (Release)"
-	@echo "  make gui-dev              - Run the native macOS tool with a minimalistic GUI (Debug, fast)"
+	@echo "  make gui                  - Run the native macOS tool with a minimalistic GUI (fast)"
 	@echo "  make generate-icon        - Convert SVG icon to PNG for the application"
 	@echo "  make lint                 - Run static analysis and style checks"
 	@echo "  make format               - Automatically fix code style issues"

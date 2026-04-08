@@ -2,8 +2,7 @@ package ofis
 
 import androidx.compose.ui.window.Window
 import platform.AppKit.NSApplication
-import platform.AppKit.NSApplicationDelegateProtocol
-import platform.darwin.NSObject
+import platform.AppKit.NSApplicationActivationPolicy
 
 actual fun getGuiNavigator(): GuiNavigator = object : GuiNavigator {
     override fun showToolSelection() {}
@@ -12,10 +11,10 @@ actual fun getGuiNavigator(): GuiNavigator = object : GuiNavigator {
 
 actual fun platformGui() {
     val app = NSApplication.sharedApplication()
-    Window(
-        title = "Ofis"
-    ) {
+    app.setActivationPolicy(NSApplicationActivationPolicy.NSApplicationActivationPolicyRegular)
+    Window(title = "Ofis") {
         App()
     }
+    app.activateIgnoringOtherApps(true)
     app.run()
 }
