@@ -7,6 +7,6 @@ import ofis.tool.pdf.compress.model.ProcessResult
  * Windows stub — Win32 CreateProcessW implementation needed.
  * TODO: implement with CreateProcessW + anonymous pipes.
  */
-internal actual fun runProcessInternal(command: NativeCommand): ProcessResult {
+actual fun runProcess(command: NativeCommand): ProcessResult {
     error("Process execution not yet implemented for Windows. Contribute a CreateProcessW runner.")
 }

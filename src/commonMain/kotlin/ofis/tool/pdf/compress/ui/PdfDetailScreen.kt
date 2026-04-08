@@ -118,11 +118,13 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
                     selectedFileSize = selectedFileSize,
                     placeholder = "Tap to select a PDF",
                     onSelect = {
-                        pickFile(listOf("pdf"))?.let {
-                            selectedFilePath = it
-                            selectedFileSize = fileSystem.metadataOrNull(it.toPath())?.size
-                            resizeInfo = null
-                            logs = ""
+                        scope.launch {
+                            pickFile(listOf("pdf"))?.let {
+                                selectedFilePath = it
+                                selectedFileSize = fileSystem.metadataOrNull(it.toPath())?.size
+                                resizeInfo = null
+                                logs = ""
+                            }
                         }
                     },
                     onClear = {
@@ -191,9 +193,9 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
                     if (outputFilePath != null) {
                         AppButton(
                             onClick = {
-                                val dest = saveFile(suggestedSaveName ?: "compressed.pdf")
-                                if (dest != null && outputFilePath != null) {
-                                    scope.launch {
+                                scope.launch {
+                                    val dest = saveFile(suggestedSaveName ?: "compressed.pdf")
+                                    if (dest != null && outputFilePath != null) {
                                         withContext(Dispatchers.Default) {
                                             val srcPath = outputFilePath!!.toPath()
                                             val destPath = dest.toPath()

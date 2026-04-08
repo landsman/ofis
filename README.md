@@ -36,11 +36,6 @@ For consistency, all common tasks should be performed using `make` commands. The
   make debug ARGS="pdf-compress input.pdf"
   ```
 
-- **Run Wasm version (Browser):**
-  ```bash
-  make run-wasm
-  ```
-
 - **Code Quality:**
   ```bash
   make lint    # Run static analysis

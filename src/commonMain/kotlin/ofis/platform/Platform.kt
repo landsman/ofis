@@ -10,9 +10,9 @@ expect fun platformGui()
 
 expect fun exitProcess(status: Int)
 
-expect fun pickFile(allowedExtensions: List<String>): String?
+expect suspend fun pickFile(allowedExtensions: List<String>): String?
 
-expect fun saveFile(suggestedName: String): String?
+expect suspend fun saveFile(suggestedName: String): String?
 
 /** Returns available bytes on the volume containing [dirPath], or [Long.MAX_VALUE] if unknown. */
 expect fun availableDiskSpace(dirPath: String): Long

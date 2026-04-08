@@ -2,6 +2,7 @@ package ofis.platform
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.window.Window
+import kotlinx.coroutines.suspendCancellableCoroutine
 import ofis.App
 import platform.AppKit.NSApplication
 import platform.AppKit.NSFloatingWindowLevel
@@ -11,6 +12,7 @@ import platform.AppKit.NSWindow
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileSystemFreeSize
 import platform.Foundation.NSNumber
+import kotlin.coroutines.resume
 
 actual fun availableDiskSpace(dirPath: String): Long {
     val attrs = NSFileManager.defaultManager.attributesOfFileSystemForPath(dirPath, error = null)
@@ -18,23 +20,31 @@ actual fun availableDiskSpace(dirPath: String): Long {
     return free?.longValue ?: Long.MAX_VALUE
 }
 
-actual fun saveFile(suggestedName: String): String? {
+actual suspend fun saveFile(suggestedName: String): String? = suspendCancellableCoroutine { continuation ->
     val panel = platform.AppKit.NSSavePanel.savePanel()
     panel.setNameFieldStringValue(suggestedName)
-    return if (panel.runModal() == 1L /* NSModalResponseOK */) panel.URL()?.path else null
+    panel.beginWithCompletionHandler { response ->
+        if (response == 1L /* NSModalResponseOK */) {
+            continuation.resume(panel.URL()?.path)
+        } else {
+            continuation.resume(null)
+        }
+    }
 }
 
-actual fun pickFile(allowedExtensions: List<String>): String? {
+actual suspend fun pickFile(allowedExtensions: List<String>): String? = suspendCancellableCoroutine { continuation ->
     val panel = NSOpenPanel.openPanel()
     panel.setCanChooseFiles(true)
     panel.setCanChooseDirectories(false)
     panel.setAllowsMultipleSelection(false)
     // TODO: filter by allowedExtensions once SDK binding is clarified
 
-    return if (panel.runModal() == 1L /* NSModalResponseOK */) {
-        panel.URL()?.path
-    } else {
-        null
+    panel.beginWithCompletionHandler { response ->
+        if (response == 1L /* NSModalResponseOK */) {
+            continuation.resume(panel.URL()?.path)
+        } else {
+            continuation.resume(null)
+        }
     }
 }
 
