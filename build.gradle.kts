@@ -81,34 +81,28 @@ kotlin {
     linuxX64 {
         binaries.executable {
             baseName = "Ofis"
-            entryPoint = "ofis.main"
+            entryPoint = "ofis.platform.main"
         }
     }
     macosX64 {
         binaries.executable {
             baseName = "Ofis"
-            entryPoint = "ofis.main"
+            entryPoint = "ofis.platform.main"
         }
     }
     macosArm64 {
         binaries.executable {
             baseName = "Ofis"
-            entryPoint = "ofis.main"
+            entryPoint = "ofis.platform.main"
         }
     }
     mingwX64 {
         binaries.executable {
             baseName = "Ofis"
-            entryPoint = "ofis.main"
+            entryPoint = "ofis.platform.main"
         }
     }
 
-    // Web target
-    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-        binaries.executable()
-    }
 
     sourceSets {
         all {
@@ -152,6 +146,7 @@ kotlin {
         val macosX64Main by getting { dependsOn(macosMain) }
         val macosArm64Main by getting { dependsOn(macosMain) }
         val mingwX64Main by getting { dependsOn(mingwMain) }
+
 
         val linuxX64Test by getting { dependsOn(nativeTest) }
         val macosX64Test by getting { dependsOn(nativeTest) }
@@ -203,7 +198,6 @@ tasks.register("analyzeUnused") {
         "detektLinuxX64Main",
         "detektMacosX64Main",
         "detektMacosArm64Main",
-        "detektMingwX64Main",
-        "detektWasmJsMain"
+        "detektMingwX64Main"
     )
 }

@@ -1,5 +1,6 @@
 package ofis.platform
 
+import ofis.commonMain
 import okio.FileSystem
 import platform.posix.exit
 

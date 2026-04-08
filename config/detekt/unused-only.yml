@@ -1,0 +1,29 @@
+build:
+  maxIssues: 0
+
+config:
+  validation: true
+
+processors:
+  active: false
+
+console-reports:
+  active: true
+
+output-reports:
+  active: true
+  exclude: []
+
+style:
+  active: true
+  UnusedImports:
+    active: true
+
+potential-bugs:
+  active: true
+  UnusedPrivateClass:
+    active: true
+  UnusedPrivateMember:
+    active: true
+  UnusedParameter:
+    active: true

@@ -2,33 +2,24 @@ package ofis
 
 import ofis.config.GlobalConfig
 import ofis.config.Logger
-import ofis.platform.exitProcess
-import ofis.platform.platformGui
 
-fun commonMain(argList: List<String>) {
+fun commonMain(argList: List<String>): Int {
     val debugFlag = "--debug"
     val hasDebug = argList.contains(debugFlag)
     GlobalConfig.debug = hasDebug
-
-    val guiFlag = "--gui"
-    if (argList.contains(guiFlag)) {
-        platformGui()
-        return
-    }
 
     if (argList.isEmpty()) {
         println("Welcome to Ofis!")
         println("Available tools:")
         ToolRegistry.list().forEach { println("- ${it.name}: ${it.description}") }
-        return
+        return 0
     }
 
-    val filteredArgs = argList.filter { it != debugFlag && it != guiFlag }
+    val filteredArgs = argList.filter { it != debugFlag && it != "--gui" }
 
     if (filteredArgs.isEmpty()) {
         println("Error: No tool specified.")
-        exitProcess(1)
-        return
+        return 1
     }
 
     val toolName = filteredArgs[0]
@@ -38,8 +29,9 @@ fun commonMain(argList: List<String>) {
     if (tool != null) {
         Logger.debug("Running tool: $toolName with args: $toolArgs")
         tool.run(toolArgs)
+        return 0
     } else {
         println("Unknown tool: $toolName")
-        exitProcess(1)
+        return 1
     }
 }

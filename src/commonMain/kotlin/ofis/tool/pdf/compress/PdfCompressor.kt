@@ -1,13 +1,12 @@
 package ofis.tool.pdf.compress
 
-import ofis.config.Logger
 import ofis.PdfParser
 import ofis.ToolRegistry
+import ofis.config.Logger
 import ofis.platform.fileSystem
-import ofis.utils.format.formatSize
 import ofis.tool.Tool
 import ofis.tool.ToolBox
-
+import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
 import okio.buffer
 
@@ -22,13 +21,14 @@ class PdfCompressor : Tool {
         }
         val input = args[0]
         val output = getOutputPath(input, args.getOrNull(1))
-        
+
         val levelIndex = args.indexOf("--level")
-        val level = if (levelIndex != -1 && levelIndex + 1 < args.size) {
-            args[levelIndex + 1].toIntOrNull() ?: 5
-        } else {
-            5
-        }
+        val level =
+            if (levelIndex != -1 && levelIndex + 1 < args.size) {
+                args[levelIndex + 1].toIntOrNull() ?: 5
+            } else {
+                5
+            }
 
         Logger.info("Compressing $input to $output with level $level...")
 
@@ -89,12 +89,12 @@ class PdfCompressor : Tool {
             }
 
             val outputSize = fs.metadata(outputPath).size ?: 0L
-            val reduction = if (inputSize > 0) {
-                ((inputSize - outputSize).toDouble() / inputSize.toDouble() * 100).toInt()
-            } else {
-                0
-            }
-
+            val reduction =
+                if (inputSize > 0) {
+                    ((inputSize - outputSize).toDouble() / inputSize.toDouble() * 100).toInt()
+                } else {
+                    0
+                }
 
             Logger.info("Saved compressed (not really) PDF to $output")
             Logger.info("RESIZE_INFO: ${formatSize(inputSize)} -> ${formatSize(outputSize)} ($reduction%)")

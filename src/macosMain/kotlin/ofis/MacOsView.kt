@@ -1,26 +1,14 @@
 package ofis.platform
 
-import androidx.compose.ui.window.Window
-import kotlinx.cinterop.BetaInteropApi
-import ofis.App
-import ofis.tool.Tool
-import platform.AppKit.NSApplication
-import platform.AppKit.NSApplicationActivationPolicy
-import platform.AppKit.NSImage
-import platform.AppKit.NSOpenPanel
-import platform.AppKit.NSApplicationDelegateProtocol
-import platform.darwin.NSObject
-
-actual fun getGuiNavigator(): GuiNavigator = object : GuiNavigator {
-    override fun showToolSelection() {}
-    override fun showTool(tool: Tool) {}
-}
+import platform.AppKit.*
+import platform.CoreGraphics.CGRectMake
 
 actual fun pickFile(allowedExtensions: List<String>): String? {
     val panel = NSOpenPanel.openPanel()
     panel.setCanChooseFiles(true)
     panel.setCanChooseDirectories(false)
     panel.setAllowsMultipleSelection(false)
+    panel.setAllowedFileTypes(allowedExtensions)
 
     return if (panel.runModal() == 1L /* NSModalResponseOK */) {
         val url = panel.URL()
@@ -30,32 +18,20 @@ actual fun pickFile(allowedExtensions: List<String>): String? {
     }
 }
 
-@OptIn(BetaInteropApi::class)
-@Suppress("CONFLICTING_OVERLOADS")
-class AppDelegate : NSObject(), NSApplicationDelegateProtocol {
-    override fun applicationShouldTerminateAfterLastWindowClosed(sender: NSApplication): Boolean {
-        return true
-    }
-}
-
-private var delegate: AppDelegate? = null
-
 actual fun platformGui() {
-    println("Launching GUI...")
     val app = NSApplication.sharedApplication()
-    delegate = AppDelegate()
-    app.delegate = delegate
-    app.setActivationPolicy(NSApplicationActivationPolicy.NSApplicationActivationPolicyRegular)
 
-    val iconPath = "build/mac_os_app_icon.png"
-    val icon = NSImage(byReferencingFile = iconPath)
-    if (icon.isValid()) {
-        app.setApplicationIconImage(icon)
-    }
+    val styleMask = (NSWindowStyleMaskTitled or NSWindowStyleMaskClosable or NSWindowStyleMaskResizable)
+    val window = NSWindow(
+        contentRect = CGRectMake(0.0, 0.0, 1000.0, 700.0),
+        styleMask = styleMask,
+        backing = NSBackingStoreBuffered,
+        defer = false
+    )
+    window.title = "Ofis"
 
-    Window(title = "Ofis") {
-        App()
-    }
+    window.center()
+    window.makeKeyAndOrderFront(null)
     app.activateIgnoringOtherApps(true)
     app.run()
 }
