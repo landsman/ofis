@@ -5,6 +5,7 @@ import okio.FileSystem
 interface Tool {
     val name: String
     val description: String
+
     fun run(args: List<String>)
 }
 
@@ -37,7 +38,16 @@ object ToolRegistry {
 expect val fileSystem: FileSystem
 
 expect fun platformMain(args: List<String>)
+
 expect fun platformGui()
+
+interface GuiNavigator {
+    fun showToolSelection()
+    fun showTool(tool: Tool)
+}
+
+expect fun getGuiNavigator(): GuiNavigator
+
 expect fun exitProcess(status: Int)
 
 object GlobalConfig {
@@ -46,10 +56,12 @@ object GlobalConfig {
 
 object Logger {
     var onLog: ((String) -> Unit)? = null
+
     fun info(msg: String) {
         println(msg)
         onLog?.invoke(msg)
     }
+
     fun debug(msg: String) {
         if (GlobalConfig.debug) {
             println("[DEBUG] $msg")
@@ -62,7 +74,7 @@ fun commonMain(argList: List<String>) {
     val debugFlag = "--debug"
     val hasDebug = argList.contains(debugFlag)
     GlobalConfig.debug = hasDebug
-    
+
     val guiFlag = "--gui"
     if (argList.contains(guiFlag)) {
         platformGui()
@@ -75,7 +87,7 @@ fun commonMain(argList: List<String>) {
         ToolRegistry.list().forEach { println("- ${it.name}: ${it.description}") }
         return
     }
-    
+
     val filteredArgs = argList.filter { it != debugFlag && it != guiFlag }
 
     if (filteredArgs.isEmpty()) {

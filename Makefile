@@ -6,7 +6,7 @@ build: lint
 
 # Debug mode for macOS
 debug: generate-icon
-	./gradlew runReleaseExecutableMacosArm64 -Pargs="--debug $(ARGS)"
+	@./gradlew --console=plain -q runReleaseExecutableMacosArm64 -Pargs="--debug $(ARGS)"
 
 # GUI mode for macOS
 gui: generate-icon prepare-macos-bin
@@ -19,8 +19,8 @@ generate-icon:
 
 # Prepare macOS executable name (symlink without .kexe for proper Dock title)
 prepare-macos-bin:
-	./gradlew linkReleaseExecutableMacosArm64
-	ln -sf Ofis.kexe build/bin/macosArm64/releaseExecutable/Ofis
+	@./gradlew --console=plain -q linkReleaseExecutableMacosArm64
+	@ln -sf Ofis.kexe build/bin/macosArm64/releaseExecutable/Ofis
 
 # Testing
 test:
@@ -41,7 +41,7 @@ clean:
 
 # Run native (assuming macosArm64 as primary on Apple Silicon)
 run-native:
-	./gradlew runReleaseExecutableMacosArm64 -Pargs="$(ARGS)"
+	@./gradlew --console=plain -q runReleaseExecutableMacosArm64 -Pargs="$(ARGS)"
 
 # Run wasm (node.js required for console run)
 run-wasm:

@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.Exec
+
 plugins {
     kotlin("multiplatform") version "2.1.10"
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
@@ -102,7 +104,7 @@ kotlin {
                 if (this is org.jetbrains.kotlin.gradle.plugin.mpp.Executable) {
                     val runTaskName = "run${name.replaceFirstChar { it.uppercase() }}${targetName.replaceFirstChar { it.uppercase() }}"
                     tasks.matching { it.name == runTaskName }.configureEach {
-                        val runTask = this as? org.gradle.api.tasks.Exec
+                        val runTask = this as? Exec
                         runTask?.let {
                             val argsProperty = project.findProperty("args") as? String
                             if (argsProperty != null) {

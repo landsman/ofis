@@ -2,22 +2,61 @@ package ofis
 
 import okio.*
 
-actual val fileSystem: FileSystem = object : FileSystem() {
-    override fun atomicMove(source: Path, target: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
-    override fun canonicalize(path: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
-    override fun createDirectory(dir: Path, mustCreate: Boolean) = throw UnsupportedOperationException("Wasm filesystem not supported")
-    override fun createSymlink(source: Path, target: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
-    override fun delete(path: Path, mustExist: Boolean) = throw UnsupportedOperationException("Wasm filesystem not supported")
-    override fun list(dir: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
-    override fun listRecursively(dir: Path, followSymlinks: Boolean) = throw UnsupportedOperationException("Wasm filesystem not supported")
-    override fun metadataOrNull(path: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
-    override fun openReadOnly(file: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
-    override fun openReadWrite(file: Path, mustCreate: Boolean, mustExist: Boolean) = throw UnsupportedOperationException("Wasm filesystem not supported")
-    override fun sink(file: Path, append: Boolean) = throw UnsupportedOperationException("Wasm filesystem not supported")
-    override fun source(file: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
-    override fun appendingSink(file: Path, mustExist: Boolean) = throw UnsupportedOperationException("Wasm filesystem not supported")
-    override fun listOrNull(dir: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
-}
+actual val fileSystem: FileSystem =
+    object : FileSystem() {
+        override fun atomicMove(
+            source: Path,
+            target: Path,
+        ) = throw UnsupportedOperationException("Wasm filesystem not supported")
+
+        override fun canonicalize(path: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
+
+        override fun createDirectory(
+            dir: Path,
+            mustCreate: Boolean,
+        ) = throw UnsupportedOperationException("Wasm filesystem not supported")
+
+        override fun createSymlink(
+            source: Path,
+            target: Path,
+        ) = throw UnsupportedOperationException("Wasm filesystem not supported")
+
+        override fun delete(
+            path: Path,
+            mustExist: Boolean,
+        ) = throw UnsupportedOperationException("Wasm filesystem not supported")
+
+        override fun list(dir: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
+
+        override fun listRecursively(
+            dir: Path,
+            followSymlinks: Boolean,
+        ) = throw UnsupportedOperationException("Wasm filesystem not supported")
+
+        override fun metadataOrNull(path: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
+
+        override fun openReadOnly(file: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
+
+        override fun openReadWrite(
+            file: Path,
+            mustCreate: Boolean,
+            mustExist: Boolean,
+        ) = throw UnsupportedOperationException("Wasm filesystem not supported")
+
+        override fun sink(
+            file: Path,
+            append: Boolean,
+        ) = throw UnsupportedOperationException("Wasm filesystem not supported")
+
+        override fun source(file: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
+
+        override fun appendingSink(
+            file: Path,
+            mustExist: Boolean,
+        ) = throw UnsupportedOperationException("Wasm filesystem not supported")
+
+        override fun listOrNull(dir: Path) = throw UnsupportedOperationException("Wasm filesystem not supported")
+    }
 
 actual fun platformMain(args: List<String>) {
     commonMain(args)
@@ -26,6 +65,8 @@ actual fun platformMain(args: List<String>) {
 actual fun platformGui() {
     println("GUI is not supported on Wasm/Browser yet.")
 }
+
+actual fun getGuiNavigator(): GuiNavigator = throw UnsupportedOperationException("GUI is not supported on Wasm/Browser yet.")
 
 actual fun exitProcess(status: Int) {
     // In browser, we cannot exit a process.

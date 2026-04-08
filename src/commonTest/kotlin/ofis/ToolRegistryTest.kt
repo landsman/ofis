@@ -1,8 +1,8 @@
 package ofis
 
 import kotlin.test.Test
-import kotlin.test.assertTrue
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class ToolRegistryTest {
     @Test
@@ -11,7 +11,7 @@ class ToolRegistryTest {
         // Since we are using top-level initialization in PdfCompressor.kt,
         // it might not be initialized yet unless something references it.
         // Let's check.
-        
+
         val pdfTool = ToolRegistry.get("pdf-compress")
         assertNotNull(pdfTool, "PdfCompressor should be registered in ToolRegistry")
     }

@@ -1,7 +1,6 @@
 package ofis
 
 import okio.FileSystem
-
 import platform.posix.exit
 
 actual val fileSystem: FileSystem = FileSystem.SYSTEM

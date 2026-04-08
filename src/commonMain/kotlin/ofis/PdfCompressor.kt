@@ -17,11 +17,14 @@ class PdfCompressor : Tool {
         val level = args.getOrElse(args.indexOf("--level") + 1) { "5" }.toIntOrNull() ?: 5
 
         Logger.info("Compressing $input to $output with level $level...")
-        
+
         compressPdf(input, output, level)
     }
 
-    internal fun getOutputPath(input: String, providedOutput: String?): String {
+    internal fun getOutputPath(
+        input: String,
+        providedOutput: String?,
+    ): String {
         if (providedOutput != null) return providedOutput
         val inputPath = input.toPath()
         val parent = inputPath.parent
@@ -32,11 +35,15 @@ class PdfCompressor : Tool {
         }
     }
 
-    private fun compressPdf(input: String, output: String, level: Int) {
+    private fun compressPdf(
+        input: String,
+        output: String,
+        level: Int,
+    ) {
         val fs = fileSystem
         val inputPath = input.toPath()
         val outputPath = output.toPath()
-        
+
         if (!fs.exists(inputPath)) {
             Logger.info("Error: Input file $input not found.")
             return
@@ -51,7 +58,7 @@ class PdfCompressor : Tool {
             } finally {
                 source.close()
             }
-            
+
             // 2. Compress/Write (For now just copy)
             val sink = fs.sink(outputPath).buffer()
             try {
@@ -65,7 +72,7 @@ class PdfCompressor : Tool {
             } finally {
                 sink.close()
             }
-            
+
             Logger.info("Saved compressed (not really) PDF to $output")
         } catch (e: Exception) {
             Logger.info("Error during compression: ${e.message}")
