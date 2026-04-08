@@ -131,3 +131,20 @@ kotlin {
         }
     }
 }
+
+tasks.register<Exec>("dmg") {
+    group = "package"
+    description = "Packages the macOS application as a DMG (macOS only)"
+    dependsOn("icon")
+    
+    val target = if (System.getProperty("os.arch") == "aarch64") "macosArm64" else "macosX64"
+    dependsOn("linkReleaseExecutable${target.replaceFirstChar { it.uppercase() }}")
+    
+    commandLine("make", "dmg")
+}
+
+tasks.register<Exec>("icon") {
+    group = "build"
+    description = "Generates application icons"
+    commandLine("make", "icon")
+}

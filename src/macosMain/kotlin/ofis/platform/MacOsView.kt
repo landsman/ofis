@@ -12,6 +12,7 @@ import platform.AppKit.NSImage
 import platform.AppKit.NSOpenPanel
 import platform.AppKit.NSSavePanel
 import platform.AppKit.NSWindow
+import platform.Foundation.NSBundle
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileSystemFreeSize
 import platform.Foundation.NSNumber
@@ -67,9 +68,12 @@ actual suspend fun pickFile(allowedExtensions: List<String>): String? = withCont
 actual fun platformGui() {
     val app = NSApplication.sharedApplication()
     app.setActivationPolicy(NSApplicationActivationPolicy.NSApplicationActivationPolicyRegular)
-    NSImage(contentsOfFile = "build/mac_os_app_icon.png").let {
-        app.setApplicationIconImage(it)
-    }
+
+    // Try to load icon from bundle first (for bundled app), then from local path (for 'make run')
+    val icon = NSBundle.mainBundle.pathForResource("AppIcon", "icns")?.let { NSImage(contentsOfFile = it) }
+        ?: NSImage(contentsOfFile = "build/mac_os_app_icon.png")
+
+    icon?.let { app.setApplicationIconImage(it) }
 
     // Sets up a Compose-backed NSWindow (non-blocking)
     Window("Ofis") {
