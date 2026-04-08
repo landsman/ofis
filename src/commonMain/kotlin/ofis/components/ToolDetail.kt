@@ -9,6 +9,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,11 +67,17 @@ fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = "← Back",
-                modifier = Modifier.clickable { onBack() }.padding(end = 16.dp),
+                modifier = Modifier.pointerHoverIcon(PointerIcon.Hand).clickable { onBack() }.padding(end = 20.dp),
                 color = Color(0xFF4A90E2),
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
-            Text(text = tool.displayName, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = tool.displayName,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color(0xFF1A1A1A)
+            )
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = { showLogs = !showLogs }) {
                 Icon(
@@ -102,11 +110,11 @@ fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
                 }
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             if (selectedFilePath != null && resizeInfo == null && !isRunning) {
                 ProfileSelector(selected = selectedProfile, onSelect = { selectedProfile = it })
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             if (isRunning) {
@@ -123,7 +131,7 @@ fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
 
             // ── action buttons ─────────────────────────────────────────────
             if (resizeInfo == null) {
-                Button(
+                AppButton(
                     onClick = {
                         selectedFilePath?.let { path ->
                             isRunning = true
@@ -142,21 +150,26 @@ fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
                             }
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    modifier = Modifier.fillMaxWidth().height(54.dp),
                     enabled = selectedFilePath != null && !isRunning,
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Color(0xFF4A4AFF),
                         contentColor = Color.White,
                         disabledBackgroundColor = Color(0xFFBBBBBB)
+                    ),
+                    elevation = ButtonDefaults.elevation(
+                        defaultElevation = 2.dp,
+                        pressedElevation = 0.dp,
+                        disabledElevation = 0.dp
                     )
                 ) {
-                    Text("Compress PDF", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text("Compress PDF", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                 }
             } else {
                 // Save — only shown when there is an actual smaller output file
                 if (outputFilePath != null) {
-                    Button(
+                    AppButton(
                         onClick = {
                             val dest = saveFile(suggestedSaveName ?: "compressed.pdf")
                             if (dest != null && outputFilePath != null) {
@@ -220,7 +233,7 @@ fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
                     Spacer(modifier = Modifier.height(10.dp))
                 }
 
-                Button(
+                AppButton(
                     onClick = {
                         resizeInfo = null; selectedFilePath = null; selectedFileSize = null
                         outputFilePath = null; suggestedSaveName = null; logs = ""
