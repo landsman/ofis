@@ -5,12 +5,29 @@ import kotlinx.cinterop.BetaInteropApi
 import platform.AppKit.NSApplication
 import platform.AppKit.NSApplicationActivationPolicy
 import platform.AppKit.NSImage
+import platform.AppKit.NSOpenPanel
 import platform.AppKit.NSApplicationDelegateProtocol
+import platform.AppKit.NSModalResponseOK
 import platform.darwin.NSObject
+import platform.Foundation.NSURL
 
 actual fun getGuiNavigator(): GuiNavigator = object : GuiNavigator {
     override fun showToolSelection() {}
     override fun showTool(tool: Tool) {}
+}
+
+actual fun pickFile(allowedExtensions: List<String>): String? {
+    val panel = NSOpenPanel.openPanel()
+    panel.setCanChooseFiles(true)
+    panel.setCanChooseDirectories(false)
+    panel.setAllowsMultipleSelection(false)
+
+    return if (panel.runModal() == 1L /* NSModalResponseOK */) {
+        val url = panel.URL()
+        url?.path
+    } else {
+        null
+    }
 }
 
 @OptIn(BetaInteropApi::class)

@@ -50,6 +50,8 @@ expect fun getGuiNavigator(): GuiNavigator
 
 expect fun exitProcess(status: Int)
 
+expect fun pickFile(allowedExtensions: List<String>): String?
+
 object GlobalConfig {
     var debug: Boolean = false
 }

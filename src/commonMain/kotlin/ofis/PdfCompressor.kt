@@ -14,7 +14,13 @@ class PdfCompressor : Tool {
         }
         val input = args[0]
         val output = getOutputPath(input, args.getOrNull(1))
-        val level = args.getOrElse(args.indexOf("--level") + 1) { "5" }.toIntOrNull() ?: 5
+        
+        val levelIndex = args.indexOf("--level")
+        val level = if (levelIndex != -1 && levelIndex + 1 < args.size) {
+            args[levelIndex + 1].toIntOrNull() ?: 5
+        } else {
+            5
+        }
 
         Logger.info("Compressing $input to $output with level $level...")
 

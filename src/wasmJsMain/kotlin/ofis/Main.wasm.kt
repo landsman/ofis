@@ -68,6 +68,8 @@ actual fun platformGui() {
 
 actual fun getGuiNavigator(): GuiNavigator = throw UnsupportedOperationException("GUI is not supported on Wasm/Browser yet.")
 
+actual fun pickFile(allowedExtensions: List<String>): String? = null
+
 actual fun exitProcess(status: Int) {
     // In browser, we cannot exit a process.
     // We could throw an exception or just log.

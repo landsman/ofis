@@ -112,6 +112,7 @@ fun ToolCard(tool: Tool, onClick: () -> Unit) {
 @Composable
 fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
     var logs by remember { mutableStateOf("") }
+    var selectedFilePath by remember { mutableStateOf<String?>(null) }
     
     // Wire up Logger to our UI
     LaunchedEffect(tool) {
@@ -146,13 +147,46 @@ fun ToolDetailScreen(tool: Tool, onBack: () -> Unit) {
         
         Spacer(modifier = Modifier.height(20.dp))
         
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                onClick = {
+                    val path = pickFile(listOf("pdf"))
+                    if (path != null) {
+                        selectedFilePath = path
+                    }
+                },
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFF0F0F0))
+            ) {
+                Text(if (selectedFilePath == null) "Select PDF File" else "Change File")
+            }
+            
+            if (selectedFilePath != null) {
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = selectedFilePath!!.split("/").last(),
+                    fontSize = 14.sp,
+                    color = Color.DarkGray
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+        
         Button(
             onClick = {
-                // For now, we still need platform-specific file picking
-                // but we can trigger tool.run with some logic or just a dummy for verification
-                Logger.info("Running ${tool.name}...")
+                if (selectedFilePath != null) {
+                    Logger.info("Running ${tool.name} with file: $selectedFilePath")
+                    tool.run(listOf(selectedFilePath!!))
+                } else {
+                    Logger.info("Please select a file first.")
+                }
             },
             modifier = Modifier.fillMaxWidth(),
+            enabled = selectedFilePath != null,
             shape = RoundedCornerShape(8.dp)
         ) {
             Text("Run Tool")

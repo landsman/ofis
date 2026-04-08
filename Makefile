@@ -82,8 +82,13 @@ test-all:
 	$(GRADLE) allTests
 
 # Linting
-lint:
+lint: semgrep
 	$(GRADLE) detekt ktlintCheck
+
+# Semgrep (runs in Docker)
+semgrep:
+	@echo "Running Semgrep in Docker..."
+	docker run --rm -v "$(PWD):/src" returntocorp/semgrep semgrep scan --config auto --error
 
 # Formatting
 format:
@@ -113,7 +118,8 @@ help:
 	@echo "  make debug [ARGS=\"...\"]  - Run the native macOS tool with verbose logging"
 	@echo "  make gui                  - Run the native macOS tool with a minimalistic GUI (fast)"
 	@echo "  make generate-icon        - Convert SVG icon to PNG for the application"
-	@echo "  make lint                 - Run static analysis and style checks"
+	@echo "  make lint                 - Run static analysis (including Semgrep), and style checks"
+	@echo "  make semgrep              - Run Semgrep analysis in Docker"
 	@echo "  make format               - Automatically fix code style issues"
 	@echo "  make run-wasm             - Run the Wasm browser version"
 	@echo "  make help                 - Show this help message"
