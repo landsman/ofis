@@ -1,18 +1,19 @@
 package ofis.platform
 
-import platform.AppKit.*
-import platform.CoreGraphics.CGRectMake
+import androidx.compose.ui.window.Window
+import ofis.App
+import platform.AppKit.NSApplication
+import platform.AppKit.NSOpenPanel
 
 actual fun pickFile(allowedExtensions: List<String>): String? {
     val panel = NSOpenPanel.openPanel()
     panel.setCanChooseFiles(true)
     panel.setCanChooseDirectories(false)
     panel.setAllowsMultipleSelection(false)
-    panel.setAllowedFileTypes(allowedExtensions)
+    // TODO: filter by allowedExtensions once SDK binding is clarified
 
     return if (panel.runModal() == 1L /* NSModalResponseOK */) {
-        val url = panel.URL()
-        url?.path
+        panel.URL()?.path
     } else {
         null
     }
@@ -20,18 +21,11 @@ actual fun pickFile(allowedExtensions: List<String>): String? {
 
 actual fun platformGui() {
     val app = NSApplication.sharedApplication()
+    // Sets up a Compose-backed NSWindow (non-blocking)
+    Window("Ofis") {
+        App()
+    }
 
-    val styleMask = (NSWindowStyleMaskTitled or NSWindowStyleMaskClosable or NSWindowStyleMaskResizable)
-    val window = NSWindow(
-        contentRect = CGRectMake(0.0, 0.0, 1000.0, 700.0),
-        styleMask = styleMask,
-        backing = NSBackingStoreBuffered,
-        defer = false
-    )
-    window.title = "Ofis"
-
-    window.center()
-    window.makeKeyAndOrderFront(null)
     app.activateIgnoringOtherApps(true)
-    app.run()
+    app.run() // AppKit event loop — blocks until app quits
 }

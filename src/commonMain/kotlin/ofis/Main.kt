@@ -2,11 +2,19 @@ package ofis
 
 import ofis.config.GlobalConfig
 import ofis.config.Logger
+import ofis.platform.platformGui
 
 fun commonMain(argList: List<String>): Int {
     val debugFlag = "--debug"
+    val guiFlag = "--gui"
     val hasDebug = argList.contains(debugFlag)
+    val hasGui = argList.contains(guiFlag)
     GlobalConfig.debug = hasDebug
+
+    if (hasGui) {
+        platformGui()
+        return 0
+    }
 
     if (argList.isEmpty()) {
         println("Welcome to Ofis!")
