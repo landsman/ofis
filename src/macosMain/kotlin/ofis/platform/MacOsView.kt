@@ -7,6 +7,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import ofis.App
 import platform.AppKit.NSApplication
+import platform.AppKit.NSApplicationActivationPolicy
 import platform.AppKit.NSImage
 import platform.AppKit.NSOpenPanel
 import platform.AppKit.NSSavePanel
@@ -65,7 +66,7 @@ actual suspend fun pickFile(allowedExtensions: List<String>): String? = withCont
 
 actual fun platformGui() {
     val app = NSApplication.sharedApplication()
-    // app.setActivationPolicy(0L) // NSApplicationActivationPolicyRegular
+    app.setActivationPolicy(NSApplicationActivationPolicy.NSApplicationActivationPolicyRegular)
     NSImage(contentsOfFile = "build/mac_os_app_icon.png").let {
         app.setApplicationIconImage(it)
     }
