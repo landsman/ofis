@@ -27,8 +27,7 @@ import ofis.tool.pdf.compress.model.CompressionProfile
 import ofis.tool.pdf.compress.service.saveCompressedFile
 import ofis.ui.system.FileDropZone
 import ofis.ui.system.LogOverlay
-import ofis.ui.system.toast.ToastData
-import ofis.ui.system.toast.ToastHost
+import ofis.ui.system.toast.LocalToastController
 import okio.Path.Companion.toPath
 
 @Composable
@@ -38,6 +37,7 @@ fun PdfDetailScreen(
     onCloseLogs: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val toastController = LocalToastController.current
 
     var logs by remember { mutableStateOf("") }
     var selectedFilePath by remember { mutableStateOf<String?>(null) }
@@ -48,7 +48,6 @@ fun PdfDetailScreen(
     var suggestedSaveName by remember { mutableStateOf<String?>(null) }
     var isRunning by remember { mutableStateOf(false) }
     var selectedProfile by remember { mutableStateOf(CompressionProfile.BALANCED) }
-    var toast by remember { mutableStateOf<ToastData?>(null) }
 
     val isAlreadyOptimal =
         resizeInfo
@@ -70,7 +69,7 @@ fun PdfDetailScreen(
                     msg.startsWith("SUGGESTED_NAME: ") -> suggestedSaveName = msg.substringAfter("SUGGESTED_NAME: ")
                     msg.startsWith("Error: ") -> {
                         isRunning = false
-                        toast = ToastData(msg.substringAfter("Error: "), isSuccess = false)
+                        toastController.show(msg.substringAfter("Error: "), isSuccess = false)
                     }
                 }
                 logs += msg + "\n"
@@ -163,7 +162,7 @@ fun PdfDetailScreen(
                             val result = saveCompressedFile(outputFilePath!!, suggestedSaveName)
                             withContext(Dispatchers.Main) {
                                 result.savedPath?.let { outputFilePath = it }
-                                toast = result.toast
+                                toastController.show(result.toast)
                             }
                         }
                     })
@@ -184,7 +183,5 @@ fun PdfDetailScreen(
         if (showLogs) {
             LogOverlay(logs = logs, onClose = onCloseLogs)
         }
-
-        ToastHost(toast = toast, onDismiss = { toast = null })
     }
 }
