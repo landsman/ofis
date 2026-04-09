@@ -1,4 +1,4 @@
-package ofis.ui.view.tool_selection.component
+package ofis.ui.view.toolselection.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

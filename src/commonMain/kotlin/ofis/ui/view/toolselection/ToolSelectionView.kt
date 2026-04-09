@@ -1,4 +1,4 @@
-package ofis.ui.view.tool_selection
+package ofis.ui.view.toolselection
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ofis.tool.Tool
 import ofis.tool.ToolRegistry
-import ofis.ui.view.tool_selection.component.ToolCard
+import ofis.ui.view.toolselection.component.ToolCard
 
 @Composable
 fun ToolSelectionView(onToolSelect: (Tool) -> Unit) {

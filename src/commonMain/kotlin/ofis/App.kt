@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ofis.tool.Tool
 import ofis.ui.system.DotGridBackground
-import ofis.ui.view.tool_selection.ToolSelectionView
+import ofis.ui.view.toolselection.ToolSelectionView
 
 @Composable
 fun App() {
