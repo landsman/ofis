@@ -1,4 +1,5 @@
 package ofis.tool.pdf.compress.service
+
 import ofis.platform.fileSystem
 import ofis.platform.service.findHelperBinary
 import ofis.tool.pdf.compress.model.*
