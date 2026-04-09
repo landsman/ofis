@@ -1,10 +1,17 @@
 package ofis.tool.pdf.compress.service
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.ObjCObjectVar
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.ptr
 import kotlinx.cinterop.readBytes
+import kotlinx.cinterop.value
+import ofis.config.Logger
 import ofis.tool.pdf.compress.model.NativeCommand
 import ofis.tool.pdf.compress.model.ProcessResult
 import platform.Foundation.NSData
+import platform.Foundation.NSError
 import platform.Foundation.NSPipe
 import platform.Foundation.NSTask
 import platform.Foundation.NSURL
@@ -15,16 +22,47 @@ import platform.Foundation.NSURL
  * Safe: arguments are passed as an NSArray, never shell-interpolated.
  */
 actual fun runProcess(command: NativeCommand): ProcessResult {
+    Logger.info("[runProcess] ${command.executable} ${command.arguments.joinToString(" ")}")
+    return try {
+        runProcessInternal(command)
+    } catch (e: Exception) {
+        Logger.info("[runProcess] exception: ${e.message}")
+        ProcessResult(exitCode = -1, stdout = "", stderr = e.message ?: "unknown error")
+    }
+}
+
+@OptIn(ExperimentalForeignApi::class)
+private fun runProcessInternal(command: NativeCommand): ProcessResult {
     val task = NSTask()
     task.executableURL = NSURL.fileURLWithPath(command.executable)
     task.arguments = command.arguments
+
+    Logger.info("[runProcess] executableURL=${task.executableURL} arguments=${task.arguments}")
 
     val stdoutPipe = NSPipe()
     val stderrPipe = NSPipe()
     task.standardOutput = stdoutPipe
     task.standardError = stderrPipe
 
-    task.launchAndReturnError(null)
+    // Capture NSError so we know exactly why the launch failed.
+    val launched: Boolean
+    val launchError: String?
+    memScoped {
+        val errorPtr = alloc<ObjCObjectVar<NSError?>>()
+        launched = task.launchAndReturnError(errorPtr.ptr)
+        launchError = errorPtr.value?.localizedDescription
+    }
+
+    Logger.info("[runProcess] launched=$launched pid=${if (launched) task.processIdentifier else -1} error=$launchError")
+
+    if (!launched) {
+        // ARC releases the NSPipe objects here, closing both ends — no deadlock.
+        return ProcessResult(
+            exitCode = 127,
+            stdout = "",
+            stderr = launchError ?: "Failed to launch: ${command.executable}",
+        )
+    }
 
     // Reading to EOF blocks until the process closes its stdout/stderr (i.e. exits)
     val stdoutData = stdoutPipe.fileHandleForReading.readDataToEndOfFileAndReturnError(null) ?: NSData()
@@ -33,11 +71,14 @@ actual fun runProcess(command: NativeCommand): ProcessResult {
     // Spin until NSTask records the exit status (normally 0–1 iterations after pipes close)
     while (task.running) { /* yield */ }
 
-    return ProcessResult(
-        exitCode = task.terminationStatus,
-        stdout = stdoutData.utf8(),
-        stderr = stderrData.utf8(),
-    )
+    val result =
+        ProcessResult(
+            exitCode = task.terminationStatus,
+            stdout = stdoutData.utf8(),
+            stderr = stderrData.utf8(),
+        )
+    Logger.info("[runProcess] exit=${result.exitCode} stdout=${result.stdout.length}B stderr=${result.stderr.length}B")
+    return result
 }
 
 @OptIn(ExperimentalForeignApi::class)

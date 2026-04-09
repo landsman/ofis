@@ -48,9 +48,9 @@ fun CompressionProgress() {
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator(color = Color(0xFF4A4AFF), strokeWidth = 3.dp)
+            Spacer(modifier = Modifier.height(12.dp))
             if (isSlow) {
-                CircularProgressIndicator(color = Color(0xFF4A4AFF), strokeWidth = 3.dp)
-                Spacer(modifier = Modifier.height(12.dp))
                 Text("Almost there!", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 Text("Compressing your PDF...", color = Color(0xFF4A4AFF), fontSize = 14.sp)
             } else {

@@ -6,16 +6,20 @@ ifeq ($(OS),Darwin)
     ifeq ($(ARCH),arm64)
         TARGET_SUFFIX  := MacosArm64
         HOST_TEST_TASK := macosArm64Test
+        BIN_DIR        := macosArm64
     else
         TARGET_SUFFIX  := MacosX64
         HOST_TEST_TASK := macosX64Test
+        BIN_DIR        := macosX64
     endif
 else ifeq ($(OS),Linux)
     TARGET_SUFFIX  := LinuxX64
     HOST_TEST_TASK := linuxX64Test
+    BIN_DIR        := linuxX64
 else
     TARGET_SUFFIX  := MingwX64
     HOST_TEST_TASK := allTests
+    BIN_DIR        := mingwX64
 endif
 
 GRADLE  := ./gradlew

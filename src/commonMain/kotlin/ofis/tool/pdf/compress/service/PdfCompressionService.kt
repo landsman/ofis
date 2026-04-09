@@ -19,11 +19,17 @@ class PdfCompressionService(
     fun compress(request: CompressionRequest): CompressionResult {
         val fs = fileSystem
         var result: CompressionResult? = null
-        val total = measureTime {
-            result = doCompress(request, fs)
+        return try {
+            val total =
+                measureTime {
+                    result = doCompress(request, fs)
+                }
+            Logger.info("[timing] total: $total")
+            result!!
+        } catch (e: Exception) {
+            Logger.info("[compress] unexpected exception: ${e.message}")
+            CompressionResult.Failure(CompressionError.InvalidInput("Unexpected error: ${e.message}"))
         }
-        Logger.info("[timing] total: $total")
-        return result!!
     }
 
     private fun doCompress(
@@ -39,7 +45,11 @@ class PdfCompressionService(
 
         // ── resolve binaries ───────────────────────────────────────────────
         lateinit var qpdf: String
-        val tFindQpdf = measureTime { qpdf = binaryFinder("qpdf") ?: return CompressionResult.Failure(CompressionError.BinaryNotFound("qpdf")) }
+        val tFindQpdf =
+            measureTime {
+                qpdf =
+                    binaryFinder("qpdf") ?: return CompressionResult.Failure(CompressionError.BinaryNotFound("qpdf"))
+            }
         Logger.info("[timing] find qpdf: $tFindQpdf → $qpdf")
 
         val tmpQpdf: Path = request.outputPath.parent!! / "${request.outputPath.name}.qpdf.tmp"
@@ -67,7 +77,15 @@ class PdfCompressionService(
 
                 CompressionProfile.BALANCED, CompressionProfile.MAXIMUM -> {
                     lateinit var gs: String
-                    val tFindGs = measureTime { gs = binaryFinder("gs") ?: return run { cleanupQuiet(tmpQpdf); CompressionResult.Failure(CompressionError.BinaryNotFound("gs (ghostscript)")) } }
+                    val tFindGs =
+                        measureTime {
+                            gs =
+                                binaryFinder("gs")
+                                    ?: return run {
+                                        cleanupQuiet(tmpQpdf)
+                                        CompressionResult.Failure(CompressionError.BinaryNotFound("gs (ghostscript)"))
+                                    }
+                        }
                     Logger.info("[timing] find gs: $tFindGs → $gs")
 
                     val tmpGs: Path = request.outputPath.parent!! / "${request.outputPath.name}.gs.tmp"

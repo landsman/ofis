@@ -36,7 +36,12 @@ actual fun findHelperBinary(name: String): String? {
         val buf = ByteArray(256)
         buf.usePinned { pinned -> fgets(pinned.addressOf(0), buf.size, result) }
         pclose(result)
-        val path = buf.decodeToString().trim().takeIf { it.isNotEmpty() && !it.startsWith("not found") }
+        val path =
+            buf
+                .decodeToString()
+                .substringBefore('\u0000')
+                .trim()
+                .takeIf { it.isNotEmpty() && !it.startsWith("not found") }
         if (path != null) return path
     }
 
