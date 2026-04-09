@@ -34,7 +34,6 @@ import okio.Path.Companion.toPath
 @Composable
 fun PdfDetailScreen(
     tool: Tool,
-    onBack: () -> Unit,
     showLogs: Boolean,
 ) {
     val scope = rememberCoroutineScope()

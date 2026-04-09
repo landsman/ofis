@@ -106,18 +106,18 @@ kotlin {
             kotlin.srcDirs("src/windows/kotlin")
         }
 
-        val linuxX64Main by getting { dependsOn(linuxMain) }
-        val macosArm64Main by getting { dependsOn(macosMain) }
-        val mingwX64Main by getting { dependsOn(windowsMain) }
+        getByName("linuxX64Main") { dependsOn(linuxMain) }
+        getByName("macosArm64Main") { dependsOn(macosMain) }
+        getByName("mingwX64Main") { dependsOn(windowsMain) }
 
         val macosTest by creating {
             dependsOn(nativeTest)
             kotlin.srcDirs("tests/platform/macos/kotlin")
         }
 
-        val linuxX64Test by getting { dependsOn(nativeTest) }
-        val macosArm64Test by getting { dependsOn(macosTest) }
-        val mingwX64Test by getting { dependsOn(nativeTest) }
+        getByName("linuxX64Test") { dependsOn(nativeTest) }
+        getByName("macosArm64Test") { dependsOn(macosTest) }
+        getByName("mingwX64Test") { dependsOn(nativeTest) }
 
         targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().all {
             binaries.all {
