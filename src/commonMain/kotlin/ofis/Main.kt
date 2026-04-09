@@ -2,17 +2,20 @@ package ofis
 
 import ofis.config.GlobalConfig
 import ofis.config.Logger
+import ofis.platform.defaultToGui
 import ofis.platform.platformGui
 import ofis.tool.ToolRegistry
 
 fun commonMain(argList: List<String>): Int {
     val debugFlag = "--debug"
     val guiFlag = "--gui"
+    val cliFlag = "--cli"
     val hasDebug = argList.contains(debugFlag)
     val hasGui = argList.contains(guiFlag)
+    val hasCli = argList.contains(cliFlag)
     GlobalConfig.debug = hasDebug
 
-    if (hasGui) {
+    if (hasGui || (argList.isEmpty() && defaultToGui && !hasCli)) {
         platformGui()
         return 0
     }
@@ -24,7 +27,7 @@ fun commonMain(argList: List<String>): Int {
         return 0
     }
 
-    val filteredArgs = argList.filter { it != debugFlag && it != "--gui" }
+    val filteredArgs = argList.filter { it != debugFlag && it != guiFlag && it != cliFlag }
 
     if (filteredArgs.isEmpty()) {
         println("Error: No tool specified.")

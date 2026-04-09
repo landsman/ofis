@@ -1,5 +1,7 @@
 package ofis.platform
 
+actual val defaultToGui: Boolean = false
+
 actual fun availableDiskSpace(dirPath: String): Long = Long.MAX_VALUE // TODO: statvfs
 
 actual fun platformGui() {

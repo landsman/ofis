@@ -4,6 +4,9 @@ import okio.FileSystem
 
 expect val fileSystem: FileSystem
 
+/** True on platforms where the app defaults to GUI mode when launched with no arguments (e.g. macOS .app bundle). */
+expect val defaultToGui: Boolean
+
 expect fun platformMain(args: List<String>)
 
 expect fun platformGui()
