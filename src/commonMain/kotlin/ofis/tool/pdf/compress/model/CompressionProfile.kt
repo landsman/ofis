@@ -15,9 +15,10 @@ enum class CompressionProfile(
     ;
 
     /** CLI argument used when passing this profile to the tool runner. */
-    fun toArg(): String = when (this) {
-        HIGH_QUALITY -> "high"
-        BALANCED     -> "balanced"
-        MAXIMUM      -> "max"
-    }
+    fun toArg(): String =
+        when (this) {
+            HIGH_QUALITY -> "high"
+            BALANCED -> "balanced"
+            MAXIMUM -> "max"
+        }
 }

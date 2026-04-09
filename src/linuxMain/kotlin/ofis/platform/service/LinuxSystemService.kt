@@ -2,8 +2,8 @@ package ofis.platform.service
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.toKString
+import kotlinx.cinterop.usePinned
 import platform.posix.X_OK
 import platform.posix.access
 import platform.posix.fgets

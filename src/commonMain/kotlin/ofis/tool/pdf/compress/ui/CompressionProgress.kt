@@ -40,11 +40,12 @@ fun CompressionProgress() {
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFFF0F4FF), RoundedCornerShape(12.dp))
-            .padding(24.dp),
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFF0F4FF), RoundedCornerShape(12.dp))
+                .padding(24.dp),
+        contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             if (isSlow) {

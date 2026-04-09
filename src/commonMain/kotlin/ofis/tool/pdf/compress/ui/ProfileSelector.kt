@@ -15,8 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ofis.ui.system.Badge
 import ofis.tool.pdf.compress.model.CompressionProfile
+import ofis.ui.system.Badge
 
 @Composable
 fun ProfileSelector(
@@ -27,7 +27,7 @@ fun ProfileSelector(
         text = "Compression Level",
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp,
-        color = Color(0xFF1A1A1A)
+        color = Color(0xFF1A1A1A),
     )
     Spacer(modifier = Modifier.height(12.dp))
     CompressionProfile.entries.forEach { profile ->
@@ -46,21 +46,23 @@ private fun ProfileOption(
     val bgColor = if (selected) Color(0xFFF0F0FF) else Color.White
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(bgColor, RoundedCornerShape(10.dp))
-            .border(1.5.dp, borderColor, RoundedCornerShape(10.dp))
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(bgColor, RoundedCornerShape(10.dp))
+                .border(1.5.dp, borderColor, RoundedCornerShape(10.dp))
+                .clickable { onClick() }
+                .padding(horizontal = 16.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(
             selected = selected,
             onClick = onClick,
-            colors = RadioButtonDefaults.colors(
-                selectedColor = Color(0xFF4A4AFF),
-                unselectedColor = Color(0xFFCCCCCC)
-            )
+            colors =
+                RadioButtonDefaults.colors(
+                    selectedColor = Color(0xFF4A4AFF),
+                    unselectedColor = Color(0xFFCCCCCC),
+                ),
         )
         Spacer(modifier = Modifier.width(10.dp))
         Column {

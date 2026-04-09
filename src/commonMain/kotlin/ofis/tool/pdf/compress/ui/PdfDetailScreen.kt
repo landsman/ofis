@@ -44,7 +44,10 @@ import ofis.ui.system.ToastHost
 import okio.Path.Companion.toPath
 
 @Composable
-fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
+fun PdfDetailScreen(
+    tool: Tool,
+    onBack: () -> Unit,
+) {
     val scope = rememberCoroutineScope()
 
     var logs by remember { mutableStateOf("") }
@@ -63,10 +66,17 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
         val listener: (String) -> Unit = { msg ->
             scope.launch(Dispatchers.Main) {
                 when {
-                    msg.startsWith("RESIZE_INFO: ")    -> { resizeInfo = msg.substringAfter("RESIZE_INFO: "); isRunning = false }
-                    msg.startsWith("OUTPUT_PATH: ")    -> outputFilePath = msg.substringAfter("OUTPUT_PATH: ")
+                    msg.startsWith("RESIZE_INFO: ") -> {
+                        resizeInfo = msg.substringAfter("RESIZE_INFO: ")
+                        isRunning = false
+                    }
+                    msg.startsWith("OUTPUT_PATH: ") -> outputFilePath = msg.substringAfter("OUTPUT_PATH: ")
                     msg.startsWith("SUGGESTED_NAME: ") -> suggestedSaveName = msg.substringAfter("SUGGESTED_NAME: ")
-                    msg.startsWith("Error: ")          -> { isRunning = false; toast = ToastData(msg.substringAfter("Error: "), isSuccess = false) }
+                    msg.startsWith("Error: ") -> {
+                        isRunning = false
+                        toast =
+                            ToastData(msg.substringAfter("Error: "), isSuccess = false)
+                    }
                 }
                 logs += msg + "\n"
             }
@@ -77,7 +87,6 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-
             // ── header ─────────────────────────────────────────────────────────
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -85,20 +94,20 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
                     modifier = Modifier.pointerHoverIcon(PointerIcon.Hand).clickable { onBack() }.padding(end = 20.dp),
                     color = Color(0xFF4A90E2),
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Text(
                     text = tool.displayName,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF1A1A1A)
+                    color = Color(0xFF1A1A1A),
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = { showLogs = !showLogs }) {
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = "Toggle logs",
-                        tint = if (showLogs) Color(0xFF4A90E2) else Color.Gray
+                        tint = if (showLogs) Color(0xFF4A90E2) else Color.Gray,
                     )
                 }
             }
@@ -124,9 +133,12 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
                         }
                     },
                     onClear = {
-                        selectedFilePath = null; selectedFileSize = null
-                        resizeInfo = null; outputFilePath = null; suggestedSaveName = null
-                    }
+                        selectedFilePath = null
+                        selectedFileSize = null
+                        resizeInfo = null
+                        outputFilePath = null
+                        suggestedSaveName = null
+                    },
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -163,7 +175,7 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
                                     }
                                 }
                             }
-                        }
+                        },
                     )
                 } else {
                     if (outputFilePath != null) {
@@ -180,16 +192,17 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
                         Spacer(modifier = Modifier.height(10.dp))
                     }
                     CompressAnotherPdfFileButton(onClick = {
-                        resizeInfo = null; selectedFilePath = null; selectedFileSize = null
-                        outputFilePath = null; suggestedSaveName = null; logs = ""
+                        resizeInfo = null
+                        selectedFilePath = null
+                        selectedFileSize = null
+                        outputFilePath = null
+                        suggestedSaveName = null
+                        logs = ""
                     })
                 }
             }
         } // Column
 
         ToastHost(toast = toast, onDismiss = { toast = null })
-
     } // Box
 }
-
-

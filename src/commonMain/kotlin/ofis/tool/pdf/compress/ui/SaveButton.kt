@@ -19,10 +19,11 @@ fun SaveButton(onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier.fillMaxWidth().height(48.dp),
         shape = RoundedCornerShape(10.dp),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color(0xFF4A4AFF),
-            contentColor = Color.White
-        )
+        colors =
+            ButtonDefaults.buttonColors(
+                backgroundColor = Color(0xFF4A4AFF),
+                contentColor = Color.White,
+            ),
     ) {
         Text("Save compressed PDF", fontWeight = FontWeight.Bold, fontSize = 16.sp)
     }

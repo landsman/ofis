@@ -24,16 +24,16 @@ fun ToolSelectionView(onToolSelect: (Tool) -> Unit) {
             text = "Ofis",
             fontSize = 42.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF000000)
+            color = Color(0xFF000000),
         )
         Text(
             text = "Tooling Platform",
             fontSize = 18.sp,
-            color = Color(0xFF666666)
+            color = Color(0xFF666666),
         )
-        
+
         Spacer(modifier = Modifier.height(40.dp))
-        
+
         val tools = ToolRegistry.list()
         LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             items(tools) { tool ->
@@ -42,4 +42,3 @@ fun ToolSelectionView(onToolSelect: (Tool) -> Unit) {
         }
     }
 }
-

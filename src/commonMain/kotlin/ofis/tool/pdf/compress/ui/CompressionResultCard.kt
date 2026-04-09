@@ -26,12 +26,13 @@ fun CompressionResultCard(info: String) {
     val alreadyOptimal = savedPercent != null && savedPercent <= 0
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White, RoundedCornerShape(12.dp))
-            .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
-            .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(Color.White, RoundedCornerShape(12.dp))
+                .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
+                .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text("📊", fontSize = 32.sp)
         Spacer(modifier = Modifier.height(8.dp))
@@ -40,17 +41,18 @@ fun CompressionResultCard(info: String) {
         if (alreadyOptimal) {
             Spacer(modifier = Modifier.height(10.dp))
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFFFF8E1), RoundedCornerShape(8.dp))
-                    .padding(12.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFFFF8E1), RoundedCornerShape(8.dp))
+                        .padding(12.dp),
             ) {
                 Text(
                     text = "This PDF is already well-optimized. The compressed version isn't smaller.",
                     color = Color(0xFF795548),
                     fontSize = 13.sp,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
         }
@@ -60,14 +62,14 @@ fun CompressionResultCard(info: String) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             SizeLabel(value = original, caption = "Original", color = Color(0xFF555555))
             Text("→", fontSize = 20.sp, color = Color.Gray)
             SizeLabel(
                 value = compressed,
                 caption = "Compressed",
-                color = if (alreadyOptimal) Color(0xFFFF5722) else Color(0xFF4CAF50)
+                color = if (alreadyOptimal) Color(0xFFFF5722) else Color(0xFF4CAF50),
             )
         }
 
@@ -77,21 +79,25 @@ fun CompressionResultCard(info: String) {
                 progress = savedPercent / 100f,
                 modifier = Modifier.fillMaxWidth(0.8f).height(6.dp),
                 color = Color(0xFF4CAF50),
-                backgroundColor = Color(0xFFE0E0E0)
+                backgroundColor = Color(0xFFE0E0E0),
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = "$savedPercent% smaller",
                 color = Color(0xFF4CAF50),
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp
+                fontSize = 14.sp,
             )
         }
     }
 }
 
 @Composable
-private fun SizeLabel(value: String, caption: String, color: Color) {
+private fun SizeLabel(
+    value: String,
+    caption: String,
+    color: Color,
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(value, fontWeight = FontWeight.Bold, fontSize = 20.sp, color = color)
         Text(caption, color = Color.Gray, fontSize = 12.sp)

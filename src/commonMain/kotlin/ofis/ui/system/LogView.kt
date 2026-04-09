@@ -16,13 +16,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun LogView(logs: String, modifier: Modifier = Modifier) {
+fun LogView(
+    logs: String,
+    modifier: Modifier = Modifier,
+) {
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Color(0xFFF8F8F8), RoundedCornerShape(8.dp))
-            .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(8.dp))
-            .padding(12.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(Color(0xFFF8F8F8), RoundedCornerShape(8.dp))
+                .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(8.dp))
+                .padding(12.dp),
     ) {
         LazyColumn {
             item {
@@ -30,7 +34,7 @@ fun LogView(logs: String, modifier: Modifier = Modifier) {
                     text = logs.ifEmpty { "No logs yet..." },
                     fontFamily = FontFamily.Monospace,
                     fontSize = 12.sp,
-                    color = Color(0xFF333333)
+                    color = Color(0xFF333333),
                 )
             }
         }

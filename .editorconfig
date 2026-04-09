@@ -1,3 +1,4 @@
 [*.{kt,kts}]
 ij_kotlin_allow_trailing_comma = true
 ktlint_standard_no-wildcard-imports = disabled
+ij_kotlin_blank_lines_after_package = 1

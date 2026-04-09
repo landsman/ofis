@@ -1,13 +1,12 @@
 package ofis.tool.pdf.compress
-import ofis.tool.pdf.compress.model.*
-import ofis.tool.pdf.compress.service.PdfCompressionService
-import ofis.tool.pdf.compress.ui.PdfDetailScreen
-
 import androidx.compose.runtime.Composable
-import ofis.tool.ToolRegistry
 import ofis.config.Logger
 import ofis.tool.Tool
 import ofis.tool.ToolBox
+import ofis.tool.ToolRegistry
+import ofis.tool.pdf.compress.model.*
+import ofis.tool.pdf.compress.service.PdfCompressionService
+import ofis.tool.pdf.compress.ui.PdfDetailScreen
 import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
 
@@ -37,11 +36,12 @@ class PdfCompressor : Tool {
         val outputStr = args.getOrNull(1)?.takeIf { !it.startsWith("--") } ?: defaultOutput(inputStr)
         val profile = parseProfile(args)
 
-        val request = CompressionRequest(
-            inputPath = inputStr.toPath(),
-            outputPath = outputStr.toPath(),
-            profile = profile,
-        )
+        val request =
+            CompressionRequest(
+                inputPath = inputStr.toPath(),
+                outputPath = outputStr.toPath(),
+                profile = profile,
+            )
 
         Logger.info("Compressing $inputStr → $outputStr [${profile.label}]")
 
@@ -55,7 +55,9 @@ class PdfCompressor : Tool {
                     Logger.info("OUTPUT_PATH: ${result.outputPath}")
                     Logger.info("SUGGESTED_NAME: ${suggestedName(inputStr, profile)}")
                 }
-                Logger.info("RESIZE_INFO: ${formatSize(result.originalBytes)} → ${formatSize(result.compressedBytes)} (${result.savedPercent}%)")
+                Logger.info(
+                    "RESIZE_INFO: ${formatSize(result.originalBytes)} → ${formatSize(result.compressedBytes)} (${result.savedPercent}%)",
+                )
             }
             is CompressionResult.Failure -> {
                 Logger.info("Error: ${result.reason}")
@@ -63,22 +65,29 @@ class PdfCompressor : Tool {
         }
     }
 
-    private fun suggestedName(input: String, profile: CompressionProfile): String {
+    private fun suggestedName(
+        input: String,
+        profile: CompressionProfile,
+    ): String {
         val name = input.toPath().name
         val base = name.substringBeforeLast(".")
-        val suffix = when (profile) {
-            CompressionProfile.HIGH_QUALITY -> "high-quality"
-            CompressionProfile.BALANCED     -> "balanced"
-            CompressionProfile.MAXIMUM      -> "maximum"
-        }
+        val suffix =
+            when (profile) {
+                CompressionProfile.HIGH_QUALITY -> "high-quality"
+                CompressionProfile.BALANCED -> "balanced"
+                CompressionProfile.MAXIMUM -> "maximum"
+            }
         return "$base-ofis-compressed-$suffix.pdf"
     }
 
     private fun defaultOutput(input: String): String {
         val p = input.toPath()
         val parent = p.parent
-        return if (parent != null) (parent / "compressed_${p.name}").toString()
-        else "compressed_${p.name}"
+        return if (parent != null) {
+            (parent / "compressed_${p.name}").toString()
+        } else {
+            "compressed_${p.name}"
+        }
     }
 
     private fun parseProfile(args: List<String>): CompressionProfile {
@@ -93,4 +102,3 @@ class PdfCompressor : Tool {
         return CompressionProfile.BALANCED
     }
 }
-

@@ -5,6 +5,7 @@ Architecture, roadmap, and technical decisions live in `.docs/plan/PLANNER.md`. 
 
 ## After every file operation
 - `git add` every newly created file immediately after writing it — never leave new files untracked
+- Run `make format` after every code change to auto-fix style (blank lines, trailing commas, imports)
 - Do not commit unless explicitly asked
 
 ## Quick commands to run after refactoring

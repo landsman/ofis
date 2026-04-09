@@ -19,8 +19,9 @@ actual fun platformGui() {
     val app = NSApplication.sharedApplication()
     app.setActivationPolicy(NSApplicationActivationPolicy.NSApplicationActivationPolicyRegular)
 
-    val icon = NSBundle.mainBundle.pathForResource("AppIcon", "icns")?.let { NSImage(contentsOfFile = it) }
-        ?: NSImage(contentsOfFile = "build/mac_os_app_icon.png")
+    val icon =
+        NSBundle.mainBundle.pathForResource("AppIcon", "icns")?.let { NSImage(contentsOfFile = it) }
+            ?: NSImage(contentsOfFile = "build/mac_os_app_icon.png")
     icon.let { app.setApplicationIconImage(it) }
 
     Window("Ofis") {
@@ -37,29 +38,31 @@ actual fun platformGui() {
     app.run()
 }
 
-actual suspend fun saveFile(suggestedName: String): String? = withContext(Dispatchers.Main) {
-    suspendCancellableCoroutine { continuation ->
-        val panel = NSSavePanel.savePanel()
-        panel.setNameFieldStringValue(suggestedName)
-        panel.beginWithCompletionHandler { response ->
-            continuation.resume(if (response == 1L) panel.URL()?.path else null)
+actual suspend fun saveFile(suggestedName: String): String? =
+    withContext(Dispatchers.Main) {
+        suspendCancellableCoroutine { continuation ->
+            val panel = NSSavePanel.savePanel()
+            panel.setNameFieldStringValue(suggestedName)
+            panel.beginWithCompletionHandler { response ->
+                continuation.resume(if (response == 1L) panel.URL()?.path else null)
+            }
+            panel.makeKeyAndOrderFront(null)
+            NSApplication.sharedApplication().activateIgnoringOtherApps(true)
         }
-        panel.makeKeyAndOrderFront(null)
-        NSApplication.sharedApplication().activateIgnoringOtherApps(true)
     }
-}
 
-actual suspend fun pickFile(allowedExtensions: List<String>): String? = withContext(Dispatchers.Main) {
-    suspendCancellableCoroutine { continuation ->
-        val panel = NSOpenPanel.openPanel()
-        panel.setCanChooseFiles(true)
-        panel.setCanChooseDirectories(false)
-        panel.setAllowsMultipleSelection(false)
-        // TODO: filter by allowedExtensions once SDK binding is clarified
-        panel.beginWithCompletionHandler { response ->
-            continuation.resume(if (response == 1L) panel.URL()?.path else null)
+actual suspend fun pickFile(allowedExtensions: List<String>): String? =
+    withContext(Dispatchers.Main) {
+        suspendCancellableCoroutine { continuation ->
+            val panel = NSOpenPanel.openPanel()
+            panel.setCanChooseFiles(true)
+            panel.setCanChooseDirectories(false)
+            panel.setAllowsMultipleSelection(false)
+            // TODO: filter by allowedExtensions once SDK binding is clarified
+            panel.beginWithCompletionHandler { response ->
+                continuation.resume(if (response == 1L) panel.URL()?.path else null)
+            }
+            panel.makeKeyAndOrderFront(null)
+            NSApplication.sharedApplication().activateIgnoringOtherApps(true)
         }
-        panel.makeKeyAndOrderFront(null)
-        NSApplication.sharedApplication().activateIgnoringOtherApps(true)
     }
-}

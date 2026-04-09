@@ -21,7 +21,7 @@ fun DotGridBackground() {
                 drawCircle(
                     color = dotColor,
                     radius = dotSize / 2,
-                    center = Offset(x * spacing, y * spacing)
+                    center = Offset(x * spacing, y * spacing),
                 )
             }
         }

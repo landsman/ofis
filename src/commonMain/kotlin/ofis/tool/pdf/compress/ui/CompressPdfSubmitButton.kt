@@ -17,22 +17,27 @@ import ofis.ui.system.AppButton
  * Button for submitting PDF compression request, main CTA button.
  */
 @Composable
-fun CompressPdfSubmitButton(enabled: Boolean, onClick: () -> Unit) {
+fun CompressPdfSubmitButton(
+    enabled: Boolean,
+    onClick: () -> Unit,
+) {
     AppButton(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth().height(54.dp),
         enabled = enabled,
         shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color(0xFF4A4AFF),
-            contentColor = Color.White,
-            disabledBackgroundColor = Color(0xFFBBBBBB)
-        ),
-        elevation = ButtonDefaults.elevation(
-            defaultElevation = 2.dp,
-            pressedElevation = 0.dp,
-            disabledElevation = 0.dp
-        )
+        colors =
+            ButtonDefaults.buttonColors(
+                backgroundColor = Color(0xFF4A4AFF),
+                contentColor = Color.White,
+                disabledBackgroundColor = Color(0xFFBBBBBB),
+            ),
+        elevation =
+            ButtonDefaults.elevation(
+                defaultElevation = 2.dp,
+                pressedElevation = 0.dp,
+                disabledElevation = 0.dp,
+            ),
     ) {
         Text("Compress PDF", fontWeight = FontWeight.Bold, fontSize = 18.sp)
     }

@@ -42,8 +42,8 @@ actual fun findHelperBinary(name: String): String? {
 
     // 3. Common Homebrew locations (fallback)
     return listOf(
-        "/opt/homebrew/bin/$name",  // Apple Silicon
-        "/usr/local/bin/$name",     // Intel
+        "/opt/homebrew/bin/$name", // Apple Silicon
+        "/usr/local/bin/$name", // Intel
         "/usr/bin/$name",
     ).firstOrNull { access(it, X_OK) == 0 }
 }

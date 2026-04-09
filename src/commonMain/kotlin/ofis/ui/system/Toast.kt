@@ -17,10 +17,16 @@ import kotlin.time.Duration.Companion.milliseconds
 
 private const val TOAST_DURATION_MS = 3_500L
 
-data class ToastData(val message: String, val isSuccess: Boolean)
+data class ToastData(
+    val message: String,
+    val isSuccess: Boolean,
+)
 
 @Composable
-fun ToastHost(toast: ToastData?, onDismiss: () -> Unit) {
+fun ToastHost(
+    toast: ToastData?,
+    onDismiss: () -> Unit,
+) {
     LaunchedEffect(toast) {
         if (toast != null) {
             delay(TOAST_DURATION_MS.milliseconds)
@@ -47,12 +53,13 @@ private fun ToastCard(toast: ToastData) {
     val icon = if (toast.isSuccess) "✓" else "✕"
 
     Row(
-        modifier = Modifier
-            .padding(top = 24.dp, start = 16.dp, end = 16.dp)
-            .background(bgColor, RoundedCornerShape(12.dp))
-            .padding(horizontal = 20.dp, vertical = 14.dp),
+        modifier =
+            Modifier
+                .padding(top = 24.dp, start = 16.dp, end = 16.dp)
+                .background(bgColor, RoundedCornerShape(12.dp))
+                .padding(horizontal = 20.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(icon, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
         Text(toast.message, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)

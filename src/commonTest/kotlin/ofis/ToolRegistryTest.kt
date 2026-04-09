@@ -1,10 +1,10 @@
 package ofis
 
+import ofis.tool.ToolBox
+import ofis.tool.ToolRegistry
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import ofis.tool.ToolRegistry
-import ofis.tool.ToolBox
 
 class ToolRegistryTest {
     @Test

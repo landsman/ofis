@@ -23,8 +23,9 @@ fun Badge(
         fontSize = 11.sp,
         fontWeight = FontWeight.SemiBold,
         color = textColor,
-        modifier = modifier
-            .background(backgroundColor, RoundedCornerShape(4.dp))
-            .padding(horizontal = 6.dp, vertical = 2.dp)
+        modifier =
+            modifier
+                .background(backgroundColor, RoundedCornerShape(4.dp))
+                .padding(horizontal = 6.dp, vertical = 2.dp),
     )
 }

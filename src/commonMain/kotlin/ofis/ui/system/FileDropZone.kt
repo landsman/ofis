@@ -37,15 +37,16 @@ fun FileDropZone(
     onClear: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(if (selectedFilePath == null) 120.dp else 80.dp)
-            .background(Color.White, RoundedCornerShape(12.dp))
-            .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
-            .pointerHoverIcon(PointerIcon.Hand, overrideDescendants = false)
-            .clickable(enabled = selectedFilePath == null, onClick = onSelect)
-            .padding(horizontal = 20.dp),
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(if (selectedFilePath == null) 120.dp else 80.dp)
+                .background(Color.White, RoundedCornerShape(12.dp))
+                .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
+                .pointerHoverIcon(PointerIcon.Hand, overrideDescendants = false)
+                .clickable(enabled = selectedFilePath == null, onClick = onSelect)
+                .padding(horizontal = 20.dp),
+        contentAlignment = Alignment.Center,
     ) {
         if (selectedFilePath == null) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -62,7 +63,7 @@ fun FileDropZone(
                         text = selectedFilePath.split("/").last(),
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 15.sp,
-                        color = Color(0xFF333333)
+                        color = Color(0xFF333333),
                     )
                     if (selectedFileSize != null) {
                         Text(text = formatSize(selectedFileSize), color = Color.Gray, fontSize = 13.sp)
@@ -72,11 +73,12 @@ fun FileDropZone(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Clear selection",
                     tint = Color.Gray,
-                    modifier = Modifier
-                        .size(28.dp)
-                        .pointerHoverIcon(PointerIcon.Hand)
-                        .clickable { onClear() }
-                        .padding(4.dp)
+                    modifier =
+                        Modifier
+                            .size(28.dp)
+                            .pointerHoverIcon(PointerIcon.Hand)
+                            .clickable { onClear() }
+                            .padding(4.dp),
                 )
             }
         }

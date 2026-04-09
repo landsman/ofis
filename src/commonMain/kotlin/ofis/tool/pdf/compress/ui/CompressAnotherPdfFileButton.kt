@@ -22,10 +22,11 @@ fun CompressAnotherPdfFileButton(onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier.fillMaxWidth().height(48.dp),
         shape = RoundedCornerShape(10.dp),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color(0xFFF0F0F0),
-            contentColor = Color(0xFF333333)
-        )
+        colors =
+            ButtonDefaults.buttonColors(
+                backgroundColor = Color(0xFFF0F0F0),
+                contentColor = Color(0xFF333333),
+            ),
     ) {
         Text("Compress another file", fontWeight = FontWeight.Medium, fontSize = 15.sp)
     }

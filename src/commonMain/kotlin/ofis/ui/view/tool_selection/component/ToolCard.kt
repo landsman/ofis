@@ -24,17 +24,21 @@ import ofis.tool.Tool
 import ofis.ui.system.AppButton
 
 @Composable
-fun ToolCard(tool: Tool, onClick: () -> Unit) {
+fun ToolCard(
+    tool: Tool,
+    onClick: () -> Unit,
+) {
     Row(
-            modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
-                    .background(Color.White, RoundedCornerShape(12.dp))
-                    .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
-                    .pointerHoverIcon(PointerIcon.Hand, overrideDescendants = false)
-                    .clickable { onClick() }
-                    .padding(horizontal = 20.dp),
-            verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .background(Color.White, RoundedCornerShape(12.dp))
+                .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
+                .pointerHoverIcon(PointerIcon.Hand, overrideDescendants = false)
+                .clickable { onClick() }
+                .padding(horizontal = 20.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(text = tool.displayName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
@@ -42,9 +46,9 @@ fun ToolCard(tool: Tool, onClick: () -> Unit) {
         }
 
         AppButton(
-                onClick = onClick,
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFF0F0F0))
+            onClick = onClick,
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFF0F0F0)),
         ) {
             Text("Open")
         }

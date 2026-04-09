@@ -39,23 +39,38 @@ sealed interface CompressionResult {
         val alreadyOptimal: Boolean get() = compressedBytes >= originalBytes
     }
 
-    data class Failure(val reason: CompressionError) : CompressionResult
+    data class Failure(
+        val reason: CompressionError,
+    ) : CompressionResult
 }
 
 // ── Error model ───────────────────────────────────────────────────────────────
 
 sealed interface CompressionError {
-    data class BinaryNotFound(val name: String) : CompressionError {
+    data class BinaryNotFound(
+        val name: String,
+    ) : CompressionError {
         override fun toString() = "Required tool not found: $name. Install it first (e.g. brew install $name)."
     }
-    data class ProcessFailed(val tool: String, val exitCode: Int, val stderr: String) : CompressionError {
+
+    data class ProcessFailed(
+        val tool: String,
+        val exitCode: Int,
+        val stderr: String,
+    ) : CompressionError {
         override fun toString() = "$tool exited with code $exitCode: $stderr"
     }
-    data class InvalidInput(val message: String) : CompressionError {
+
+    data class InvalidInput(
+        val message: String,
+    ) : CompressionError {
         override fun toString() = message
     }
+
     // todo: implement this - low space on disk, missing permission to write, etc
-    data class FileSystemError(val message: String) : CompressionError {
+    data class FileSystemError(
+        val message: String,
+    ) : CompressionError {
         override fun toString() = message
     }
 }
