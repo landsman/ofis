@@ -1,10 +1,13 @@
 package ofis.tool.pdf.compress
+
 import androidx.compose.runtime.Composable
 import ofis.config.Logger
 import ofis.tool.Tool
 import ofis.tool.ToolBox
 import ofis.tool.ToolRegistry
-import ofis.tool.pdf.compress.model.*
+import ofis.tool.pdf.compress.model.CompressionProfile
+import ofis.tool.pdf.compress.model.CompressionRequest
+import ofis.tool.pdf.compress.model.CompressionResult
 import ofis.tool.pdf.compress.service.PdfCompressionService
 import ofis.tool.pdf.compress.ui.PdfDetailScreen
 import ofis.utils.format.formatSize
@@ -37,11 +40,11 @@ class PdfCompressor : Tool {
         val profile = parseProfile(args)
 
         val request =
-            CompressionRequest(
-                inputPath = inputStr.toPath(),
-                outputPath = outputStr.toPath(),
-                profile = profile,
-            )
+                CompressionRequest(
+                        inputPath = inputStr.toPath(),
+                        outputPath = outputStr.toPath(),
+                        profile = profile,
+                )
 
         Logger.info("Compressing $inputStr → $outputStr [${profile.label}]")
 
@@ -66,8 +69,8 @@ class PdfCompressor : Tool {
     }
 
     private fun suggestedName(
-        input: String,
-        profile: CompressionProfile,
+            input: String,
+            profile: CompressionProfile,
     ): String {
         val name = input.toPath().name
         val base = name.substringBeforeLast(".")

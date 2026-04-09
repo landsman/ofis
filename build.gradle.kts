@@ -1,8 +1,5 @@
 
 import io.gitlab.arturbosch.detekt.Detekt
-import org.gradle.api.file.ConfigurableFileCollection
-import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
-import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 
 plugins {
     kotlin("multiplatform") version "2.1.10"
@@ -33,21 +30,8 @@ ktlint {
     verbose.set(true)
     outputToConsole.set(true)
     enableExperimentalRules.set(true)
-}
-
-afterEvaluate {
-    val srcPath = projectDir.resolve("src").absolutePath
-    @Suppress("UnstableApiUsage")
-    tasks.withType<KtLintCheckTask>().all {
-        val fc = source as ConfigurableFileCollection
-        val filtered = fc.asFileTree.matching { include { it.file.absolutePath.startsWith(srcPath) } }.files
-        fc.setFrom(filtered)
-    }
-    @Suppress("UnstableApiUsage")
-    tasks.withType<KtLintFormatTask>().all {
-        val fc = source as ConfigurableFileCollection
-        val filtered = fc.asFileTree.matching { include { it.file.absolutePath.startsWith(srcPath) } }.files
-        fc.setFrom(filtered)
+    filter {
+        exclude("**/generated/**")
     }
 }
 

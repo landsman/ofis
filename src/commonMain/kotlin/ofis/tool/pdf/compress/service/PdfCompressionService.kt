@@ -32,7 +32,7 @@ class PdfCompressionService {
         if (qpdfResult.exitCode != 0 && qpdfResult.exitCode != 3) {
             cleanupQuiet(tmpQpdf)
             return CompressionResult.Failure(
-                    CompressionError.ProcessFailed("qpdf", qpdfResult.exitCode, qpdfResult.stderr),
+                CompressionError.ProcessFailed("qpdf", qpdfResult.exitCode, qpdfResult.stderr),
             )
         }
         val warnings =
@@ -112,16 +112,16 @@ class PdfCompressionService {
                 CompressionProfile.MAXIMUM -> "9"
             }
         return NativeCommand(
-                executable = binary,
-                arguments =
-                        listOf(
-                                input.toString(),
-                                "--compress-streams=y",
-                                "--object-streams=generate",
-                                "--recompress-flate",
-                                "--compression-level=$level",
-                                output.toString(),
-                        ),
+            executable = binary,
+            arguments =
+                listOf(
+                    input.toString(),
+                    "--compress-streams=y",
+                    "--object-streams=generate",
+                    "--recompress-flate",
+                    "--compression-level=$level",
+                    output.toString(),
+                ),
         )
     }
 
@@ -144,25 +144,25 @@ class PdfCompressionService {
                 CompressionProfile.HIGH_QUALITY -> error("gs not used for HIGH_QUALITY")
             }
         return NativeCommand(
-                executable = binary,
-                arguments =
-                        listOf(
-                                "-q",
-                                "-dNOPAUSE",
-                                "-dBATCH",
-                                "-dSAFER",
-                                "-sDEVICE=pdfwrite",
-                                "-dCompatibilityLevel=1.4",
-                                "-dPDFSETTINGS=$preset",
-                                "-dColorImageDownsampleType=/Bicubic",
-                                "-dColorImageResolution=$dpi",
-                                "-dGrayImageDownsampleType=/Bicubic",
-                                "-dGrayImageResolution=$dpi",
-                                "-dMonoImageDownsampleType=/Bicubic",
-                                "-dMonoImageResolution=$dpi",
-                                "-sOutputFile=$output",
-                                input.toString(),
-                        ),
+            executable = binary,
+            arguments =
+                listOf(
+                    "-q",
+                    "-dNOPAUSE",
+                    "-dBATCH",
+                    "-dSAFER",
+                    "-sDEVICE=pdfwrite",
+                    "-dCompatibilityLevel=1.4",
+                    "-dPDFSETTINGS=$preset",
+                    "-dColorImageDownsampleType=/Bicubic",
+                    "-dColorImageResolution=$dpi",
+                    "-dGrayImageDownsampleType=/Bicubic",
+                    "-dGrayImageResolution=$dpi",
+                    "-dMonoImageDownsampleType=/Bicubic",
+                    "-dMonoImageResolution=$dpi",
+                    "-sOutputFile=$output",
+                    input.toString(),
+                ),
         )
     }
 
