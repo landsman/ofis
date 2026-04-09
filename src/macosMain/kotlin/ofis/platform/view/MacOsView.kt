@@ -21,7 +21,7 @@ actual fun platformGui() {
 
     val icon = NSBundle.mainBundle.pathForResource("AppIcon", "icns")?.let { NSImage(contentsOfFile = it) }
         ?: NSImage(contentsOfFile = "build/mac_os_app_icon.png")
-    icon?.let { app.setApplicationIconImage(it) }
+    icon.let { app.setApplicationIconImage(it) }
 
     Window("Ofis") {
         App()

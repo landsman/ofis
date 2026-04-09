@@ -3,7 +3,6 @@ import ofis.tool.pdf.compress.model.*
 
 import ofis.platform.fileSystem
 import ofis.platform.service.findHelperBinary
-import okio.Path
 import okio.Path.Companion.toPath
 
 class PdfCompressionService {

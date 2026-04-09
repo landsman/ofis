@@ -11,6 +11,7 @@ actual fun platformMain(args: List<String>) {
     commonMain(args)
 }
 
+@Suppress("unused") // actual implementation of expect fun exitProcess in Platform.kt
 actual fun exitProcess(status: Int) {
     exit(status)
 }
