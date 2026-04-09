@@ -8,16 +8,28 @@ import kotlinx.coroutines.withContext
 import ofis.App
 import platform.AppKit.NSApplication
 import platform.AppKit.NSApplicationActivationPolicy
+import platform.AppKit.NSApplicationDelegateProtocol
 import platform.AppKit.NSImage
 import platform.AppKit.NSOpenPanel
 import platform.AppKit.NSSavePanel
 import platform.AppKit.NSWindow
 import platform.Foundation.NSBundle
+import platform.darwin.NSObject
 import kotlin.coroutines.resume
+
+private class AppDelegate :
+    NSObject(),
+    NSApplicationDelegateProtocol {
+    /* terminate the process (make gui) when the window is closed */
+    override fun applicationShouldTerminateAfterLastWindowClosed(sender: NSApplication): Boolean = true
+}
 
 actual fun platformGui() {
     val app = NSApplication.sharedApplication()
+    /* show the app in macOS dock when it's opened */
     app.setActivationPolicy(NSApplicationActivationPolicy.NSApplicationActivationPolicyRegular)
+    /* return correct exit code when window is closed */
+    app.delegate = AppDelegate()
 
     val icon =
         NSBundle.mainBundle.pathForResource("AppIcon", "icns")?.let { NSImage(contentsOfFile = it) }
