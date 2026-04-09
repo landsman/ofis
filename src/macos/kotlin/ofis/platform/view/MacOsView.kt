@@ -20,15 +20,15 @@ import kotlin.coroutines.resume
 private class AppDelegate :
     NSObject(),
     NSApplicationDelegateProtocol {
-    /* terminate the process (make gui) when the window is closed */
+    // terminate the process (make gui) when the window is closed
     override fun applicationShouldTerminateAfterLastWindowClosed(sender: NSApplication): Boolean = true
 }
 
 actual fun platformGui() {
     val app = NSApplication.sharedApplication()
-    /* show the app in macOS dock when it's opened */
+    // show the app in macOS dock when it's opened
     app.setActivationPolicy(NSApplicationActivationPolicy.NSApplicationActivationPolicyRegular)
-    /* return correct exit code when window is closed */
+    // return correct exit code when window is closed
     app.delegate = AppDelegate()
 
     val icon =
