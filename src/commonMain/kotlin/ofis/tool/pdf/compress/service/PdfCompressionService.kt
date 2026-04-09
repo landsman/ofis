@@ -2,6 +2,7 @@ package ofis.tool.pdf.compress.service
 import ofis.tool.pdf.compress.model.*
 
 import ofis.platform.fileSystem
+import ofis.platform.service.findHelperBinary
 import okio.Path
 import okio.Path.Companion.toPath
 
@@ -18,7 +19,7 @@ class PdfCompressionService {
         val originalBytes = fs.metadata(request.inputPath).size ?: 0L
 
         // ── resolve binaries ───────────────────────────────────────────────
-        val qpdf = findOnPath("qpdf")
+        val qpdf = findHelperBinary("qpdf")
             ?: return CompressionResult.Failure(CompressionError.BinaryNotFound("qpdf"))
 
         val tmpQpdf: Path = request.outputPath.parent!! / "${request.outputPath.name}.qpdf.tmp"
@@ -40,7 +41,7 @@ class PdfCompressionService {
             CompressionProfile.HIGH_QUALITY -> tmpQpdf
 
             CompressionProfile.BALANCED, CompressionProfile.MAXIMUM -> {
-                val gs = findOnPath("gs")
+                val gs = findHelperBinary("gs")
                     ?: return run {
                         cleanupQuiet(tmpQpdf)
                         CompressionResult.Failure(CompressionError.BinaryNotFound("gs (ghostscript)"))
@@ -148,8 +149,3 @@ class PdfCompressionService {
     }
 }
 
-/** Checks if a binary exists on system PATH by running `which` / `where`. */
-internal fun findOnPath(name: String): String? {
-    val result = runProcess(NativeCommand("which", listOf(name)))
-    return if (result.exitCode == 0) result.stdout.trim().takeIf { it.isNotEmpty() } else null
-}

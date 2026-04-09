@@ -34,10 +34,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ofis.config.Logger
-import ofis.platform.availableDiskSpace
 import ofis.platform.fileSystem
-import ofis.platform.pickFile
-import ofis.platform.saveFile
+import ofis.platform.service.availableDiskSpace
+import ofis.platform.view.pickFile
+import ofis.platform.view.saveFile
 import ofis.tool.Tool
 import ofis.tool.pdf.compress.model.CompressionProfile
 import ofis.ui.system.AppButton
@@ -71,7 +71,7 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
                     msg.startsWith("RESIZE_INFO: ")    -> { resizeInfo = msg.substringAfter("RESIZE_INFO: "); isRunning = false }
                     msg.startsWith("OUTPUT_PATH: ")    -> outputFilePath = msg.substringAfter("OUTPUT_PATH: ")
                     msg.startsWith("SUGGESTED_NAME: ") -> suggestedSaveName = msg.substringAfter("SUGGESTED_NAME: ")
-                    msg.startsWith("Error: ")          -> isRunning = false
+                    msg.startsWith("Error: ")          -> { isRunning = false; toast = ToastData(msg.substringAfter("Error: "), isSuccess = false) }
                 }
                 logs += msg + "\n"
             }

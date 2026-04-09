@@ -3,7 +3,7 @@ package ofis
 import ofis.config.GlobalConfig
 import ofis.config.Logger
 import ofis.platform.defaultToGui
-import ofis.platform.platformGui
+import ofis.platform.view.platformGui
 import ofis.tool.ToolRegistry
 
 fun commonMain(argList: List<String>): Int {

@@ -80,13 +80,25 @@ macos_icon:
 macos_dmg: macos_icon
 	@if [ "$(OS)" != "Darwin" ]; then echo "Error: DMG creation only supported on macOS"; exit 1; fi
 	@command -v create-dmg >/dev/null || { echo "Error: install create-dmg: brew install create-dmg"; exit 1; }
+	@command -v dylibbundler >/dev/null || { echo "Error: install dylibbundler: brew install dylibbundler"; exit 1; }
+	@command -v qpdf >/dev/null 2>&1 || { echo "Error: install qpdf: brew install qpdf"; exit 1; }
+	@command -v gs >/dev/null 2>&1 || { echo "Error: install ghostscript: brew install ghostscript"; exit 1; }
 	$(GRADLE) linkReleaseExecutable$(TARGET_SUFFIX)
 	@rm -rf build/Ofis.app
-	@mkdir -p build/Ofis.app/Contents/MacOS build/Ofis.app/Contents/Resources
+	@mkdir -p build/Ofis.app/Contents/MacOS build/Ofis.app/Contents/Resources build/Ofis.app/Contents/Frameworks
 	@cp build/bin/$(shell echo $(TARGET_SUFFIX) | sed 's/M/m/')/releaseExecutable/Ofis.kexe \
 		build/Ofis.app/Contents/MacOS/Ofis
 	@cp src/macosMain/resources/Info.plist build/Ofis.app/Contents/Info.plist
 	@cp build/AppIcon.icns build/Ofis.app/Contents/Resources/AppIcon.icns
+	@echo "Bundling helper binaries (qpdf, gs)..."
+	@cp $$(which qpdf) build/Ofis.app/Contents/MacOS/qpdf
+	@cp $$(which gs) build/Ofis.app/Contents/MacOS/gs
+	@echo "Bundling dylib dependencies..."
+	dylibbundler -od -b \
+		-x build/Ofis.app/Contents/MacOS/qpdf \
+		-x build/Ofis.app/Contents/MacOS/gs \
+		-d build/Ofis.app/Contents/Frameworks/ \
+		-p @executable_path/../Frameworks/
 	@rm -f build/Ofis.dmg
 	create-dmg \
 		--volname "Ofis" \
@@ -181,7 +193,7 @@ help:
 	@echo "  format           — auto-fix style issues"
 	@echo ""
 	@echo "  macos_icon       — convert SVG icon to PNG and ICNS"
-	@echo "  macos_dmg        — package app as DMG (macOS only, requires create-dmg)"
+	@echo "  macos_dmg        — package app as DMG (macOS only, requires create-dmg, dylibbundler, qpdf, ghostscript)"
 	@echo "  macos_sign       — sign app with Developer ID (requires SIGN_ID)"
 	@echo "  macos_notarize   — notarize + staple DMG (requires APPLE_ID, APPLE_TEAM_ID, APPLE_APP_PASSWORD)"
 	@echo "  macos_release    — publish DMG to GitHub Releases (requires gh)"
