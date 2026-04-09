@@ -105,18 +105,18 @@ format:
 # Icon generation (requires rsvg-convert: brew install librsvg)
 macos_icon:
 	@mkdir -p build/icon.iconset
-	@rsvg-convert -w 16 -h 16 src/macosMain/resources/icon.svg -o build/icon.iconset/icon_16x16.png
-	@rsvg-convert -w 32 -h 32 src/macosMain/resources/icon.svg -o build/icon.iconset/icon_16x16@2x.png
-	@rsvg-convert -w 32 -h 32 src/macosMain/resources/icon.svg -o build/icon.iconset/icon_32x32.png
-	@rsvg-convert -w 64 -h 64 src/macosMain/resources/icon.svg -o build/icon.iconset/icon_32x32@2x.png
-	@rsvg-convert -w 128 -h 128 src/macosMain/resources/icon.svg -o build/icon.iconset/icon_128x128.png
-	@rsvg-convert -w 256 -h 256 src/macosMain/resources/icon.svg -o build/icon.iconset/icon_128x128@2x.png
-	@rsvg-convert -w 256 -h 256 src/macosMain/resources/icon.svg -o build/icon.iconset/icon_256x256.png
-	@rsvg-convert -w 512 -h 512 src/macosMain/resources/icon.svg -o build/icon.iconset/icon_256x256@2x.png
-	@rsvg-convert -w 512 -h 512 src/macosMain/resources/icon.svg -o build/icon.iconset/icon_512x512.png
-	@rsvg-convert -w 1024 -h 1024 src/macosMain/resources/icon.svg -o build/icon.iconset/icon_512x512@2x.png
+	@rsvg-convert -w 16 -h 16 src/macos/resources/icon.svg -o build/icon.iconset/icon_16x16.png
+	@rsvg-convert -w 32 -h 32 src/macos/resources/icon.svg -o build/icon.iconset/icon_16x16@2x.png
+	@rsvg-convert -w 32 -h 32 src/macos/resources/icon.svg -o build/icon.iconset/icon_32x32.png
+	@rsvg-convert -w 64 -h 64 src/macos/resources/icon.svg -o build/icon.iconset/icon_32x32@2x.png
+	@rsvg-convert -w 128 -h 128 src/macos/resources/icon.svg -o build/icon.iconset/icon_128x128.png
+	@rsvg-convert -w 256 -h 256 src/macos/resources/icon.svg -o build/icon.iconset/icon_128x128@2x.png
+	@rsvg-convert -w 256 -h 256 src/macos/resources/icon.svg -o build/icon.iconset/icon_256x256.png
+	@rsvg-convert -w 512 -h 512 src/macos/resources/icon.svg -o build/icon.iconset/icon_256x256@2x.png
+	@rsvg-convert -w 512 -h 512 src/macos/resources/icon.svg -o build/icon.iconset/icon_512x512.png
+	@rsvg-convert -w 1024 -h 1024 src/macos/resources/icon.svg -o build/icon.iconset/icon_512x512@2x.png
 	@iconutil -c icns build/icon.iconset -o build/AppIcon.icns
-	@rsvg-convert -w 1024 -h 1024 src/macosMain/resources/icon.svg -o build/mac_os_app_icon.png \
+	@rsvg-convert -w 1024 -h 1024 src/macos/resources/icon.svg -o build/mac_os_app_icon.png \
 		|| echo "Warning: rsvg-convert not found (brew install librsvg)"
 
 # DMG packaging using create-dmg (brew install create-dmg)
@@ -131,7 +131,7 @@ macos_dmg: macos_icon
 	@mkdir -p build/Ofis.app/Contents/MacOS build/Ofis.app/Contents/Resources build/Ofis.app/Contents/Frameworks
 	@cp build/bin/$(shell echo $(TARGET_SUFFIX) | sed 's/M/m/')/releaseExecutable/Ofis.kexe \
 		build/Ofis.app/Contents/MacOS/Ofis
-	@cp src/macosMain/resources/Info.plist build/Ofis.app/Contents/Info.plist
+	@cp src/macos/resources/Info.plist build/Ofis.app/Contents/Info.plist
 	@cp build/AppIcon.icns build/Ofis.app/Contents/Resources/AppIcon.icns
 	@echo "Bundling helper binaries (qpdf, gs)..."
 	@cp $$(which qpdf) build/Ofis.app/Contents/MacOS/qpdf
