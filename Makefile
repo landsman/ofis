@@ -22,7 +22,7 @@ GRADLE  := ./gradlew
 VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "1.0.0")
 
 # ── Setup ─────────────────────────────────────────────────────────────────────
-.PHONY: install install-bins
+.PHONY: install install-bins uninstall-bins
 
 # Download all Kotlin/Gradle dependencies into the local cache
 install:
@@ -44,6 +44,19 @@ else ifeq ($(OS),Linux)
 	apt-get install -y qpdf ghostscript librsvg2-bin
 else
 	@echo "Error: install-bins is not supported on $(OS)"; exit 1
+endif
+
+# Uninstall binary dependencies installed by install-bins
+uninstall-bins:
+ifeq ($(OS),Darwin)
+	@command -v brew >/dev/null || { echo "Error: Homebrew not found"; exit 1; }
+	brew uninstall --ignore-dependencies qpdf ghostscript librsvg create-dmg dylibbundler || true
+else ifeq ($(OS),Linux)
+	@command -v apt-get >/dev/null || { echo "Error: apt-get not found - only Ubuntu/Debian is supported"; exit 1; }
+	@[ "$$(id -u)" = "0" ] || { echo "Error: run with sudo: sudo make uninstall-bins"; exit 1; }
+	apt-get remove -y qpdf ghostscript librsvg2-bin || true
+else
+	@echo "Error: uninstall-bins is not supported on $(OS)"; exit 1
 endif
 
 # ── Development ───────────────────────────────────────────────────────────────
@@ -226,6 +239,7 @@ help:
 	@echo ""
 	@echo "  install          — download all Kotlin/Gradle dependencies into local cache"
 	@echo "  install-bins     — install binary deps: macOS via Homebrew, Ubuntu/Debian via apt"
+	@echo "  uninstall-bins   — uninstall binary deps installed by install-bins"
 	@echo "  check            — compile only, catches missing imports/type errors fast"
 	@echo "  build            — compile host binary (fast, no lint)"
 	@echo "  run              — build + run  (ARGS='pdf-compress input.pdf')"

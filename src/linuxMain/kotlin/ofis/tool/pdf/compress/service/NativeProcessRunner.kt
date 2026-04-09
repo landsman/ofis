@@ -41,22 +41,24 @@ actual fun runProcess(command: NativeCommand): ProcessResult =
         check(pipe(stdoutPipe) == 0) { "pipe(stdout) failed" }
         check(pipe(stderrPipe) == 0) { "pipe(stderr) failed" }
 
+        // Build argv BEFORE fork() — heap allocation is not safe in a forked child
+        // of a multithreaded process (malloc lock may be held by another thread).
+        val all = listOf(command.executable) + command.arguments
+        val argv = allocArray<CPointerVar<ByteVar>>(all.size + 1)
+        all.forEachIndexed { i, s -> argv[i] = s.cstr.getPointer(this) }
+        argv[all.size] = null
+
         val pid = fork()
         check(pid >= 0) { "fork() failed" }
 
         if (pid == 0) {
-            // ── child process ──────────────────────────────────────────────────
+            // ── child process — only async-signal-safe calls here ──────────────
             dup2(stdoutPipe[1], STDOUT_FILENO)
             dup2(stderrPipe[1], STDERR_FILENO)
             close(stdoutPipe[0])
             close(stdoutPipe[1])
             close(stderrPipe[0])
             close(stderrPipe[1])
-
-            val all = listOf(command.executable) + command.arguments
-            val argv = allocArray<CPointerVar<ByteVar>>(all.size + 1)
-            all.forEachIndexed { i, s -> argv[i] = s.cstr.getPointer(this) }
-            argv[all.size] = null
 
             execvp(command.executable, argv)
             _exit(127) // execvp failed

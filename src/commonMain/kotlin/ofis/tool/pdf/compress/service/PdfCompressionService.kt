@@ -1,5 +1,6 @@
 package ofis.tool.pdf.compress.service
 
+import ofis.config.Logger
 import ofis.platform.fileSystem
 import ofis.platform.service.findHelperBinary
 import ofis.tool.pdf.compress.model.CompressionError
@@ -7,12 +8,28 @@ import ofis.tool.pdf.compress.model.CompressionProfile
 import ofis.tool.pdf.compress.model.CompressionRequest
 import ofis.tool.pdf.compress.model.CompressionResult
 import ofis.tool.pdf.compress.model.NativeCommand
+import ofis.tool.pdf.compress.model.ProcessResult
 import okio.Path
+import kotlin.time.measureTime
 
-class PdfCompressionService {
+class PdfCompressionService(
+    private val binaryFinder: (String) -> String? = ::findHelperBinary,
+    private val processRunner: (NativeCommand) -> ProcessResult = ::runProcess,
+) {
     fun compress(request: CompressionRequest): CompressionResult {
         val fs = fileSystem
+        var result: CompressionResult? = null
+        val total = measureTime {
+            result = doCompress(request, fs)
+        }
+        Logger.info("[timing] total: $total")
+        return result!!
+    }
 
+    private fun doCompress(
+        request: CompressionRequest,
+        fs: okio.FileSystem,
+    ): CompressionResult {
         // ── validate input ─────────────────────────────────────────────────
         if (!fs.exists(request.inputPath)) {
             return CompressionResult.Failure(CompressionError.InvalidInput("File not found: ${request.inputPath}"))
@@ -21,14 +38,17 @@ class PdfCompressionService {
         val originalBytes = fs.metadata(request.inputPath).size ?: 0L
 
         // ── resolve binaries ───────────────────────────────────────────────
-        val qpdf =
-            findHelperBinary("qpdf")
-                ?: return CompressionResult.Failure(CompressionError.BinaryNotFound("qpdf"))
+        lateinit var qpdf: String
+        val tFindQpdf = measureTime { qpdf = binaryFinder("qpdf") ?: return CompressionResult.Failure(CompressionError.BinaryNotFound("qpdf")) }
+        Logger.info("[timing] find qpdf: $tFindQpdf → $qpdf")
 
         val tmpQpdf: Path = request.outputPath.parent!! / "${request.outputPath.name}.qpdf.tmp"
 
         // ── qpdf pass (always runs) ────────────────────────────────────────
-        val qpdfResult = runProcess(buildQpdfCommand(qpdf, request.inputPath, tmpQpdf, request.profile))
+        lateinit var qpdfResult: ProcessResult
+        val tQpdf = measureTime { qpdfResult = processRunner(buildQpdfCommand(qpdf, request.inputPath, tmpQpdf, request.profile)) }
+        Logger.info("[timing] qpdf: $tQpdf (exit=${qpdfResult.exitCode})")
+
         if (qpdfResult.exitCode != 0 && qpdfResult.exitCode != 3) {
             cleanupQuiet(tmpQpdf)
             return CompressionResult.Failure(
@@ -46,15 +66,14 @@ class PdfCompressionService {
                 CompressionProfile.HIGH_QUALITY -> tmpQpdf
 
                 CompressionProfile.BALANCED, CompressionProfile.MAXIMUM -> {
-                    val gs =
-                        findHelperBinary("gs")
-                            ?: return run {
-                                cleanupQuiet(tmpQpdf)
-                                CompressionResult.Failure(CompressionError.BinaryNotFound("gs (ghostscript)"))
-                            }
+                    lateinit var gs: String
+                    val tFindGs = measureTime { gs = binaryFinder("gs") ?: return run { cleanupQuiet(tmpQpdf); CompressionResult.Failure(CompressionError.BinaryNotFound("gs (ghostscript)")) } }
+                    Logger.info("[timing] find gs: $tFindGs → $gs")
 
                     val tmpGs: Path = request.outputPath.parent!! / "${request.outputPath.name}.gs.tmp"
-                    val gsResult = runProcess(buildGhostscriptCommand(gs, tmpQpdf, tmpGs, request.profile))
+                    lateinit var gsResult: ProcessResult
+                    val tGs = measureTime { gsResult = processRunner(buildGhostscriptCommand(gs, tmpQpdf, tmpGs, request.profile)) }
+                    Logger.info("[timing] gs: $tGs (exit=${gsResult.exitCode})")
                     cleanupQuiet(tmpQpdf)
 
                     if (gsResult.exitCode != 0) {
