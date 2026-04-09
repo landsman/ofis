@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import ofis.config.Logger
 import ofis.tool.Tool
 import ofis.ui.system.DotGridBackground
 import ofis.ui.view.toolselection.ToolSelectionView
@@ -26,9 +27,15 @@ fun App() {
 
             Column(modifier = Modifier.fillMaxSize().padding(40.dp)) {
                 if (currentTool == null) {
-                    ToolSelectionView(onToolSelect = { currentTool = it })
+                    ToolSelectionView(onToolSelect = {
+                        Logger.debug("navigate → ${it.name}")
+                        currentTool = it
+                    })
                 } else {
-                    currentTool!!.Screen(onBack = { currentTool = null })
+                    currentTool!!.Screen(onBack = {
+                        Logger.debug("navigate → home")
+                        currentTool = null
+                    })
                 }
             }
         }

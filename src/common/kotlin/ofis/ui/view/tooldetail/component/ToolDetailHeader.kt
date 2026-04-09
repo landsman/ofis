@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ofis.tool.Tool
+import ofis.ui.system.LocalWindowWidth
+import ofis.ui.system.WindowWidth
 
 @Composable
 fun ToolDetailHeader(
@@ -23,6 +25,20 @@ fun ToolDetailHeader(
     onBack: () -> Unit,
     actions: (@Composable () -> Unit)? = null,
 ) {
+    val window = LocalWindowWidth.current
+    val titleSize =
+        when (window) {
+            WindowWidth.Compact -> 18.sp
+            WindowWidth.Medium -> 22.sp
+            WindowWidth.Expanded -> 28.sp
+        }
+    val backSize =
+        when (window) {
+            WindowWidth.Compact -> 13.sp
+            WindowWidth.Medium -> 14.sp
+            WindowWidth.Expanded -> 16.sp
+        }
+
     Box(
         modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
     ) {
@@ -35,7 +51,7 @@ fun ToolDetailHeader(
                     .pointerHoverIcon(PointerIcon.Hand)
                     .clickable { onBack() },
             color = Color(0xFF4A90E2),
-            fontSize = 16.sp,
+            fontSize = backSize,
             fontWeight = FontWeight.Bold,
         )
 
@@ -43,12 +59,12 @@ fun ToolDetailHeader(
         Text(
             text = tool.displayName,
             modifier = Modifier.align(Alignment.Center),
-            fontSize = 28.sp,
+            fontSize = titleSize,
             fontWeight = FontWeight.ExtraBold,
             color = Color(0xFF1A1A1A),
         )
 
-        // Right — optional actions
+        // Right — optional actions (icons, badges, etc.)
         if (actions != null) {
             Row(modifier = Modifier.align(Alignment.CenterEnd)) {
                 actions()

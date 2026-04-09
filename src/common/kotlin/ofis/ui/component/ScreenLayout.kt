@@ -1,16 +1,20 @@
 package ofis.ui.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import ofis.ui.system.LocalWindowWidth
+import ofis.ui.system.toWindowWidth
 
 private val DEFAULT_MAX_WIDTH = 860.dp
 
@@ -21,10 +25,8 @@ fun ScreenLayout(
     maxWidth: Dp = DEFAULT_MAX_WIDTH,
     content: @Composable () -> Unit,
 ) {
-    // Full-width outer shell — fills the window
     Column(modifier = Modifier.fillMaxSize()) {
-        // Constrained + centred column for header / content / footer
-        Column(
+        BoxWithConstraints(
             modifier =
                 Modifier
                     .weight(1f)
@@ -33,10 +35,15 @@ fun ScreenLayout(
                     .widthIn(max = maxWidth)
                     .fillMaxWidth(),
         ) {
-            Box(modifier = Modifier.fillMaxWidth()) { header() }
-            Box(modifier = Modifier.weight(1f).fillMaxWidth()) { content() }
-            if (footer != null) {
-                Box(modifier = Modifier.fillMaxWidth()) { footer() }
+            val windowWidth = this.maxWidth.toWindowWidth()
+            CompositionLocalProvider(LocalWindowWidth provides windowWidth) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Box(modifier = Modifier.fillMaxWidth()) { header() }
+                    Box(modifier = Modifier.weight(1f).fillMaxWidth()) { content() }
+                    if (footer != null) {
+                        Box(modifier = Modifier.fillMaxWidth()) { footer() }
+                    }
+                }
             }
         }
     }
