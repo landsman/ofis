@@ -26,7 +26,7 @@ import ofis.tool.Tool
 import ofis.tool.pdf.compress.model.CompressionProfile
 import ofis.tool.pdf.compress.service.saveCompressedFile
 import ofis.ui.system.FileDropZone
-import ofis.ui.system.LogView
+import ofis.ui.system.LogOverlay
 import ofis.ui.system.toast.ToastData
 import ofis.ui.system.toast.ToastHost
 import okio.Path.Companion.toPath
@@ -35,6 +35,7 @@ import okio.Path.Companion.toPath
 fun PdfDetailScreen(
     tool: Tool,
     showLogs: Boolean,
+    onCloseLogs: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -56,7 +57,6 @@ fun PdfDetailScreen(
             ?.toIntOrNull()
             ?.let { it <= 0 } ?: false
 
-    // Logger listener — posts all state updates back to Main so Compose sees them
     DisposableEffect(tool) {
         val listener: (String) -> Unit = { msg ->
             scope.launch(Dispatchers.Main) {
@@ -70,8 +70,7 @@ fun PdfDetailScreen(
                     msg.startsWith("SUGGESTED_NAME: ") -> suggestedSaveName = msg.substringAfter("SUGGESTED_NAME: ")
                     msg.startsWith("Error: ") -> {
                         isRunning = false
-                        toast =
-                            ToastData(msg.substringAfter("Error: "), isSuccess = false)
+                        toast = ToastData(msg.substringAfter("Error: "), isSuccess = false)
                     }
                 }
                 logs += msg + "\n"
@@ -81,112 +80,111 @@ fun PdfDetailScreen(
         onDispose { if (Logger.onLog == listener) Logger.onLog = null }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // ── scrollable content (vertically centred when not logs) ──────────
-            if (showLogs) {
-                LogView(logs = logs, modifier = Modifier.weight(1f))
-            } else {
-                Box(
-                    modifier = Modifier.weight(1f).fillMaxWidth(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        FileDropZone(
-                            selectedFilePath = selectedFilePath,
-                            selectedFileSize = selectedFileSize,
-                            placeholder = "Tap to select a PDF",
-                            onSelect = {
-                                scope.launch {
-                                    kotlinx.coroutines.yield()
-                                    pickFile(listOf("pdf"))?.let {
-                                        selectedFilePath = it
-                                        selectedFileSize = fileSystem.metadataOrNull(it.toPath())?.size
-                                        resizeInfo = null
-                                        logs = ""
-                                    }
-                                }
-                            },
-                            onClear = {
-                                selectedFilePath = null
-                                selectedFileSize = null
-                                resizeInfo = null
-                                outputFilePath = null
-                                suggestedSaveName = null
-                            },
-                        )
-
-                        if (selectedFilePath != null && resizeInfo == null && !isRunning) {
-                            Spacer(modifier = Modifier.height(20.dp))
-                            ProfileSelector(selected = selectedProfile, onSelect = { selectedProfile = it })
-                        }
-
-                        if (isRunning) {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            CompressionProgress()
-                        }
-
-                        resizeInfo?.let {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            CompressionResultCard(info = it, profile = completedProfile)
-                        }
-                    }
+    val runCompression: (CompressionProfile) -> Unit = { profile ->
+        selectedFilePath?.let { path ->
+            selectedProfile = profile
+            resizeInfo = null
+            outputFilePath = null
+            suggestedSaveName = null
+            logs = ""
+            isRunning = true
+            scope.launch {
+                withContext(Dispatchers.Default) {
+                    tool.run(listOf(path, "--profile", profile.toArg()))
                 }
             }
+        }
+    }
 
-            // ── fixed footer — action buttons ──────────────────────────────────
-            if (!showLogs) {
-                val runCompression: (CompressionProfile) -> Unit = { profile ->
-                    selectedFilePath?.let { path ->
-                        selectedProfile = profile
-                        resizeInfo = null
-                        outputFilePath = null
-                        suggestedSaveName = null
-                        logs = ""
-                        isRunning = true
-                        scope.launch {
-                            withContext(Dispatchers.Default) {
-                                tool.run(listOf(path, "--profile", profile.toArg()))
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-                if (resizeInfo == null) {
-                    CompressPdfSubmitButton(
-                        enabled = selectedFilePath != null && !isRunning,
-                        onClick = { runCompression(selectedProfile) },
-                    )
-                } else {
-                    if (isAlreadyOptimal && selectedProfile != CompressionProfile.MAXIMUM) {
-                        TryHigherCompressionButton(onClick = { runCompression(CompressionProfile.MAXIMUM) })
-                        Spacer(modifier = Modifier.height(10.dp))
-                    } else if (outputFilePath != null) {
-                        SaveButton(onClick = {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // ── main content ───────────────────────────────────────────────────────
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    FileDropZone(
+                        selectedFilePath = selectedFilePath,
+                        selectedFileSize = selectedFileSize,
+                        placeholder = "Tap to select a PDF",
+                        onSelect = {
                             scope.launch {
                                 kotlinx.coroutines.yield()
-                                val result = saveCompressedFile(outputFilePath!!, suggestedSaveName)
-                                withContext(Dispatchers.Main) {
-                                    result.savedPath?.let { outputFilePath = it }
-                                    toast = result.toast
+                                pickFile(listOf("pdf"))?.let {
+                                    selectedFilePath = it
+                                    selectedFileSize = fileSystem.metadataOrNull(it.toPath())?.size
+                                    resizeInfo = null
+                                    logs = ""
                                 }
                             }
-                        })
-                        Spacer(modifier = Modifier.height(10.dp))
+                        },
+                        onClear = {
+                            selectedFilePath = null
+                            selectedFileSize = null
+                            resizeInfo = null
+                            outputFilePath = null
+                            suggestedSaveName = null
+                        },
+                    )
+
+                    if (selectedFilePath != null && resizeInfo == null && !isRunning) {
+                        Spacer(modifier = Modifier.height(20.dp))
+                        ProfileSelector(selected = selectedProfile, onSelect = { selectedProfile = it })
                     }
-                    CompressAnotherPdfFileButton(onClick = {
-                        resizeInfo = null
-                        selectedFilePath = null
-                        selectedFileSize = null
-                        outputFilePath = null
-                        suggestedSaveName = null
-                        logs = ""
-                    })
+
+                    if (isRunning) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        CompressionProgress()
+                    }
+
+                    resizeInfo?.let {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        CompressionResultCard(info = it, profile = completedProfile)
+                    }
                 }
             }
-        } // Column
+
+            // ── footer — action buttons ────────────────────────────────────────
+            Spacer(modifier = Modifier.height(16.dp))
+            if (resizeInfo == null) {
+                CompressPdfSubmitButton(
+                    enabled = selectedFilePath != null && !isRunning,
+                    onClick = { runCompression(selectedProfile) },
+                )
+            } else {
+                if (isAlreadyOptimal && selectedProfile != CompressionProfile.MAXIMUM) {
+                    TryHigherCompressionButton(onClick = { runCompression(CompressionProfile.MAXIMUM) })
+                    Spacer(modifier = Modifier.height(10.dp))
+                } else if (outputFilePath != null) {
+                    SaveButton(onClick = {
+                        scope.launch {
+                            kotlinx.coroutines.yield()
+                            val result = saveCompressedFile(outputFilePath!!, suggestedSaveName)
+                            withContext(Dispatchers.Main) {
+                                result.savedPath?.let { outputFilePath = it }
+                                toast = result.toast
+                            }
+                        }
+                    })
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+                CompressAnotherPdfFileButton(onClick = {
+                    resizeInfo = null
+                    selectedFilePath = null
+                    selectedFileSize = null
+                    outputFilePath = null
+                    suggestedSaveName = null
+                    logs = ""
+                })
+            }
+        }
+
+        // ── log overlay — sits on top of everything ────────────────────────────
+        if (showLogs) {
+            LogOverlay(logs = logs, onClose = onCloseLogs)
+        }
 
         ToastHost(toast = toast, onDismiss = { toast = null })
-    } // Box
+    }
 }

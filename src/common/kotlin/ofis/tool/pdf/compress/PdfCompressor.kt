@@ -46,7 +46,7 @@ class PdfCompressor : Tool {
                 }
             },
         ) {
-            PdfDetailScreen(tool = this, showLogs = showLogs)
+            PdfDetailScreen(tool = this, showLogs = showLogs, onCloseLogs = { showLogs = false })
         }
     }
 
