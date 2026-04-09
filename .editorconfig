@@ -2,3 +2,13 @@
 ij_kotlin_allow_trailing_comma = true
 ktlint_standard_no-wildcard-imports = disabled
 ij_kotlin_blank_lines_after_package = 1
+ktlint_function_naming_ignore_when_annotated_with = Composable
+ktlint_standard_filename = disabled
+
+# Disable rules for Compose-generated files in build/
+[build/**/*.{kt,kts}]
+ktlint_standard_indent = disabled
+ktlint_standard_import-ordering = disabled
+ktlint_standard_class-naming = disabled
+ktlint_standard_no-consecutive-blank-lines = disabled
+ktlint_standard_function-signature = disabled

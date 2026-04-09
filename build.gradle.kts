@@ -1,5 +1,8 @@
 
 import io.gitlab.arturbosch.detekt.Detekt
+import org.gradle.api.file.ConfigurableFileCollection
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 
 plugins {
     kotlin("multiplatform") version "2.1.10"
@@ -30,6 +33,16 @@ ktlint {
     verbose.set(true)
     outputToConsole.set(true)
     enableExperimentalRules.set(true)
+}
+
+afterEvaluate {
+    val buildPath = layout.buildDirectory.get().asFile.absolutePath
+    fun excludeBuildDir(fc: ConfigurableFileCollection) {
+        val filtered = fc.asFileTree.matching { exclude { it.file.absolutePath.startsWith(buildPath) } }.files
+        fc.setFrom(filtered)
+    }
+    tasks.withType<KtLintCheckTask>().configureEach { excludeBuildDir(source as ConfigurableFileCollection) }
+    tasks.withType<KtLintFormatTask>().configureEach { excludeBuildDir(source as ConfigurableFileCollection) }
 }
 
 repositories {
