@@ -41,7 +41,10 @@ actual fun platformGui() {
         LaunchedEffect(Unit) {
             app.activateIgnoringOtherApps(true)
             app.windows.forEach { window ->
-                (window as? NSWindow)?.makeKeyAndOrderFront(null)
+                (window as? NSWindow)?.let {
+                    it.makeKeyAndOrderFront(null)
+                    it.acceptsMouseMovedEvents = true
+                }
             }
         }
     }

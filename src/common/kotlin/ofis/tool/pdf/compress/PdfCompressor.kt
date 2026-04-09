@@ -4,11 +4,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import ofis.config.Logger
 import ofis.tool.Tool
@@ -19,6 +16,7 @@ import ofis.tool.pdf.compress.model.CompressionRequest
 import ofis.tool.pdf.compress.model.CompressionResult
 import ofis.tool.pdf.compress.service.PdfCompressionService
 import ofis.tool.pdf.compress.ui.PdfDetailScreen
+import ofis.ui.system.LocalLogController
 import ofis.ui.view.tooldetail.ToolDetailView
 import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
@@ -32,21 +30,21 @@ class PdfCompressor : Tool {
 
     @Composable
     override fun Screen(onBack: () -> Unit) {
-        var showLogs by remember { mutableStateOf(false) }
+        val logController = LocalLogController.current
         ToolDetailView(
             tool = this,
             onBack = onBack,
             headerActions = {
-                IconButton(onClick = { showLogs = !showLogs }) {
+                IconButton(onClick = { logController.toggle() }) {
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = "Toggle logs",
-                        tint = if (showLogs) Color(0xFF4A90E2) else Color.Gray,
+                        tint = if (logController.isVisible) MaterialTheme.colorScheme.primary else Color.Gray,
                     )
                 }
             },
         ) {
-            PdfDetailScreen(tool = this, showLogs = showLogs, onCloseLogs = { showLogs = false })
+            PdfDetailScreen(tool = this)
         }
     }
 

@@ -15,11 +15,13 @@ fun commonMain(argList: List<String>): Int {
     val hasCli = argList.contains(cliFlag)
     GlobalConfig.debug = hasDebug
 
+    /** GUI */
     if (hasGui || (argList.isEmpty() && defaultToGui && !hasCli)) {
         platformGui()
         return 0
     }
 
+    /** CLI it is, let's offer the user the available tools */
     if (argList.isEmpty()) {
         println("Welcome to Ofis!")
         println("Available tools:")
@@ -34,6 +36,7 @@ fun commonMain(argList: List<String>): Int {
         return 1
     }
 
+    /** CLI: user has specified a tool, let's run it */
     val toolName = filteredArgs[0]
     val toolArgs = filteredArgs.drop(1)
     val tool = ToolRegistry.get(toolName)

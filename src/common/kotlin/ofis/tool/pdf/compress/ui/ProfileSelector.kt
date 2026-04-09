@@ -2,7 +2,6 @@ package ofis.tool.pdf.compress.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ofis.tool.pdf.compress.model.CompressionProfile
 import ofis.ui.system.Badge
+import ofis.ui.system.handClickable
 
 @Composable
 fun ProfileSelector(
@@ -59,7 +59,7 @@ private fun ProfileOption(
                 .fillMaxWidth()
                 .background(bgColor, RoundedCornerShape(10.dp))
                 .border(1.5.dp, borderColor, RoundedCornerShape(10.dp))
-                .clickable { onClick() }
+                .handClickable { onClick() }
                 .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

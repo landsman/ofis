@@ -2,7 +2,6 @@ package ofis.ui.system
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,16 +17,23 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.DragData
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.onExternalDrag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.ui.system.handClickable
 import ofis.utils.format.formatSize
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FileDropZone(
     selectedFilePath: String?,
@@ -35,16 +41,37 @@ fun FileDropZone(
     placeholder: String,
     onSelect: () -> Unit,
     onClear: () -> Unit,
+    onDropFile: ((String) -> Unit)? = null,
 ) {
+    var isDragging by remember { mutableStateOf(false) }
+
+    val borderColor = if (isDragging) Color(0xFF4A90E2) else Color(0xFFE0E0E0)
+    val borderWidth = if (isDragging) 2.dp else 1.dp
+    val bgColor = if (isDragging) Color(0xFFF0F6FF) else Color.White
+
     Box(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .height(if (selectedFilePath == null) 120.dp else 80.dp)
-                .background(Color.White, RoundedCornerShape(12.dp))
-                .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
-                .pointerHoverIcon(PointerIcon.Hand, overrideDescendants = false)
-                .clickable(enabled = selectedFilePath == null, onClick = onSelect)
+                .height(if (selectedFilePath == null) 160.dp else 100.dp)
+                .background(bgColor, RoundedCornerShape(12.dp))
+                .border(borderWidth, borderColor, RoundedCornerShape(12.dp))
+                .onExternalDrag(
+                    enabled = onDropFile != null,
+                    onDragStart = { isDragging = true },
+                    onDragExit = { isDragging = false },
+                    onDrop = { state ->
+                        isDragging = false
+                        val dragData = state.dragData
+                        if (dragData is DragData.FilesList) {
+                            dragData
+                                .readFiles()
+                                .firstOrNull()
+                                ?.removePrefix("file://")
+                                ?.let { onDropFile?.invoke(it) }
+                        }
+                    },
+                ).handClickable(enabled = selectedFilePath == null, onClick = onSelect)
                 .padding(horizontal = 20.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -76,8 +103,7 @@ fun FileDropZone(
                     modifier =
                         Modifier
                             .size(28.dp)
-                            .pointerHoverIcon(PointerIcon.Hand)
-                            .clickable { onClear() }
+                            .handClickable { onClear() }
                             .padding(4.dp),
                 )
             }

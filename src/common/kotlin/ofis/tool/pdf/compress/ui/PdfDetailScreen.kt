@@ -19,27 +19,22 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ofis.config.Logger
 import ofis.platform.fileSystem
 import ofis.platform.view.pickFile
 import ofis.tool.Tool
 import ofis.tool.pdf.compress.model.CompressionProfile
 import ofis.tool.pdf.compress.service.saveCompressedFile
 import ofis.ui.system.FileDropZone
-import ofis.ui.system.LogOverlay
+import ofis.ui.system.LocalLogController
 import ofis.ui.system.toast.LocalToastController
 import okio.Path.Companion.toPath
 
 @Composable
-fun PdfDetailScreen(
-    tool: Tool,
-    showLogs: Boolean,
-    onCloseLogs: () -> Unit,
-) {
+fun PdfDetailScreen(tool: Tool) {
     val scope = rememberCoroutineScope()
     val toastController = LocalToastController.current
+    val logController = LocalLogController.current
 
-    var logs by remember { mutableStateOf("") }
     var selectedFilePath by remember { mutableStateOf<String?>(null) }
     var selectedFileSize by remember { mutableStateOf<Long?>(null) }
     var resizeInfo by remember { mutableStateOf<String?>(null) }
@@ -56,8 +51,9 @@ fun PdfDetailScreen(
             ?.toIntOrNull()
             ?.let { it <= 0 } ?: false
 
-    DisposableEffect(tool) {
-        val listener: (String) -> Unit = { msg ->
+    // Parse structured messages that arrive via LogController
+    DisposableEffect(logController) {
+        val observer: (String) -> Unit = { msg ->
             scope.launch(Dispatchers.Main) {
                 when {
                     msg.startsWith("RESIZE_INFO: ") -> {
@@ -72,11 +68,10 @@ fun PdfDetailScreen(
                         toastController.show(msg.substringAfter("Error: "), isSuccess = false)
                     }
                 }
-                logs += msg + "\n"
             }
         }
-        Logger.onLog = listener
-        onDispose { if (Logger.onLog == listener) Logger.onLog = null }
+        logController.addObserver(observer)
+        onDispose { logController.removeObserver(observer) }
     }
 
     val runCompression: (CompressionProfile) -> Unit = { profile ->
@@ -85,7 +80,7 @@ fun PdfDetailScreen(
             resizeInfo = null
             outputFilePath = null
             suggestedSaveName = null
-            logs = ""
+            logController.clear()
             isRunning = true
             scope.launch {
                 withContext(Dispatchers.Default) {
@@ -96,7 +91,6 @@ fun PdfDetailScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // ── main content ───────────────────────────────────────────────────────
         Column(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -114,7 +108,7 @@ fun PdfDetailScreen(
                                     selectedFilePath = it
                                     selectedFileSize = fileSystem.metadataOrNull(it.toPath())?.size
                                     resizeInfo = null
-                                    logs = ""
+                                    logController.clear()
                                 }
                             }
                         },
@@ -124,6 +118,14 @@ fun PdfDetailScreen(
                             resizeInfo = null
                             outputFilePath = null
                             suggestedSaveName = null
+                        },
+                        onDropFile = { path ->
+                            selectedFilePath = path
+                            selectedFileSize = fileSystem.metadataOrNull(path.toPath())?.size
+                            resizeInfo = null
+                            outputFilePath = null
+                            suggestedSaveName = null
+                            logController.clear()
                         },
                     )
 
@@ -174,14 +176,9 @@ fun PdfDetailScreen(
                     selectedFileSize = null
                     outputFilePath = null
                     suggestedSaveName = null
-                    logs = ""
+                    logController.clear()
                 })
             }
-        }
-
-        // ── log overlay — sits on top of everything ────────────────────────────
-        if (showLogs) {
-            LogOverlay(logs = logs, onClose = onCloseLogs)
         }
     }
 }

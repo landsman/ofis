@@ -2,7 +2,6 @@ package ofis.ui.view.toolselection.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,13 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ofis.tool.Tool
 import ofis.ui.system.AppButton
+import ofis.ui.system.handClickable
 
 @Composable
 fun ToolCard(
@@ -35,8 +33,7 @@ fun ToolCard(
                 .height(80.dp)
                 .background(Color.White, RoundedCornerShape(12.dp))
                 .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
-                .pointerHoverIcon(PointerIcon.Hand, overrideDescendants = false)
-                .clickable { onClick() }
+                .handClickable { onClick() }
                 .padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

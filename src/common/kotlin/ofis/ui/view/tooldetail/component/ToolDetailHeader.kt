@@ -1,6 +1,5 @@
 package ofis.ui.view.tooldetail.component
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,14 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ofis.tool.Tool
 import ofis.ui.system.LocalWindowWidth
 import ofis.ui.system.WindowWidth
+import ofis.ui.system.handClickable
 
 @Composable
 fun ToolDetailHeader(
@@ -48,8 +46,7 @@ fun ToolDetailHeader(
             modifier =
                 Modifier
                     .align(Alignment.CenterStart)
-                    .pointerHoverIcon(PointerIcon.Hand)
-                    .clickable { onBack() },
+                    .handClickable { onBack() },
             color = Color(0xFF4A90E2),
             fontSize = backSize,
             fontWeight = FontWeight.Bold,
