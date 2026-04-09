@@ -9,5 +9,5 @@ expect fun platformGui()
 expect suspend fun pickFile(allowedExtensions: List<String>): String?
 
 /** Opens a native save dialog pre-filled with [suggestedName] and returns the chosen destination path,
- *  or null if the user cancelled. */
+ *  or null if the user canceled. */
 expect suspend fun saveFile(suggestedName: String): String?

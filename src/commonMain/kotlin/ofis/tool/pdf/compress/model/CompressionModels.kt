@@ -50,7 +50,7 @@ sealed interface CompressionError {
     data class BinaryNotFound(
         val name: String,
     ) : CompressionError {
-        override fun toString() = "Required tool not found: $name. Install it first (e.g. brew install $name)."
+        override fun toString() = "$name is not installed. Run: brew install $name"
     }
 
     data class ProcessFailed(
@@ -58,7 +58,12 @@ sealed interface CompressionError {
         val exitCode: Int,
         val stderr: String,
     ) : CompressionError {
-        override fun toString() = "$tool exited with code $exitCode: $stderr"
+        override fun toString() =
+            when {
+                exitCode == 127 -> "$tool is not installed or could not be launched. Run: brew install $tool"
+                stderr.isNotBlank() -> "$tool failed: ${stderr.trim()}"
+                else -> "$tool failed with exit code $exitCode."
+            }
     }
 
     data class InvalidInput(
