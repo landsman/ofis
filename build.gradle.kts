@@ -111,9 +111,11 @@ kotlin {
         val macosArm64Main by getting { dependsOn(macosMain) }
         val mingwX64Main by getting { dependsOn(mingwMain) }
 
+        val macosTest by creating { dependsOn(nativeTest) }
+
         val linuxX64Test by getting { dependsOn(nativeTest) }
-        val macosX64Test by getting { dependsOn(nativeTest) }
-        val macosArm64Test by getting { dependsOn(nativeTest) }
+        val macosX64Test by getting { dependsOn(macosTest) }
+        val macosArm64Test by getting { dependsOn(macosTest) }
         val mingwX64Test by getting { dependsOn(nativeTest) }
 
         targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().all {
