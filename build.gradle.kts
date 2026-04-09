@@ -67,6 +67,7 @@ kotlin {
             languageSettings.optIn("kotlinx.cinterop.BetaInteropApi")
         }
         val commonMain by getting {
+            kotlin.srcDirs("src/common/kotlin")
             dependencies {
                 implementation("com.squareup.okio:okio:3.9.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
@@ -79,12 +80,14 @@ kotlin {
             }
         }
         val commonTest by getting {
+            kotlin.srcDirs("tests/common/kotlin")
             dependencies {
                 implementation(kotlin("test"))
             }
         }
         val nativeMain by creating {
             dependsOn(commonMain)
+            kotlin.srcDirs("src/native/kotlin")
         }
         val nativeTest by creating {
             dependsOn(commonTest)
@@ -92,13 +95,15 @@ kotlin {
 
         val macosMain by creating {
             dependsOn(nativeMain)
+            kotlin.srcDirs("src/macos/kotlin")
         }
         val linuxMain by creating {
             dependsOn(nativeMain)
+            kotlin.srcDirs("src/linux/kotlin")
         }
         val windowsMain by creating {
             dependsOn(nativeMain)
-            kotlin.srcDirs("src/windowsMain/kotlin")
+            kotlin.srcDirs("src/windows/kotlin")
         }
 
         val linuxX64Main by getting { dependsOn(linuxMain) }
