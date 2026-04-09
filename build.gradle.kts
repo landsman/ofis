@@ -36,13 +36,19 @@ ktlint {
 }
 
 afterEvaluate {
-    val buildPath = layout.buildDirectory.get().asFile.absolutePath
-    fun excludeBuildDir(fc: ConfigurableFileCollection) {
-        val filtered = fc.asFileTree.matching { exclude { it.file.absolutePath.startsWith(buildPath) } }.files
+    val srcPath = projectDir.resolve("src").absolutePath
+    @Suppress("UnstableApiUsage")
+    tasks.withType<KtLintCheckTask>().all {
+        val fc = source as ConfigurableFileCollection
+        val filtered = fc.asFileTree.matching { include { it.file.absolutePath.startsWith(srcPath) } }.files
         fc.setFrom(filtered)
     }
-    tasks.withType<KtLintCheckTask>().configureEach { excludeBuildDir(source as ConfigurableFileCollection) }
-    tasks.withType<KtLintFormatTask>().configureEach { excludeBuildDir(source as ConfigurableFileCollection) }
+    @Suppress("UnstableApiUsage")
+    tasks.withType<KtLintFormatTask>().all {
+        val fc = source as ConfigurableFileCollection
+        val filtered = fc.asFileTree.matching { include { it.file.absolutePath.startsWith(srcPath) } }.files
+        fc.setFrom(filtered)
+    }
 }
 
 repositories {
