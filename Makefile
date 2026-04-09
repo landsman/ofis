@@ -1,5 +1,3 @@
-.PHONY: build run gui cli debug test test-all lint format macos_icon macos_dmg macos_sign macos_notarize macos_release linux_package linux_release deps sec clean help
-
 # Detect OS and Architecture
 OS   := $(shell uname -s)
 ARCH := $(shell uname -m)
@@ -23,6 +21,38 @@ endif
 GRADLE  := ./gradlew
 VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "1.0.0")
 
+# ── Setup ─────────────────────────────────────────────────────────────────────
+.PHONY: install install-bins
+
+# Download all Kotlin/Gradle dependencies into the local cache
+install:
+	$(GRADLE) dependencies --configuration commonMainImplementation
+
+# Install binary dependencies (macOS: Homebrew — Ubuntu/Debian: apt)
+install-bins:
+ifeq ($(OS),Darwin)
+	@command -v brew >/dev/null || { echo "Error: Homebrew not found - install from https://brew.sh"; exit 1; }
+	# pdf compression
+	brew install qpdf ghostscript librsvg
+	# bundler
+	brew install create-dmg dylibbundler
+else ifeq ($(OS),Linux)
+	@command -v apt-get >/dev/null || { echo "Error: apt-get not found - only Ubuntu/Debian is supported"; exit 1; }
+	@[ "$$(id -u)" = "0" ] || { echo "Error: run with sudo: sudo make install-bins"; exit 1; }
+	apt-get update -qq
+	# pdf compression
+	apt-get install -y qpdf ghostscript librsvg2-bin
+else
+	@echo "Error: install-bins is not supported on $(OS)"; exit 1
+endif
+
+# ── Development ───────────────────────────────────────────────────────────────
+.PHONY: check build run gui cli debug
+
+# Fast compile check: catches missing imports and type errors without linking (~seconds with config cache)
+check:
+	$(GRADLE) compileKotlin$(TARGET_SUFFIX)
+
 # Fast build: host binary only, no linting
 build:
 	$(GRADLE) linkDebugExecutable$(TARGET_SUFFIX)
@@ -43,6 +73,9 @@ cli:
 debug:
 	$(GRADLE) runDebugExecutable$(TARGET_SUFFIX) -Pargs="--debug $(ARGS)"
 
+# ── Testing & quality ─────────────────────────────────────────────────────────
+.PHONY: test test-all lint format
+
 # Tests: host platform only
 test:
 	$(GRADLE) $(HOST_TEST_TASK)
@@ -58,6 +91,9 @@ lint:
 # Code formatting
 format:
 	$(GRADLE) ktlintFormat
+
+# ── macOS release ─────────────────────────────────────────────────────────────
+.PHONY: macos_icon macos_dmg macos_sign macos_notarize macos_release
 
 # Icon generation (requires rsvg-convert: brew install librsvg)
 macos_icon:
@@ -142,6 +178,9 @@ macos_release:
 		--generate-notes
 	@echo "Released v$(VERSION) to GitHub."
 
+# ── Linux release ─────────────────────────────────────────────────────────────
+.PHONY: linux_package linux_release
+
 # Linux package: tar.gz archive of the binary
 linux_package:
 	@[ "$(OS)" = "Linux" ] || { echo "Error: linux_package is Linux-only; use macos_dmg on macOS"; exit 1; }
@@ -158,6 +197,9 @@ linux_release:
 		--title "Ofis v$(VERSION)" \
 		--generate-notes
 	@echo "Released v$(VERSION) to GitHub."
+
+# ── Maintenance ───────────────────────────────────────────────────────────────
+.PHONY: deps sec clean help
 
 # Dependency updates report
 deps:
@@ -182,10 +224,13 @@ clean:
 help:
 	@echo "Usage: make <target> [ARGS=\"...\"]"
 	@echo ""
+	@echo "  install          — download all Kotlin/Gradle dependencies into local cache"
+	@echo "  install-bins     — install binary deps: macOS via Homebrew, Ubuntu/Debian via apt"
+	@echo "  check            — compile only, catches missing imports/type errors fast"
 	@echo "  build            — compile host binary (fast, no lint)"
 	@echo "  run              — build + run  (ARGS='pdf-compress input.pdf')"
-	@echo "  gui              — launch GUI
-  cli              — launch CLI  (ARGS='pdf-compress input.pdf')"
+	@echo "  gui              — launch GUI"
+	@echo "  cli              — launch CLI  (ARGS='pdf-compress input.pdf')"
 	@echo "  debug            — run with --debug flag"
 	@echo "  test             — run tests for host platform"
 	@echo "  test-all         — run tests for all targets"

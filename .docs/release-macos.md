@@ -112,14 +112,14 @@ Users will now see a calm first-launch prompt with no malware warnings.
 
 To automate signing in CI, add these as **repository secrets** (Settings → Secrets and variables → Actions):
 
-| Secret | Value |
-|---|---|
-| `SIGN_ID` | `Developer ID Application: Your Name (TEAMID)` |
-| `APPLE_ID` | your Apple ID email |
-| `APPLE_TEAM_ID` | your Team ID |
-| `APPLE_APP_PASSWORD` | the app-specific password |
-| `MACOS_CERTIFICATE` | base64-encoded .p12 certificate export |
-| `MACOS_CERTIFICATE_PWD` | password for the .p12 export |
+| Secret                  | Value                                          |
+|-------------------------|------------------------------------------------|
+| `SIGN_ID`               | `Developer ID Application: Your Name (TEAMID)` |
+| `APPLE_ID`              | your Apple ID email                            |
+| `APPLE_TEAM_ID`         | your Team ID                                   |
+| `APPLE_APP_PASSWORD`    | the app-specific password                      |
+| `MACOS_CERTIFICATE`     | base64-encoded .p12 certificate export         |
+| `MACOS_CERTIFICATE_PWD` | password for the .p12 export                   |
 
 Then update `.github/workflows/release.yml` — replace `make macos_dmg` with the signing steps:
 
