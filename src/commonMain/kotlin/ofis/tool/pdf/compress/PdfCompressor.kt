@@ -40,11 +40,11 @@ class PdfCompressor : Tool {
         val profile = parseProfile(args)
 
         val request =
-                CompressionRequest(
-                        inputPath = inputStr.toPath(),
-                        outputPath = outputStr.toPath(),
-                        profile = profile,
-                )
+            CompressionRequest(
+                inputPath = inputStr.toPath(),
+                outputPath = outputStr.toPath(),
+                profile = profile,
+            )
 
         Logger.info("Compressing $inputStr → $outputStr [${profile.label}]")
 
@@ -69,8 +69,8 @@ class PdfCompressor : Tool {
     }
 
     private fun suggestedName(
-            input: String,
-            profile: CompressionProfile,
+        input: String,
+        profile: CompressionProfile,
     ): String {
         val name = input.toPath().name
         val base = name.substringBeforeLast(".")

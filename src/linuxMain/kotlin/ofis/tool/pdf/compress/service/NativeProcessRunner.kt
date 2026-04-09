@@ -1,9 +1,32 @@
 package ofis.tool.pdf.compress.service
 
-import kotlinx.cinterop.*
+import kotlinx.cinterop.ByteVar
+import kotlinx.cinterop.CPointerVar
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.IntVar
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.allocArray
+import kotlinx.cinterop.convert
+import kotlinx.cinterop.cstr
+import kotlinx.cinterop.get
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.ptr
+import kotlinx.cinterop.set
+import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.value
 import ofis.tool.pdf.compress.model.NativeCommand
 import ofis.tool.pdf.compress.model.ProcessResult
-import platform.posix.*
+import platform.posix.STDERR_FILENO
+import platform.posix.STDOUT_FILENO
+import platform.posix._exit
+import platform.posix.close
+import platform.posix.dup2
+import platform.posix.execvp
+import platform.posix.fork
+import platform.posix.pipe
+import platform.posix.read
+import platform.posix.waitpid
 
 /**
  * POSIX implementation using fork + execvp + pipe + waitpid.

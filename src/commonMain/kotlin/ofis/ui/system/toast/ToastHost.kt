@@ -18,8 +18,8 @@ private const val TOAST_DURATION_MS = 3_500L
 
 @Composable
 fun ToastHost(
-        toast: ToastData?,
-        onDismiss: () -> Unit,
+    toast: ToastData?,
+    onDismiss: () -> Unit,
 ) {
     LaunchedEffect(toast) {
         if (toast != null) {
@@ -30,9 +30,9 @@ fun ToastHost(
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         AnimatedVisibility(
-                visible = toast != null,
-                enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
-                exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
+            visible = toast != null,
+            enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+            exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
         ) {
             if (toast != null) {
                 ToastCard(toast)
