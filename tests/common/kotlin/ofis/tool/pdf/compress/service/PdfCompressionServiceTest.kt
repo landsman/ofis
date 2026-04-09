@@ -45,7 +45,7 @@ class PdfCompressionServiceTest {
 
         assertIs<CompressionResult.Failure>(result)
         assertIs<CompressionError.BinaryNotFound>((result).reason)
-        assertEquals("qpdf", (result.reason as CompressionError.BinaryNotFound).name)
+        assertEquals("qpdf", result.reason.name)
     }
 
     @Test
@@ -60,7 +60,7 @@ class PdfCompressionServiceTest {
 
         assertIs<CompressionResult.Failure>(result)
         assertIs<CompressionError.BinaryNotFound>(result.reason)
-        assertTrue((result.reason as CompressionError.BinaryNotFound).name.contains("gs"))
+        assertTrue(result.reason.name.contains("gs"))
     }
 
     // ── process failure ────────────────────────────────────────────────────────

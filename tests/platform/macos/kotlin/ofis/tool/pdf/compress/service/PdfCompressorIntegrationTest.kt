@@ -143,10 +143,10 @@ class PdfCompressorIntegrationTest {
         )
         assertTrue(fs.exists(result.outputPath), "Output file must exist at ${result.outputPath}")
         assertEquals(
-                result.originalBytes,
-                fixture.originalBytes,
-                "$label fixture size changed: expected ${fixture.originalBytes}B but got ${result.originalBytes}B. " +
-                        "Update the expected constant if the fixture was intentionally replaced."
+            result.originalBytes,
+            fixture.originalBytes,
+            "$label fixture size changed: expected ${fixture.originalBytes}B but got ${result.originalBytes}B. " +
+                "Update the expected constant if the fixture was intentionally replaced.",
         )
         val range =
             when (result.profile) {
