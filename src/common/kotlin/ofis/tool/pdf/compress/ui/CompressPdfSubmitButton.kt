@@ -3,8 +3,8 @@ package ofis.tool.pdf.compress.ui
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,12 +28,12 @@ fun CompressPdfSubmitButton(
         shape = RoundedCornerShape(12.dp),
         colors =
             ButtonDefaults.buttonColors(
-                backgroundColor = Color(0xFF4A4AFF),
+                containerColor = Color(0xFF4A4AFF),
                 contentColor = Color.White,
-                disabledBackgroundColor = Color(0xFFBBBBBB),
+                disabledContainerColor = Color(0xFFBBBBBB),
             ),
         elevation =
-            ButtonDefaults.elevation(
+            ButtonDefaults.buttonElevation(
                 defaultElevation = 2.dp,
                 pressedElevation = 0.dp,
                 disabledElevation = 0.dp,

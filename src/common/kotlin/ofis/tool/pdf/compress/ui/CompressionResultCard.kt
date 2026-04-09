@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,10 +21,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.tool.pdf.compress.model.CompressionProfile
 
 /** Expects info in the format: "259.8 KB → 180.2 KB (31%)" */
 @Composable
-fun CompressionResultCard(info: String) {
+fun CompressionResultCard(
+    info: String,
+    profile: CompressionProfile? = null,
+) {
     val parts = info.split(" → ")
     val original = parts.getOrNull(0) ?: ""
     val rest = parts.getOrNull(1) ?: ""
@@ -44,6 +48,10 @@ fun CompressionResultCard(info: String) {
         Text("📊", fontSize = 32.sp)
         Spacer(modifier = Modifier.height(8.dp))
         Text("Compression Complete", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        if (profile != null) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(profile.label, color = Color(0xFF888888), fontSize = 13.sp)
+        }
 
         if (alreadyOptimal) {
             Spacer(modifier = Modifier.height(10.dp))
@@ -83,10 +91,10 @@ fun CompressionResultCard(info: String) {
         if (savedPercent != null && savedPercent > 0) {
             Spacer(modifier = Modifier.height(16.dp))
             LinearProgressIndicator(
-                progress = savedPercent / 100f,
-                modifier = Modifier.fillMaxWidth(0.8f).height(6.dp),
+                progress = { savedPercent / 100f },
+                modifier = Modifier.fillMaxWidth().height(6.dp),
                 color = Color(0xFF4CAF50),
-                backgroundColor = Color(0xFFE0E0E0),
+                trackColor = Color(0xFFE0E0E0),
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(

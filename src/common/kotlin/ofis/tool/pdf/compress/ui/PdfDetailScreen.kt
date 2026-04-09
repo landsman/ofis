@@ -43,11 +43,19 @@ fun PdfDetailScreen(
     var selectedFilePath by remember { mutableStateOf<String?>(null) }
     var selectedFileSize by remember { mutableStateOf<Long?>(null) }
     var resizeInfo by remember { mutableStateOf<String?>(null) }
+    var completedProfile by remember { mutableStateOf<CompressionProfile?>(null) }
     var outputFilePath by remember { mutableStateOf<String?>(null) }
     var suggestedSaveName by remember { mutableStateOf<String?>(null) }
     var isRunning by remember { mutableStateOf(false) }
     var selectedProfile by remember { mutableStateOf(CompressionProfile.BALANCED) }
     var toast by remember { mutableStateOf<ToastData?>(null) }
+
+    val isAlreadyOptimal =
+        resizeInfo
+            ?.substringAfter("(")
+            ?.substringBefore("%")
+            ?.toIntOrNull()
+            ?.let { it <= 0 } ?: false
 
     // Logger listener — posts all state updates back to Main so Compose sees them
     DisposableEffect(tool) {
@@ -56,6 +64,7 @@ fun PdfDetailScreen(
                 when {
                     msg.startsWith("RESIZE_INFO: ") -> {
                         resizeInfo = msg.substringAfter("RESIZE_INFO: ")
+                        completedProfile = selectedProfile
                         isRunning = false
                     }
                     msg.startsWith("OUTPUT_PATH: ") -> outputFilePath = msg.substringAfter("OUTPUT_PATH: ")
@@ -120,7 +129,7 @@ fun PdfDetailScreen(
 
                         resizeInfo?.let {
                             Spacer(modifier = Modifier.height(16.dp))
-                            CompressionResultCard(info = it)
+                            CompressionResultCard(info = it, profile = completedProfile)
                         }
                     }
                 }
@@ -128,25 +137,33 @@ fun PdfDetailScreen(
 
             // ── fixed footer — action buttons ──────────────────────────────────
             if (!showLogs) {
+                val runCompression: (CompressionProfile) -> Unit = { profile ->
+                    selectedFilePath?.let { path ->
+                        selectedProfile = profile
+                        resizeInfo = null
+                        outputFilePath = null
+                        suggestedSaveName = null
+                        logs = ""
+                        isRunning = true
+                        scope.launch {
+                            withContext(Dispatchers.Default) {
+                                tool.run(listOf(path, "--profile", profile.toArg()))
+                            }
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
                 if (resizeInfo == null) {
                     CompressPdfSubmitButton(
                         enabled = selectedFilePath != null && !isRunning,
-                        onClick = {
-                            selectedFilePath?.let { path ->
-                                isRunning = true
-                                outputFilePath = null
-                                suggestedSaveName = null
-                                scope.launch {
-                                    withContext(Dispatchers.Default) {
-                                        tool.run(listOf(path, "--profile", selectedProfile.toArg()))
-                                    }
-                                }
-                            }
-                        },
+                        onClick = { runCompression(selectedProfile) },
                     )
                 } else {
-                    if (outputFilePath != null) {
+                    if (isAlreadyOptimal && selectedProfile != CompressionProfile.MAXIMUM) {
+                        TryHigherCompressionButton(onClick = { runCompression(CompressionProfile.MAXIMUM) })
+                        Spacer(modifier = Modifier.height(10.dp))
+                    } else if (outputFilePath != null) {
                         SaveButton(onClick = {
                             scope.launch {
                                 kotlinx.coroutines.yield()

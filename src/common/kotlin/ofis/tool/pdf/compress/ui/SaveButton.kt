@@ -3,8 +3,8 @@ package ofis.tool.pdf.compress.ui
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,7 +21,7 @@ fun SaveButton(onClick: () -> Unit) {
         shape = RoundedCornerShape(10.dp),
         colors =
             ButtonDefaults.buttonColors(
-                backgroundColor = Color(0xFF4A4AFF),
+                containerColor = Color(0xFF4A4AFF),
                 contentColor = Color.White,
             ),
     ) {
