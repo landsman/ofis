@@ -39,8 +39,8 @@ import ofis.tool.pdf.compress.model.CompressionProfile
 import ofis.tool.pdf.compress.service.saveCompressedFile
 import ofis.ui.system.FileDropZone
 import ofis.ui.system.LogView
-import ofis.ui.system.ToastData
-import ofis.ui.system.ToastHost
+import ofis.ui.system.toast.ToastData
+import ofis.ui.system.toast.ToastHost
 import okio.Path.Companion.toPath
 
 @Composable

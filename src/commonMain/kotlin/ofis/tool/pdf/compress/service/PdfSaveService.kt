@@ -5,7 +5,7 @@ import kotlinx.coroutines.withContext
 import ofis.platform.fileSystem
 import ofis.platform.service.availableDiskSpace
 import ofis.platform.view.saveFile
-import ofis.ui.system.ToastData
+import ofis.ui.system.toast.ToastData
 import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
 

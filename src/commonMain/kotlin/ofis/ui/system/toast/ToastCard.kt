@@ -1,63 +1,26 @@
-package ofis.ui.system
+package ofis.ui.system.toast
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.milliseconds
 
-private const val TOAST_DURATION_MS = 3_500L
-
-data class ToastData(
+open class ToastData(
     val message: String,
     val isSuccess: Boolean,
 )
 
 @Composable
-fun ToastHost(
-    toast: ToastData?,
-    onDismiss: () -> Unit,
-) {
-    LaunchedEffect(toast) {
-        if (toast != null) {
-            delay(TOAST_DURATION_MS.milliseconds)
-            onDismiss()
-        }
-    }
-
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-        AnimatedVisibility(
-            visible = toast != null,
-            enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
-            exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
-        ) {
-            if (toast != null) {
-                ToastCard(toast)
-            }
-        }
-    }
-}
-
-@Composable
-private fun ToastCard(toast: ToastData) {
+fun ToastCard(toast: ToastData) {
     val bgColor = if (toast.isSuccess) Color(0xFF2E7D32) else Color(0xFFC62828)
     val icon = if (toast.isSuccess) "✓" else "✕"
 
