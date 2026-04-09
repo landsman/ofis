@@ -138,6 +138,13 @@ kotlin {
     }
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest>().configureEach {
+    testLogging {
+        events("passed", "failed", "skipped")
+        showStandardStreams = true
+    }
+}
+
 tasks.register<Exec>("dmg") {
     group = "package"
     description = "Packages the macOS application as a DMG (macOS only)"

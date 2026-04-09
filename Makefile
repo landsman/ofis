@@ -89,7 +89,7 @@ debug:
 
 # Tests: host platform only
 test:
-	$(GRADLE) $(HOST_TEST_TASK)
+	$(GRADLE) $(HOST_TEST_TASK) --rerun
 
 # Linting (separate from build — run in CI or on demand)
 lint:

@@ -28,7 +28,7 @@ class PdfCompressorIntegrationTest {
 
     /** Resolved at runtime relative to the process working directory (project root when run via Gradle). */
     private val textPdf: Path = "tests/resources/pdf/text.pdf".toPath()
-    private val photoPdf: Path = "tests/resources/pdf/photo.pdf".toPath()
+    private val photoPdf: Path = "tests/resources/pdf/testing-document-lossless.pdf".toPath()
 
     private val outputs = mutableListOf<Path>()
 
