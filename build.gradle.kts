@@ -48,12 +48,6 @@ kotlin {
             entryPoint = "ofis.platform.main"
         }
     }
-    macosX64 {
-        binaries.executable {
-            baseName = "Ofis"
-            entryPoint = "ofis.platform.main"
-        }
-    }
     macosArm64 {
         binaries.executable {
             baseName = "Ofis"
@@ -102,19 +96,21 @@ kotlin {
         val linuxMain by creating {
             dependsOn(nativeMain)
         }
-        val mingwMain by creating {
+        val windowsMain by creating {
             dependsOn(nativeMain)
+            kotlin.srcDirs("src/windowsMain/kotlin")
         }
 
         val linuxX64Main by getting { dependsOn(linuxMain) }
-        val macosX64Main by getting { dependsOn(macosMain) }
         val macosArm64Main by getting { dependsOn(macosMain) }
-        val mingwX64Main by getting { dependsOn(mingwMain) }
+        val mingwX64Main by getting { dependsOn(windowsMain) }
 
-        val macosTest by creating { dependsOn(nativeTest) }
+        val macosTest by creating {
+            dependsOn(nativeTest)
+            kotlin.srcDirs("tests/platform/macos/kotlin")
+        }
 
         val linuxX64Test by getting { dependsOn(nativeTest) }
-        val macosX64Test by getting { dependsOn(macosTest) }
         val macosArm64Test by getting { dependsOn(macosTest) }
         val mingwX64Test by getting { dependsOn(nativeTest) }
 

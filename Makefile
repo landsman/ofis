@@ -3,15 +3,9 @@ OS   := $(shell uname -s)
 ARCH := $(shell uname -m)
 
 ifeq ($(OS),Darwin)
-    ifeq ($(ARCH),arm64)
-        TARGET_SUFFIX  := MacosArm64
-        HOST_TEST_TASK := macosArm64Test
-        BIN_DIR        := macosArm64
-    else
-        TARGET_SUFFIX  := MacosX64
-        HOST_TEST_TASK := macosX64Test
-        BIN_DIR        := macosX64
-    endif
+    TARGET_SUFFIX  := MacosArm64
+    HOST_TEST_TASK := macosArm64Test
+    BIN_DIR        := macosArm64
 else ifeq ($(OS),Linux)
     TARGET_SUFFIX  := LinuxX64
     HOST_TEST_TASK := linuxX64Test
@@ -91,15 +85,11 @@ debug:
 	$(GRADLE) runDebugExecutable$(TARGET_SUFFIX) -Pargs="--debug $(ARGS)"
 
 # ── Testing & quality ─────────────────────────────────────────────────────────
-.PHONY: test test-all lint format
+.PHONY: test lint format
 
 # Tests: host platform only
 test:
 	$(GRADLE) $(HOST_TEST_TASK)
-
-# Tests: all targets
-test-all:
-	$(GRADLE) allTests
 
 # Linting (separate from build — run in CI or on demand)
 lint:
@@ -251,7 +241,6 @@ help:
 	@echo "  cli              — launch CLI  (ARGS='pdf-compress input.pdf')"
 	@echo "  debug            — run with --debug flag"
 	@echo "  test             — run tests for host platform"
-	@echo "  test-all         — run tests for all targets"
 	@echo "  lint             — static analysis + style (detekt + ktlint)"
 	@echo "  format           — auto-fix style issues"
 	@echo ""
