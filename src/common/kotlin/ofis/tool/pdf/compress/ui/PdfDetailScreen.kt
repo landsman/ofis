@@ -1,18 +1,11 @@
 package ofis.tool.pdf.compress.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -22,12 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.pointerHoverIcon
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -47,11 +35,11 @@ import okio.Path.Companion.toPath
 fun PdfDetailScreen(
     tool: Tool,
     onBack: () -> Unit,
+    showLogs: Boolean,
 ) {
     val scope = rememberCoroutineScope()
 
     var logs by remember { mutableStateOf("") }
-    var showLogs by remember { mutableStateOf(false) }
     var selectedFilePath by remember { mutableStateOf<String?>(null) }
     var selectedFileSize by remember { mutableStateOf<Long?>(null) }
     var resizeInfo by remember { mutableStateOf<String?>(null) }
@@ -87,80 +75,60 @@ fun PdfDetailScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // ── header ─────────────────────────────────────────────────────────
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "← Back",
-                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand).clickable { onBack() }.padding(end = 20.dp),
-                    color = Color(0xFF4A90E2),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = tool.displayName,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF1A1A1A),
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = { showLogs = !showLogs }) {
-                    Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = "Toggle logs",
-                        tint = if (showLogs) Color(0xFF4A90E2) else Color.Gray,
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
+            // ── scrollable content (vertically centred when not logs) ──────────
             if (showLogs) {
                 LogView(logs = logs, modifier = Modifier.weight(1f))
             } else {
-                FileDropZone(
-                    selectedFilePath = selectedFilePath,
-                    selectedFileSize = selectedFileSize,
-                    placeholder = "Tap to select a PDF",
-                    onSelect = {
-                        scope.launch {
-                            kotlinx.coroutines.yield() // Ensure UI updates (ripple) before modal/native activity
-                            pickFile(listOf("pdf"))?.let {
-                                selectedFilePath = it
-                                selectedFileSize = fileSystem.metadataOrNull(it.toPath())?.size
+                Box(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        FileDropZone(
+                            selectedFilePath = selectedFilePath,
+                            selectedFileSize = selectedFileSize,
+                            placeholder = "Tap to select a PDF",
+                            onSelect = {
+                                scope.launch {
+                                    kotlinx.coroutines.yield()
+                                    pickFile(listOf("pdf"))?.let {
+                                        selectedFilePath = it
+                                        selectedFileSize = fileSystem.metadataOrNull(it.toPath())?.size
+                                        resizeInfo = null
+                                        logs = ""
+                                    }
+                                }
+                            },
+                            onClear = {
+                                selectedFilePath = null
+                                selectedFileSize = null
                                 resizeInfo = null
-                                logs = ""
-                            }
+                                outputFilePath = null
+                                suggestedSaveName = null
+                            },
+                        )
+
+                        if (selectedFilePath != null && resizeInfo == null && !isRunning) {
+                            Spacer(modifier = Modifier.height(20.dp))
+                            ProfileSelector(selected = selectedProfile, onSelect = { selectedProfile = it })
                         }
-                    },
-                    onClear = {
-                        selectedFilePath = null
-                        selectedFileSize = null
-                        resizeInfo = null
-                        outputFilePath = null
-                        suggestedSaveName = null
-                    },
-                )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                        if (isRunning) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            CompressionProgress()
+                        }
 
-                if (selectedFilePath != null && resizeInfo == null && !isRunning) {
-                    ProfileSelector(selected = selectedProfile, onSelect = { selectedProfile = it })
-                    Spacer(modifier = Modifier.height(4.dp))
+                        resizeInfo?.let {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            CompressionResultCard(info = it)
+                        }
+                    }
                 }
+            }
 
-                if (isRunning) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CompressionProgress()
-                }
-
-                resizeInfo?.let {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CompressionResultCard(info = it)
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                // ── action buttons ─────────────────────────────────────────────
+            // ── fixed footer — action buttons ──────────────────────────────────
+            if (!showLogs) {
+                Spacer(modifier = Modifier.height(16.dp))
                 if (resizeInfo == null) {
                     CompressPdfSubmitButton(
                         enabled = selectedFilePath != null && !isRunning,

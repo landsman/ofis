@@ -1,6 +1,15 @@
 package ofis.tool.pdf.compress
 
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import ofis.config.Logger
 import ofis.tool.Tool
 import ofis.tool.ToolBox
@@ -10,6 +19,7 @@ import ofis.tool.pdf.compress.model.CompressionRequest
 import ofis.tool.pdf.compress.model.CompressionResult
 import ofis.tool.pdf.compress.service.PdfCompressionService
 import ofis.tool.pdf.compress.ui.PdfDetailScreen
+import ofis.ui.view.tooldetail.ToolDetailView
 import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
 
@@ -22,7 +32,22 @@ class PdfCompressor : Tool {
 
     @Composable
     override fun Screen(onBack: () -> Unit) {
-        PdfDetailScreen(tool = this, onBack = onBack)
+        var showLogs by remember { mutableStateOf(false) }
+        ToolDetailView(
+            tool = this,
+            onBack = onBack,
+            headerActions = {
+                IconButton(onClick = { showLogs = !showLogs }) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = "Toggle logs",
+                        tint = if (showLogs) Color(0xFF4A90E2) else Color.Gray,
+                    )
+                }
+            },
+        ) {
+            PdfDetailScreen(tool = this, onBack = onBack, showLogs = showLogs)
+        }
     }
 
     override fun register() {
