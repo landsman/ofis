@@ -9,7 +9,8 @@ object Logger {
     }
 
     fun warn(msg: String) {
-        onLog?.invoke(msg)
+        println("[WARN] $msg")
+        onLog?.invoke("[WARN] $msg")
     }
 
     fun debug(msg: String) {

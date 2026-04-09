@@ -72,7 +72,6 @@ sealed interface CompressionError {
         override fun toString() = message
     }
 
-    // todo: implement this - low space on disk, missing permission to write, etc
     data class FileSystemError(
         val message: String,
     ) : CompressionError {

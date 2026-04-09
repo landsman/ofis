@@ -2,6 +2,7 @@ package ofis.tool.pdf.compress.service
 
 import ofis.config.Logger
 import ofis.platform.fileSystem
+import ofis.platform.service.availableDiskSpace
 import ofis.platform.service.findHelperBinary
 import ofis.tool.pdf.compress.model.CompressionError
 import ofis.tool.pdf.compress.model.CompressionProfile
@@ -121,8 +122,29 @@ class PdfCompressionService(
         }
 
         // ── atomic move to final destination ───────────────────────────────
-        request.outputPath.parent?.let { fs.createDirectories(it) }
-        fs.atomicMove(finalTmp, request.outputPath)
+        try {
+            request.outputPath.parent?.let { fs.createDirectories(it) }
+            fs.atomicMove(finalTmp, request.outputPath)
+        } catch (e: Exception) {
+            cleanupQuiet(finalTmp)
+            val outputDir = request.outputPath.parent?.toString() ?: "."
+            val freeBytes = availableDiskSpace(outputDir)
+            val requiredBytes = originalBytes * 2
+            return if (freeBytes < requiredBytes) {
+                Logger.warn(
+                    "Not enough disk space: need ${requiredBytes / 1_048_576}MB, " +
+                        "only ${freeBytes / 1_048_576}MB free in $outputDir",
+                )
+                CompressionResult.Failure(
+                    CompressionError.FileSystemError("Not enough disk space to save the compressed file."),
+                )
+            } else {
+                Logger.warn("Failed to write output to ${request.outputPath}: ${e.message}")
+                CompressionResult.Failure(
+                    CompressionError.FileSystemError("Could not save the file. Check folder permissions."),
+                )
+            }
+        }
 
         return CompressionResult.Success(
             inputPath = request.inputPath,
