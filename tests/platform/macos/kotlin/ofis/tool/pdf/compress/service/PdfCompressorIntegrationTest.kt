@@ -9,6 +9,7 @@ import okio.Path.Companion.toPath
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlin.time.measureTime
@@ -141,10 +142,11 @@ class PdfCompressorIntegrationTest {
             "[integration] $label: ${result.originalBytes / 1024}KB → ${result.compressedBytes / 1024}KB (${result.savedPercent}% saved)",
         )
         assertTrue(fs.exists(result.outputPath), "Output file must exist at ${result.outputPath}")
-        assertTrue(
-            result.originalBytes == fixture.originalBytes,
-            "$label fixture size changed: expected ${fixture.originalBytes}B but got ${result.originalBytes}B. " +
-                "Update the expected constant if the fixture was intentionally replaced.",
+        assertEquals(
+                result.originalBytes,
+                fixture.originalBytes,
+                "$label fixture size changed: expected ${fixture.originalBytes}B but got ${result.originalBytes}B. " +
+                        "Update the expected constant if the fixture was intentionally replaced."
         )
         val range =
             when (result.profile) {
