@@ -12,4 +12,12 @@ enum class CompressionProfile(
 
     /** qpdf + Ghostscript /screen — aggressive downsampling to 96 DPI */
     MAXIMUM("Maximum Compression", "Smallest file. Images will be visibly lower quality."),
+    ;
+
+    /** CLI argument used when passing this profile to the tool runner. */
+    fun toArg(): String = when (this) {
+        HIGH_QUALITY -> "high"
+        BALANCED     -> "balanced"
+        MAXIMUM      -> "max"
+    }
 }

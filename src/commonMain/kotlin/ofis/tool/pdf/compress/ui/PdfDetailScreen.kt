@@ -6,10 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -35,17 +33,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ofis.config.Logger
 import ofis.platform.fileSystem
-import ofis.platform.service.availableDiskSpace
 import ofis.platform.view.pickFile
-import ofis.platform.view.saveFile
 import ofis.tool.Tool
 import ofis.tool.pdf.compress.model.CompressionProfile
-import ofis.ui.system.AppButton
+import ofis.tool.pdf.compress.service.saveCompressedFile
 import ofis.ui.system.FileDropZone
 import ofis.ui.system.LogView
 import ofis.ui.system.ToastData
 import ofis.ui.system.ToastHost
-import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
 
 @Composable
@@ -155,120 +150,39 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
 
                 // ── action buttons ─────────────────────────────────────────────
                 if (resizeInfo == null) {
-                    AppButton(
+                    CompressPdfSubmitButton(
+                        enabled = selectedFilePath != null && !isRunning,
                         onClick = {
                             selectedFilePath?.let { path ->
                                 isRunning = true
                                 outputFilePath = null
                                 suggestedSaveName = null
-                                val profileArg = when (selectedProfile) {
-                                    CompressionProfile.HIGH_QUALITY -> "high"
-                                    CompressionProfile.BALANCED     -> "balanced"
-                                    CompressionProfile.MAXIMUM      -> "max"
-                                }
                                 scope.launch {
                                     withContext(Dispatchers.Default) {
-                                        tool.run(listOf(path, "--profile", profileArg))
+                                        tool.run(listOf(path, "--profile", selectedProfile.toArg()))
                                     }
                                 }
                             }
-                        },
-                        modifier = Modifier.fillMaxWidth().height(54.dp),
-                        enabled = selectedFilePath != null && !isRunning,
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFF4A4AFF),
-                            contentColor = Color.White,
-                            disabledBackgroundColor = Color(0xFFBBBBBB)
-                        ),
-                        elevation = ButtonDefaults.elevation(
-                            defaultElevation = 2.dp,
-                            pressedElevation = 0.dp,
-                            disabledElevation = 0.dp
-                        )
-                    ) {
-                        Text("Compress PDF", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    }
-                } else {
-                    // Save — only shown when there is an actual smaller output file
-                    if (outputFilePath != null) {
-                        AppButton(
-                            onClick = {
-                                scope.launch {
-                                    kotlinx.coroutines.yield()
-                                    val dest = saveFile(suggestedSaveName ?: "compressed.pdf")
-                                    if (dest != null && outputFilePath != null) {
-                                        withContext(Dispatchers.Default) {
-                                            val srcPath = outputFilePath!!.toPath()
-                                            val destPath = dest.toPath()
-                                            val destDir = destPath.parent?.toString() ?: "/"
-
-                                            val fileSize = fileSystem.metadataOrNull(srcPath)?.size ?: 0L
-                                            val freeSpace = availableDiskSpace(destDir)
-                                            if (freeSpace < fileSize) {
-                                                withContext(Dispatchers.Main) {
-                                                    toast = ToastData(
-                                                        "Not enough disk space. Need ${formatSize(fileSize)}, only ${formatSize(freeSpace)} available.",
-                                                        isSuccess = false
-                                                    )
-                                                }
-                                                return@withContext
-                                            }
-
-                                            try {
-                                                try {
-                                                    fileSystem.atomicMove(srcPath, destPath)
-                                                } catch (_: Exception) {
-                                                    fileSystem.copy(srcPath, destPath)
-                                                    fileSystem.delete(srcPath)
-                                                }
-                                                withContext(Dispatchers.Main) {
-                                                    outputFilePath = dest
-                                                    toast = ToastData("File saved successfully.", isSuccess = true)
-                                                }
-                                            } catch (e: Exception) {
-                                                val reason = when {
-                                                    e.message?.contains("No space left", ignoreCase = true) == true ||
-                                                    e.message?.contains("ENOSPC", ignoreCase = true) == true ->
-                                                        "Not enough disk space."
-                                                    e.message?.contains("Permission", ignoreCase = true) == true ->
-                                                        "Permission denied."
-                                                    else -> e.message ?: "Unknown error."
-                                                }
-                                                withContext(Dispatchers.Main) {
-                                                    toast = ToastData("Failed to save: $reason", isSuccess = false)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth().height(48.dp),
-                            shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color(0xFF4A4AFF),
-                                contentColor = Color.White
-                            )
-                        ) {
-                            Text("Save compressed PDF", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         }
+                    )
+                } else {
+                    if (outputFilePath != null) {
+                        SaveButton(onClick = {
+                            scope.launch {
+                                kotlinx.coroutines.yield()
+                                val result = saveCompressedFile(outputFilePath!!, suggestedSaveName)
+                                withContext(Dispatchers.Main) {
+                                    result.savedPath?.let { outputFilePath = it }
+                                    toast = result.toast
+                                }
+                            }
+                        })
                         Spacer(modifier = Modifier.height(10.dp))
                     }
-
-                    AppButton(
-                        onClick = {
-                            resizeInfo = null; selectedFilePath = null; selectedFileSize = null
-                            outputFilePath = null; suggestedSaveName = null; logs = ""
-                        },
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFFF0F0F0),
-                            contentColor = Color(0xFF333333)
-                        )
-                    ) {
-                        Text("Compress another file", fontWeight = FontWeight.Medium, fontSize = 15.sp)
-                    }
+                    CompressAnotherPdfFileButton(onClick = {
+                        resizeInfo = null; selectedFilePath = null; selectedFileSize = null
+                        outputFilePath = null; suggestedSaveName = null; logs = ""
+                    })
                 }
             }
         } // Column
@@ -277,3 +191,5 @@ fun PdfDetailScreen(tool: Tool, onBack: () -> Unit) {
 
     } // Box
 }
+
+
