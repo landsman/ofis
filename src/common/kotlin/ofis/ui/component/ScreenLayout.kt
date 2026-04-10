@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
@@ -38,10 +39,10 @@ fun ScreenLayout(
             val windowWidth = this.maxWidth.toWindowWidth()
             CompositionLocalProvider(LocalWindowWidth provides windowWidth) {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Box(modifier = Modifier.fillMaxWidth()) { header() }
+                    Box(modifier = Modifier.fillMaxWidth().padding(start = 40.dp, end = 40.dp, top = 40.dp)) { header() }
                     Box(modifier = Modifier.weight(1f).fillMaxWidth()) { content() }
                     if (footer != null) {
-                        Box(modifier = Modifier.fillMaxWidth()) { footer() }
+                        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp, vertical = 40.dp)) { footer() }
                     }
                 }
             }
