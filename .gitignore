@@ -33,3 +33,5 @@ replay_pid*
 AppIcon.png
 build/
 .gradle/
+# Compiled compose resources (generated at build time, needed by native binary at runtime)
+src/commonMain/composeResources/composeResources/

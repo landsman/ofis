@@ -11,7 +11,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.generated.resources.Res
+import ofis.generated.resources.compress_pdf_button
 import ofis.ui.system.AppButton
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Button for submitting PDF compression request, main CTA button.
@@ -39,6 +42,6 @@ fun CompressPdfSubmitButton(
                 disabledElevation = 0.dp,
             ),
     ) {
-        Text("Compress PDF", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(stringResource(Res.string.compress_pdf_button), fontWeight = FontWeight.Bold, fontSize = 18.sp)
     }
 }

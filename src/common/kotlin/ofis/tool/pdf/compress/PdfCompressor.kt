@@ -8,6 +8,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import ofis.config.Logger
+import ofis.generated.resources.Res
+import ofis.generated.resources.compress_pdf
+import ofis.generated.resources.compress_pdf_description
 import ofis.tool.Tool
 import ofis.tool.ToolBox
 import ofis.tool.ToolRegistry
@@ -20,6 +23,7 @@ import ofis.ui.system.LocalLogController
 import ofis.ui.view.tooldetail.ToolDetailView
 import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
+import org.jetbrains.compose.resources.stringResource
 
 class PdfCompressor : Tool {
     override val name = ToolBox.PDF_COMPRESSOR
@@ -27,6 +31,12 @@ class PdfCompressor : Tool {
     override val description = "Reduce file size while keeping your document readable."
 
     private val service = PdfCompressionService()
+
+    @Composable
+    override fun localizedDisplayName(): String = stringResource(Res.string.compress_pdf)
+
+    @Composable
+    override fun localizedDescription(): String = stringResource(Res.string.compress_pdf_description)
 
     @Composable
     override fun Screen(onBack: () -> Unit) {

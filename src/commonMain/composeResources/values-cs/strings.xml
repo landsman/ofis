@@ -1,0 +1,57 @@
+<resources>
+    <!-- App -->
+    <string name="app_subtitle">Platforma nástrojů</string>
+    <string name="back">← Zpět</string>
+    <string name="open">Otevřít</string>
+
+    <!-- Logs -->
+    <string name="logs_title">Logy</string>
+    <string name="close_logs">Zavřít logy</string>
+    <string name="no_logs_yet">Zatím žádné záznamy...</string>
+
+    <!-- File drop zone -->
+    <string name="or_drag_and_drop">nebo přetáhněte soubor sem</string>
+    <string name="clear_selection">Zrušit výběr</string>
+
+    <!-- PDF compress — general -->
+    <string name="compress_pdf">Komprimovat PDF</string>
+    <string name="compress_pdf_description">Zmenšete velikost souboru při zachování čitelnosti dokumentu.</string>
+    <string name="tap_to_select_pdf">Klikněte pro výběr PDF</string>
+    <string name="drop_pdf_here">Přetáhněte PDF sem</string>
+
+    <!-- PDF compress — profile selector -->
+    <string name="compression_level">Úroveň komprese</string>
+    <string name="recommended">Doporučeno</string>
+    <string name="profile_high_quality">Vysoká kvalita</string>
+    <string name="profile_high_quality_desc">Bezztrátová. Zachovává všechny obrázky v plném rozlišení.</string>
+    <string name="profile_balanced">Vyvážená</string>
+    <string name="profile_balanced_desc">Doporučená. Dobrá kvalita, výrazně menší soubor.</string>
+    <string name="profile_maximum">Maximální komprese</string>
+    <string name="profile_maximum_desc">Nejmenší soubor. Obrázky budou viditelně nižší kvality.</string>
+
+    <!-- PDF compress — progress -->
+    <string name="almost_there">Ještě chvíli!</string>
+    <string name="compressing_pdf">Komprimuji PDF...</string>
+    <string name="making_pdf_smaller">Zmenšuji soubor PDF...</string>
+
+    <!-- PDF compress — result -->
+    <string name="compression_complete">Komprese dokončena</string>
+    <string name="already_optimal">Toto PDF je již dobře optimalizované. Komprimovaná verze není menší.</string>
+    <string name="original">Originál</string>
+    <string name="compressed_label">Komprimovaný</string>
+    <string name="percent_smaller">o %1$d %% menší</string>
+
+    <!-- PDF compress — buttons -->
+    <string name="compress_pdf_button">Komprimovat PDF</string>
+    <string name="save_compressed_pdf">Uložit komprimované PDF</string>
+    <string name="compress_another_file">Komprimovat další soubor</string>
+    <string name="try_maximum_compression">Zkusit maximální kompresi</string>
+
+    <!-- Save messages -->
+    <string name="save_cancelled">Uložení zrušeno.</string>
+    <string name="file_saved">Soubor byl úspěšně uložen.</string>
+    <string name="not_enough_space">Nedostatek místa na disku.</string>
+    <string name="permission_denied">Přístup odepřen.</string>
+    <string name="not_enough_space_detail">Nedostatek místa na disku. Potřeba {need}, k dispozici pouze {avail}.</string>
+    <string name="failed_to_save">Nepodařilo se uložit: {reason}</string>
+</resources>

@@ -11,11 +11,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.i18n.LocalAppStrings
 import ofis.ui.system.LocalWindowWidth
 import ofis.ui.system.WindowWidth
 
 @Composable
 fun ToolSelectionHeader() {
+    val strings = LocalAppStrings.current
     val window = LocalWindowWidth.current
     val titleSize =
         when (window) {
@@ -44,7 +46,7 @@ fun ToolSelectionHeader() {
             color = Color(0xFF000000),
         )
         Text(
-            text = "Tooling Platform",
+            text = strings.appSubtitle,
             fontSize = subtitleSize,
             color = Color(0xFF666666),
         )

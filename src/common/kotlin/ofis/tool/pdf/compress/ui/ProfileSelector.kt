@@ -22,9 +22,13 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.generated.resources.Res
+import ofis.generated.resources.compression_level
+import ofis.generated.resources.recommended
 import ofis.tool.pdf.compress.model.CompressionProfile
 import ofis.ui.system.Badge
 import ofis.ui.system.handClickable
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ProfileSelector(
@@ -32,7 +36,7 @@ fun ProfileSelector(
     onSelect: (CompressionProfile) -> Unit,
 ) {
     Text(
-        text = "Compression Level",
+        text = stringResource(Res.string.compression_level),
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp,
         color = Color(0xFF1A1A1A),
@@ -76,13 +80,13 @@ private fun ProfileOption(
         Spacer(modifier = Modifier.width(10.dp))
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(profile.label, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                Text(profile.localizedLabel(), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                 if (profile == CompressionProfile.BALANCED) {
                     Spacer(modifier = Modifier.width(8.dp))
-                    Badge(text = "Recommended")
+                    Badge(text = stringResource(Res.string.recommended))
                 }
             }
-            Text(text = profile.description, color = Color.Gray, fontSize = 14.sp, lineHeight = 20.sp)
+            Text(text = profile.localizedDescription(), color = Color.Gray, fontSize = 14.sp, lineHeight = 20.sp)
         }
     }
 }

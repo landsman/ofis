@@ -29,22 +29,28 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ofis.generated.resources.Res
+import ofis.generated.resources.drop_pdf_here
+import ofis.generated.resources.tap_to_select_pdf
 import ofis.platform.fileSystem
 import ofis.platform.view.pickFile
 import ofis.tool.Tool
 import ofis.tool.pdf.compress.model.CompressionProfile
+import ofis.tool.pdf.compress.service.rememberSaveMessages
 import ofis.tool.pdf.compress.service.saveCompressedFile
 import ofis.ui.system.FileDropBus
 import ofis.ui.system.FileDropZone
 import ofis.ui.system.LocalLogController
 import ofis.ui.system.toast.LocalToastController
 import okio.Path.Companion.toPath
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PdfDetailScreen(tool: Tool) {
     val scope = rememberCoroutineScope()
     val toastController = LocalToastController.current
     val logController = LocalLogController.current
+    val saveMessages = rememberSaveMessages()
 
     var selectedFilePath by remember { mutableStateOf<String?>(null) }
     var selectedFileSize by remember { mutableStateOf<Long?>(null) }
@@ -121,7 +127,7 @@ fun PdfDetailScreen(tool: Tool) {
             FileDropZone(
                 selectedFilePath = selectedFilePath,
                 selectedFileSize = selectedFileSize,
-                placeholder = "Tap to select a PDF",
+                placeholder = stringResource(Res.string.tap_to_select_pdf),
                 onSelect = {
                     scope.launch {
                         kotlinx.coroutines.yield()
@@ -172,7 +178,7 @@ fun PdfDetailScreen(tool: Tool) {
                     SaveButton(onClick = {
                         scope.launch {
                             kotlinx.coroutines.yield()
-                            val result = saveCompressedFile(outputFilePath!!, suggestedSaveName)
+                            val result = saveCompressedFile(outputFilePath!!, suggestedSaveName, saveMessages)
                             withContext(Dispatchers.Main) {
                                 result.savedPath?.let { outputFilePath = it }
                                 toastController.show(result.toast)
@@ -214,7 +220,7 @@ private fun DropOverlay() {
             Text(text = "📄", fontSize = 72.sp)
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = "Drop PDF here",
+                text = stringResource(Res.string.drop_pdf_here),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color(0xFF2A70C2),

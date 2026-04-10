@@ -161,3 +161,18 @@ tasks.register<Exec>("icon") {
     description = "Generates application icons"
     commandLine("make", "icon")
 }
+
+// The macOS native resource reader looks for compiled CVR files relative to the working directory:
+//   src/commonMain/composeResources/composeResources/ofis.generated.resources/…
+// The Compose Resources plugin only puts them in build/. This task bridges the gap for dev runs.
+val copyComposeResourcesToSourceTree = tasks.register<Copy>("copyComposeResourcesToSourceTree") {
+    group = "compose resources"
+    description = "Copies compiled resource files so the native binary can find them at runtime"
+    dependsOn("prepareComposeResourcesTaskForCommonMain")
+    from(layout.buildDirectory.dir("generated/compose/resourceGenerator/preparedResources/commonMain/composeResources"))
+    into(layout.projectDirectory.dir("src/commonMain/composeResources/composeResources"))
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink>().configureEach {
+    dependsOn(copyComposeResourcesToSourceTree)
+}

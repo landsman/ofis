@@ -22,6 +22,10 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.generated.resources.Res
+import ofis.generated.resources.close_logs
+import ofis.generated.resources.logs_title
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LogOverlay(
@@ -39,7 +43,7 @@ fun LogOverlay(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Logs", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                Text(stringResource(Res.string.logs_title), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = onClose,
@@ -47,7 +51,7 @@ fun LogOverlay(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close logs",
+                        contentDescription = stringResource(Res.string.close_logs),
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }

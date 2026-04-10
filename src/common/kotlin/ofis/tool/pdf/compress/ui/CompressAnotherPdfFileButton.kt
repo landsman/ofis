@@ -11,7 +11,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.generated.resources.Res
+import ofis.generated.resources.compress_another_file
 import ofis.ui.system.AppButton
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Button for compressing another PDF file.
@@ -28,6 +31,6 @@ fun CompressAnotherPdfFileButton(onClick: () -> Unit) {
                 contentColor = Color(0xFF333333),
             ),
     ) {
-        Text("Compress another file", fontWeight = FontWeight.Medium, fontSize = 15.sp)
+        Text(stringResource(Res.string.compress_another_file), fontWeight = FontWeight.Medium, fontSize = 15.sp)
     }
 }
