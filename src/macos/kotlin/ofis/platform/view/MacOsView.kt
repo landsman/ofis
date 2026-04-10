@@ -19,6 +19,8 @@ import platform.AppKit.NSImage
 import platform.AppKit.NSOpenPanel
 import platform.AppKit.NSSavePanel
 import platform.AppKit.NSView
+import platform.AppKit.NSViewHeightSizable
+import platform.AppKit.NSViewWidthSizable
 import platform.CoreGraphics.CGRect
 import platform.Foundation.NSBundle
 import platform.Foundation.NSMakeRect
@@ -102,12 +104,9 @@ actual fun platformGui() {
                     )
                 window.contentView = dragView
                 dragView.addSubview(composeView)
-                // Make the Compose view fill the drag wrapper.
-                composeView.setFrame(
-                    dragView.bounds.useContents {
-                        NSMakeRect(origin.x, origin.y, size.width, size.height)
-                    },
-                )
+                // Keep the Compose view filling the drag wrapper on every resize.
+                composeView.autoresizingMask = NSViewWidthSizable or NSViewHeightSizable
+                composeView.setFrame(dragView.bounds)
             }
         }
     }
