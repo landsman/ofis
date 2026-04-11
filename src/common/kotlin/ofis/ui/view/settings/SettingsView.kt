@@ -24,9 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ofis.i18n.AppLanguage
 import ofis.i18n.LocalAppStrings
+import ofis.ui.component.AppHeader
 import ofis.ui.component.ScreenLayout
 import ofis.ui.system.handClickable
-import ofis.ui.view.tooldetail.component.ToolDetailHeader
 
 @Composable
 fun SettingsView(
@@ -38,8 +38,8 @@ fun SettingsView(
 
     ScreenLayout(
         header = {
-            ToolDetailHeader(
-                titleOverride = strings.settingsTitle,
+            AppHeader(
+                title = strings.settingsTitle,
                 onBack = onBack,
             )
         },

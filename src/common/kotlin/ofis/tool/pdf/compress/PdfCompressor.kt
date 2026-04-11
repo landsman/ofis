@@ -17,8 +17,8 @@ import ofis.tool.pdf.compress.model.CompressionRequest
 import ofis.tool.pdf.compress.model.CompressionResult
 import ofis.tool.pdf.compress.service.PdfCompressionService
 import ofis.tool.pdf.compress.ui.PdfDetailScreen
+import ofis.ui.component.DetailView
 import ofis.ui.system.LocalLogController
-import ofis.ui.view.tooldetail.ToolDetailView
 import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
 
@@ -38,8 +38,8 @@ class PdfCompressor : Tool {
     @Composable
     override fun Screen(onBack: () -> Unit) {
         val logController = LocalLogController.current
-        ToolDetailView(
-            tool = this,
+        DetailView(
+            title = localizedDisplayName(),
             onBack = onBack,
             headerActions = {
                 IconButton(onClick = { logController.toggle() }) {

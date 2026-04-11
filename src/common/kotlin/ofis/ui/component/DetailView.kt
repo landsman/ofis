@@ -1,20 +1,23 @@
-package ofis.ui.view.tooldetail
+package ofis.ui.component
 
 import androidx.compose.runtime.Composable
-import ofis.tool.Tool
-import ofis.ui.component.ScreenLayout
-import ofis.ui.view.tooldetail.component.ToolDetailHeader
 
 @Composable
-fun ToolDetailView(
-    tool: Tool,
+fun DetailView(
+    title: String,
     onBack: () -> Unit,
     headerActions: (@Composable () -> Unit)? = null,
     footer: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     ScreenLayout(
-        header = { ToolDetailHeader(tool = tool, onBack = onBack, actions = headerActions) },
+        header = {
+            AppHeader(
+                title = title,
+                onBack = onBack,
+                actions = headerActions,
+            )
+        },
         footer = footer,
     ) {
         content()

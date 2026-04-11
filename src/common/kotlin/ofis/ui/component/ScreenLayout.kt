@@ -39,8 +39,8 @@ fun ScreenLayout(
             val windowWidth = this.maxWidth.toWindowWidth()
             CompositionLocalProvider(LocalWindowWidth provides windowWidth) {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Box(modifier = Modifier.fillMaxWidth().padding(start = 40.dp, end = 40.dp, top = 40.dp)) { header() }
-                    Box(modifier = Modifier.weight(1f).fillMaxWidth()) { content() }
+                    Box(modifier = Modifier.fillMaxWidth()) { header() }
+                    Box(modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 24.dp)) { content() }
                     if (footer != null) {
                         Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp, vertical = 40.dp)) { footer() }
                     }
