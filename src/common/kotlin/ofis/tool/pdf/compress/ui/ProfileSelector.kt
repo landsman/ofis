@@ -34,7 +34,7 @@ fun ProfileSelector(
 ) {
     val strings = LocalAppStrings.current
     Text(
-        text = strings.pdfCompress.compressionLevel,
+        text = strings.pdfCompressCompressionLevel,
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp,
         color = Color(0xFF1A1A1A),
@@ -82,7 +82,7 @@ private fun ProfileOption(
                 Text(profile.localizedLabel(), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                 if (profile == CompressionProfile.BALANCED) {
                     Spacer(modifier = Modifier.width(8.dp))
-                    Badge(text = strings.pdfCompress.recommended)
+                    Badge(text = strings.pdfCompressRecommended)
                 }
             }
             Text(text = profile.localizedDescription(), color = Color.Gray, fontSize = 14.sp, lineHeight = 20.sp)

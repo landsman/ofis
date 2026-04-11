@@ -26,6 +26,6 @@ fun SaveButton(onClick: () -> Unit) {
                 contentColor = Color.White,
             ),
     ) {
-        Text(LocalAppStrings.current.pdfCompress.save, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text(LocalAppStrings.current.pdfCompressSave, fontWeight = FontWeight.Bold, fontSize = 16.sp)
     }
 }

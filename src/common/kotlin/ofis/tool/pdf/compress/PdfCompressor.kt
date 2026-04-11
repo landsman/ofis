@@ -30,10 +30,10 @@ class PdfCompressor : Tool {
     private val service = PdfCompressionService()
 
     @Composable
-    override fun localizedDisplayName(): String = LocalAppStrings.current.pdfCompress.name
+    override fun localizedDisplayName(): String = LocalAppStrings.current.pdfCompressName
 
     @Composable
-    override fun localizedDescription(): String = LocalAppStrings.current.pdfCompress.description
+    override fun localizedDescription(): String = LocalAppStrings.current.pdfCompressDescription
 
     @Composable
     override fun Screen(onBack: () -> Unit) {

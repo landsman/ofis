@@ -41,7 +41,7 @@ fun LogOverlay(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(strings.logs.title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                Text(strings.logsTitle, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = onClose,
@@ -49,7 +49,7 @@ fun LogOverlay(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = strings.logs.close,
+                        contentDescription = strings.logsClose,
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }

@@ -29,6 +29,6 @@ fun CompressAnotherPdfFileButton(onClick: () -> Unit) {
                 contentColor = Color(0xFF333333),
             ),
     ) {
-        Text(LocalAppStrings.current.pdfCompress.compressAnother, fontWeight = FontWeight.Medium, fontSize = 15.sp)
+        Text(LocalAppStrings.current.pdfCompressCompressAnother, fontWeight = FontWeight.Medium, fontSize = 15.sp)
     }
 }

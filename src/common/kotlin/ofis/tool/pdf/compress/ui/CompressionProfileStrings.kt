@@ -7,20 +7,19 @@ import ofis.tool.pdf.compress.model.CompressionProfile
 @Composable
 fun CompressionProfile.localizedLabel(): String {
     val strings = LocalAppStrings.current
-    val p = strings.pdfCompress
     return when (this) {
-        CompressionProfile.HIGH_QUALITY -> p.profileHighQuality
-        CompressionProfile.BALANCED -> p.profileBalanced
-        CompressionProfile.MAXIMUM -> p.profileMaximum
+        CompressionProfile.HIGH_QUALITY -> strings.pdfCompressProfileHighQuality
+        CompressionProfile.BALANCED -> strings.pdfCompressProfileBalanced
+        CompressionProfile.MAXIMUM -> strings.pdfCompressProfileMaximum
     }
 }
 
 @Composable
 fun CompressionProfile.localizedDescription(): String {
-    val p = LocalAppStrings.current.pdfCompress
+    val strings = LocalAppStrings.current
     return when (this) {
-        CompressionProfile.HIGH_QUALITY -> p.profileHighQualityDesc
-        CompressionProfile.BALANCED -> p.profileBalancedDesc
-        CompressionProfile.MAXIMUM -> p.profileMaximumDesc
+        CompressionProfile.HIGH_QUALITY -> strings.pdfCompressProfileHighQualityDesc
+        CompressionProfile.BALANCED -> strings.pdfCompressProfileBalancedDesc
+        CompressionProfile.MAXIMUM -> strings.pdfCompressProfileMaximumDesc
     }
 }

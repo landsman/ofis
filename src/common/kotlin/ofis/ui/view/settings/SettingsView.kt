@@ -39,7 +39,7 @@ fun SettingsView(
     ScreenLayout(
         header = {
             ToolDetailHeader(
-                titleOverride = strings.settings.title,
+                titleOverride = strings.settingsTitle,
                 onBack = onBack,
             )
         },
@@ -51,7 +51,7 @@ fun SettingsView(
                     .padding(horizontal = 40.dp, vertical = 24.dp),
         ) {
             Text(
-                text = strings.settings.languageLabel,
+                text = strings.settingsLanguageLabel,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 color = Color(0xFF1A1A1A),
@@ -59,9 +59,9 @@ fun SettingsView(
             Spacer(modifier = Modifier.height(12.dp))
 
             listOf(
-                AppLanguage.SYSTEM to strings.settings.languageSystem,
-                AppLanguage.ENGLISH to strings.settings.languageEnglish,
-                AppLanguage.CZECH to strings.settings.languageCzech,
+                AppLanguage.SYSTEM to strings.settingsLanguageSystem,
+                AppLanguage.ENGLISH to strings.settingsLanguageEnglish,
+                AppLanguage.CZECH to strings.settingsLanguageCzech,
             ).forEach { (language, label) ->
                 LanguageOption(
                     label = label,

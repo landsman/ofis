@@ -53,10 +53,10 @@ fun CompressionProgress() {
             CircularProgressIndicator(color = Color(0xFF4A4AFF), strokeWidth = 3.dp)
             Spacer(modifier = Modifier.height(12.dp))
             if (isSlow) {
-                Text(strings.pdfCompress.almostThere, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(strings.pdfCompress.compressing, color = Color(0xFF4A4AFF), fontSize = 14.sp)
+                Text(strings.pdfCompressAlmostThere, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(strings.pdfCompressCompressing, color = Color(0xFF4A4AFF), fontSize = 14.sp)
             } else {
-                Text(strings.pdfCompress.makingSmaller, fontSize = 15.sp, color = Color(0xFF444444))
+                Text(strings.pdfCompressMakingSmaller, fontSize = 15.sp, color = Color(0xFF444444))
             }
         }
     }

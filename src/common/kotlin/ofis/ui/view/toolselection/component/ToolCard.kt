@@ -50,7 +50,7 @@ fun ToolCard(
             shape = RoundedCornerShape(8.dp),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         ) {
-            Text(strings.common.open)
+            Text(strings.open)
         }
     }
 }

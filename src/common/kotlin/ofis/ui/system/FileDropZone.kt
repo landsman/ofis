@@ -52,7 +52,7 @@ fun FileDropZone(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = "📄", fontSize = 40.sp, modifier = Modifier.padding(bottom = 8.dp))
                 Text(placeholder, color = Color(0xFF555555), fontSize = 15.sp, fontWeight = FontWeight.Medium)
-                Text(strings.common.orDragAndDrop, color = Color(0xFFAAAAAA), fontSize = 13.sp)
+                Text(strings.orDragAndDrop, color = Color(0xFFAAAAAA), fontSize = 13.sp)
             }
         } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -71,7 +71,7 @@ fun FileDropZone(
                 }
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = strings.common.clearSelection,
+                    contentDescription = strings.clearSelection,
                     tint = Color.Gray,
                     modifier =
                         Modifier

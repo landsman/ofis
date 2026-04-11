@@ -1,71 +1,143 @@
 package ofis.i18n
 
-data class AppStrings(
-    val common: CommonStrings,
-    val logs: LogStrings,
-    val pdfCompress: PdfCompressStrings,
-    val settings: SettingsStrings,
-)
+interface AppStrings {
+    // ── Common ────────────────────────────────────────────────────────────────
 
-data class CommonStrings(
-    val appSubtitle: String,
-    val back: String,
-    val open: String,
-    val settings: String,
-    val orDragAndDrop: String,
-    val clearSelection: String,
-)
+    /** "Tooling Platform" */
+    val appSubtitle: String
 
-data class LogStrings(
-    val title: String,
-    val close: String,
-    val empty: String,
-)
+    /** "← Back" */
+    val back: String
 
-data class PdfCompressStrings(
-    // Tool card
-    val name: String,
-    val description: String,
-    // File selection
-    val tapToSelect: String,
-    val dropHere: String,
-    // Profile selector
-    val compressionLevel: String,
-    val recommended: String,
-    val profileHighQuality: String,
-    val profileHighQualityDesc: String,
-    val profileBalanced: String,
-    val profileBalancedDesc: String,
-    val profileMaximum: String,
-    val profileMaximumDesc: String,
-    // Progress
-    val almostThere: String,
-    val compressing: String,
-    val makingSmaller: String,
-    // Result
-    val complete: String,
-    val alreadyOptimal: String,
-    val original: String,
-    val compressed: String,
-    val percentSmaller: (percent: Int) -> String,
-    // Buttons
-    val button: String,
-    val save: String,
-    val compressAnother: String,
-    val tryMaximum: String,
-    // Save feedback
-    val saveCancelled: String,
-    val fileSaved: String,
-    val notEnoughSpace: String,
-    val permissionDenied: String,
-    val notEnoughSpaceDetail: (need: String, avail: String) -> String,
-    val failedToSave: (reason: String) -> String,
-)
+    /** "Open" */
+    val open: String
 
-data class SettingsStrings(
-    val title: String,
-    val languageLabel: String,
-    val languageSystem: String,
-    val languageEnglish: String,
-    val languageCzech: String,
-)
+    /** "Settings" */
+    val settings: String
+
+    /** "or drag and drop here" */
+    val orDragAndDrop: String
+
+    /** "Clear selection" */
+    val clearSelection: String
+
+    // ── Logs ──────────────────────────────────────────────────────────────────
+
+    /** "Logs" */
+    val logsTitle: String
+
+    /** "Close logs" */
+    val logsClose: String
+
+    /** "No logs yet..." */
+    val logsEmpty: String
+
+    // ── PDF Compress ──────────────────────────────────────────────────────────
+
+    /** "Compress PDF" */
+    val pdfCompressName: String
+
+    /** "Reduce file size while keeping your document readable." */
+    val pdfCompressDescription: String
+
+    /** "Tap to select a PDF" */
+    val pdfCompressTapToSelect: String
+
+    /** "Drop PDF here" */
+    val pdfCompressDropHere: String
+
+    /** "Compression Level" */
+    val pdfCompressCompressionLevel: String
+
+    /** "Recommended" */
+    val pdfCompressRecommended: String
+
+    /** "High Quality" */
+    val pdfCompressProfileHighQuality: String
+
+    /** "Lossless. Preserves all images at full resolution." */
+    val pdfCompressProfileHighQualityDesc: String
+
+    /** "Balanced" */
+    val pdfCompressProfileBalanced: String
+
+    /** "Recommended. Good quality, noticeably smaller file." */
+    val pdfCompressProfileBalancedDesc: String
+
+    /** "Maximum Compression" */
+    val pdfCompressProfileMaximum: String
+
+    /** "Smallest file. Images will be visibly lower quality." */
+    val pdfCompressProfileMaximumDesc: String
+
+    /** "Almost there!" */
+    val pdfCompressAlmostThere: String
+
+    /** "Compressing your PDF..." */
+    val pdfCompressCompressing: String
+
+    /** "Making your PDF file smaller..." */
+    val pdfCompressMakingSmaller: String
+
+    /** "Compression Complete" */
+    val pdfCompressComplete: String
+
+    /** "This PDF is already well-optimized. The compressed version isn't smaller." */
+    val pdfCompressAlreadyOptimal: String
+
+    /** "Original" */
+    val pdfCompressOriginal: String
+
+    /** "Compressed" */
+    val pdfCompressCompressed: String
+
+    /** "$n% smaller" */
+    val pdfCompressPercentSmaller: (percent: Int) -> String
+
+    /** "Compress PDF" */
+    val pdfCompressButton: String
+
+    /** "Save compressed PDF" */
+    val pdfCompressSave: String
+
+    /** "Compress another file" */
+    val pdfCompressCompressAnother: String
+
+    /** "Try Maximum Compression" */
+    val pdfCompressTryMaximum: String
+
+    /** "Save cancelled." */
+    val pdfCompressSaveCancelled: String
+
+    /** "File saved successfully." */
+    val pdfCompressFileSaved: String
+
+    /** "Not enough disk space." */
+    val pdfCompressNotEnoughSpace: String
+
+    /** "Permission denied." */
+    val pdfCompressPermissionDenied: String
+
+    /** "Not enough disk space. Need {need}, only {avail} available." */
+    val pdfCompressNotEnoughSpaceDetail: (need: String, avail: String) -> String
+
+    /** "Failed to save: {reason}" */
+    val pdfCompressFailedToSave: (reason: String) -> String
+
+    // ── Settings ──────────────────────────────────────────────────────────────
+
+    /** "Settings" */
+    val settingsTitle: String
+
+    /** "Language" */
+    val settingsLanguageLabel: String
+
+    /** "System default" */
+    val settingsLanguageSystem: String
+
+    /** "English" */
+    val settingsLanguageEnglish: String
+
+    /** "Czech" */
+    val settingsLanguageCzech: String
+}
