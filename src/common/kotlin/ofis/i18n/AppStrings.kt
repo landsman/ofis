@@ -21,6 +21,23 @@ interface AppStrings {
     /** "Clear selection" */
     val clearSelection: String
 
+    // ── Settings ──────────────────────────────────────────────────────────────
+
+    /** "Settings" */
+    val settingsTitle: String
+
+    /** "Language" */
+    val settingsLanguageLabel: String
+
+    /** "System default" */
+    val settingsLanguageSystem: String
+
+    /** "English" */
+    val settingsLanguageEnglish: String
+
+    /** "Czech" */
+    val settingsLanguageCzech: String
+
     // ── Logs ──────────────────────────────────────────────────────────────────
 
     /** "Logs" */
@@ -123,21 +140,4 @@ interface AppStrings {
 
     /** "Failed to save: {reason}" */
     val pdfCompressFailedToSave: (reason: String) -> String
-
-    // ── Settings ──────────────────────────────────────────────────────────────
-
-    /** "Settings" */
-    val settingsTitle: String
-
-    /** "Language" */
-    val settingsLanguageLabel: String
-
-    /** "System default" */
-    val settingsLanguageSystem: String
-
-    /** "English" */
-    val settingsLanguageEnglish: String
-
-    /** "Czech" */
-    val settingsLanguageCzech: String
 }

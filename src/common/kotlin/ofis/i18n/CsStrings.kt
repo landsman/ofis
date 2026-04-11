@@ -9,6 +9,13 @@ object CsStrings : AppStrings {
     override val orDragAndDrop = "nebo přetáhněte soubor sem"
     override val clearSelection = "Zrušit výběr"
 
+    // ── Settings ──────────────────────────────────────────────────────────────
+    override val settingsTitle = "Nastavení"
+    override val settingsLanguageLabel = "Jazyk"
+    override val settingsLanguageSystem = "Systémový jazyk"
+    override val settingsLanguageEnglish = "Angličtina"
+    override val settingsLanguageCzech = "Čeština"
+
     // ── Logs ──────────────────────────────────────────────────────────────────
     override val logsTitle = "Logy"
     override val logsClose = "Zavřít logy"
@@ -50,11 +57,4 @@ object CsStrings : AppStrings {
         "Nedostatek místa. Potřeba $need, k dispozici pouze $avail."
     }
     override val pdfCompressFailedToSave = { reason: String -> "Nepodařilo se uložit: $reason" }
-
-    // ── Settings ──────────────────────────────────────────────────────────────
-    override val settingsTitle = "Nastavení"
-    override val settingsLanguageLabel = "Jazyk"
-    override val settingsLanguageSystem = "Systémový jazyk"
-    override val settingsLanguageEnglish = "Angličtina"
-    override val settingsLanguageCzech = "Čeština"
 }

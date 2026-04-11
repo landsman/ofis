@@ -9,6 +9,13 @@ object EnStrings : AppStrings {
     override val orDragAndDrop = "or drag and drop here"
     override val clearSelection = "Clear selection"
 
+    // ── Settings ──────────────────────────────────────────────────────────────
+    override val settingsTitle = "Settings"
+    override val settingsLanguageLabel = "Language"
+    override val settingsLanguageSystem = "System default"
+    override val settingsLanguageEnglish = "English"
+    override val settingsLanguageCzech = "Czech"
+
     // ── Logs ──────────────────────────────────────────────────────────────────
     override val logsTitle = "Logs"
     override val logsClose = "Close logs"
@@ -50,11 +57,4 @@ object EnStrings : AppStrings {
         "Not enough disk space. Need $need, only $avail available."
     }
     override val pdfCompressFailedToSave = { reason: String -> "Failed to save: $reason" }
-
-    // ── Settings ──────────────────────────────────────────────────────────────
-    override val settingsTitle = "Settings"
-    override val settingsLanguageLabel = "Language"
-    override val settingsLanguageSystem = "System default"
-    override val settingsLanguageEnglish = "English"
-    override val settingsLanguageCzech = "Czech"
 }
