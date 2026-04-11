@@ -23,7 +23,7 @@ jobs:
           restore-keys: konan-macos-
 
       - name: Install tools
-        run: make install bins
+        run: make install install-bins
 
       - name: Run tests
         run: make test
