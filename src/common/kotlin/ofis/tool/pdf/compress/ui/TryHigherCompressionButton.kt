@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.i18n.LocalAppStrings
 import ofis.ui.system.AppButton
 
 @Composable
@@ -25,6 +26,6 @@ fun TryHigherCompressionButton(onClick: () -> Unit) {
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             ),
     ) {
-        Text("Try Maximum Compression", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text(LocalAppStrings.current.pdfCompressTryMaximum, fontWeight = FontWeight.Bold, fontSize = 16.sp)
     }
 }

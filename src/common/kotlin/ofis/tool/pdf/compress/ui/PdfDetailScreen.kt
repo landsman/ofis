@@ -29,10 +29,12 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ofis.i18n.LocalAppStrings
 import ofis.platform.fileSystem
 import ofis.platform.view.pickFile
 import ofis.tool.Tool
 import ofis.tool.pdf.compress.model.CompressionProfile
+import ofis.tool.pdf.compress.service.SaveMessages
 import ofis.tool.pdf.compress.service.saveCompressedFile
 import ofis.ui.system.FileDropBus
 import ofis.ui.system.FileDropZone
@@ -45,6 +47,18 @@ fun PdfDetailScreen(tool: Tool) {
     val scope = rememberCoroutineScope()
     val toastController = LocalToastController.current
     val logController = LocalLogController.current
+    val strings = LocalAppStrings.current
+    val saveMessages =
+        remember(strings) {
+            SaveMessages(
+                saveCancelled = strings.pdfCompressSaveCancelled,
+                fileSaved = strings.pdfCompressFileSaved,
+                notEnoughSpace = strings.pdfCompressNotEnoughSpace,
+                permissionDenied = strings.pdfCompressPermissionDenied,
+                notEnoughSpaceDetail = strings.pdfCompressNotEnoughSpaceDetail,
+                failedToSave = strings.pdfCompressFailedToSave,
+            )
+        }
 
     var selectedFilePath by remember { mutableStateOf<String?>(null) }
     var selectedFileSize by remember { mutableStateOf<Long?>(null) }
@@ -121,7 +135,7 @@ fun PdfDetailScreen(tool: Tool) {
             FileDropZone(
                 selectedFilePath = selectedFilePath,
                 selectedFileSize = selectedFileSize,
-                placeholder = "Tap to select a PDF",
+                placeholder = strings.pdfCompressTapToSelect,
                 onSelect = {
                     scope.launch {
                         kotlinx.coroutines.yield()
@@ -172,7 +186,7 @@ fun PdfDetailScreen(tool: Tool) {
                     SaveButton(onClick = {
                         scope.launch {
                             kotlinx.coroutines.yield()
-                            val result = saveCompressedFile(outputFilePath!!, suggestedSaveName)
+                            val result = saveCompressedFile(outputFilePath!!, suggestedSaveName, saveMessages)
                             withContext(Dispatchers.Main) {
                                 result.savedPath?.let { outputFilePath = it }
                                 toastController.show(result.toast)
@@ -201,6 +215,7 @@ fun PdfDetailScreen(tool: Tool) {
 
 @Composable
 private fun DropOverlay() {
+    val strings = LocalAppStrings.current
     Box(
         modifier =
             Modifier
@@ -214,7 +229,7 @@ private fun DropOverlay() {
             Text(text = "📄", fontSize = 72.sp)
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = "Drop PDF here",
+                text = strings.pdfCompressDropHere,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color(0xFF2A70C2),

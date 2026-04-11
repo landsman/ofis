@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.i18n.LocalAppStrings
 import ofis.tool.Tool
 import ofis.ui.system.LocalWindowWidth
 import ofis.ui.system.WindowWidth
@@ -19,10 +20,12 @@ import ofis.ui.system.handClickable
 
 @Composable
 fun ToolDetailHeader(
-    tool: Tool,
+    tool: Tool? = null,
+    titleOverride: String? = null,
     onBack: () -> Unit,
     actions: (@Composable () -> Unit)? = null,
 ) {
+    val strings = LocalAppStrings.current
     val window = LocalWindowWidth.current
     val titleSize =
         when (window) {
@@ -42,7 +45,7 @@ fun ToolDetailHeader(
     ) {
         // Left — back button
         Text(
-            text = "← Back",
+            text = strings.back,
             modifier =
                 Modifier
                     .align(Alignment.CenterStart)
@@ -53,8 +56,9 @@ fun ToolDetailHeader(
         )
 
         // Centre — tool title
+        val title = titleOverride ?: tool?.localizedDisplayName() ?: ""
         Text(
-            text = tool.displayName,
+            text = title,
             modifier = Modifier.align(Alignment.Center),
             fontSize = titleSize,
             fontWeight = FontWeight.ExtraBold,

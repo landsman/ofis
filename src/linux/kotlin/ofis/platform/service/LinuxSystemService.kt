@@ -8,8 +8,18 @@ import platform.posix.X_OK
 import platform.posix.access
 import platform.posix.fgets
 import platform.posix.getenv
+import platform.posix.mkdir
 import platform.posix.pclose
 import platform.posix.popen
+
+actual fun appDataDir(): String {
+    val xdg = getenv("XDG_DATA_HOME")?.toKString()?.takeIf { it.isNotEmpty() }
+    val home = getenv("HOME")?.toKString() ?: "."
+    val base = xdg ?: "$home/.local/share"
+    val dir = "$base/ofis"
+    mkdir(dir, 0b111101101u) // 0755
+    return dir
+}
 
 actual fun availableDiskSpace(dirPath: String): Long = Long.MAX_VALUE // TODO: statvfs
 

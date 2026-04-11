@@ -22,12 +22,14 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.i18n.LocalAppStrings
 
 @Composable
 fun LogOverlay(
     logs: String,
     onClose: () -> Unit,
 ) {
+    val strings = LocalAppStrings.current
     Box(
         modifier =
             Modifier
@@ -39,7 +41,7 @@ fun LogOverlay(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Logs", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                Text(strings.logsTitle, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = onClose,
@@ -47,7 +49,7 @@ fun LogOverlay(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close logs",
+                        contentDescription = strings.logsClose,
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }

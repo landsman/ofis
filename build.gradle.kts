@@ -42,6 +42,8 @@ repositories {
 }
 
 kotlin {
+    jvm()
+
     linuxX64 {
         binaries.executable {
             baseName = "Ofis"
@@ -83,6 +85,17 @@ kotlin {
             kotlin.srcDirs("tests/common/kotlin")
             dependencies {
                 implementation(kotlin("test"))
+            }
+        }
+        val jvmMain by getting {
+            dependsOn(commonMain)
+            kotlin.srcDirs("src/jvm/kotlin")
+        }
+        val jvmTest by getting {
+            dependsOn(commonTest)
+            kotlin.srcDirs("tests/jvm/kotlin")
+            dependencies {
+                implementation(kotlin("reflect"))
             }
         }
         val nativeMain by creating {
@@ -142,6 +155,16 @@ tasks.withType<org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest
     testLogging {
         events("passed", "failed", "skipped")
         showStandardStreams = true
+    }
+}
+
+tasks.withType<Test>().configureEach {
+    testLogging {
+        events("passed", "failed", "skipped")
+        showExceptions = true
+        showCauses = true
+        showStackTraces = false
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
 }
 

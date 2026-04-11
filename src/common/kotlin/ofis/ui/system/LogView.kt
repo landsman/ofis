@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.i18n.LocalAppStrings
 
 @Composable
 fun LogView(
@@ -31,7 +32,7 @@ fun LogView(
         LazyColumn {
             item {
                 Text(
-                    text = logs.ifEmpty { "No logs yet..." },
+                    text = logs.ifEmpty { LocalAppStrings.current.logsEmpty },
                     fontFamily = FontFamily.Monospace,
                     fontSize = 12.sp,
                     color = Color(0xFF333333),

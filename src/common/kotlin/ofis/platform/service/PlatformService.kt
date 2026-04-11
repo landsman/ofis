@@ -1,5 +1,12 @@
 package ofis.platform.service
 
+/** Returns the platform-appropriate directory for persistent app data.
+ *  - macOS:   ~/Library/Application Support/Ofis
+ *  - Linux:   ~/.local/share/ofis  (or $XDG_DATA_HOME/ofis)
+ *  - Windows: %APPDATA%\Ofis
+ *  The directory is guaranteed to exist when returned. */
+expect fun appDataDir(): String
+
 /** Returns the number of free bytes on the volume containing [dirPath].
  *  Used before writing output files to guard against out-of-disk-space failures.
  *  Returns [Long.MAX_VALUE] if the platform cannot determine free space. */

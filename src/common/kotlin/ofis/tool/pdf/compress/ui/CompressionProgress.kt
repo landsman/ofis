@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import ofis.i18n.LocalAppStrings
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val SLOW_THRESHOLD_MS = 3_000L
@@ -33,6 +34,7 @@ private const val SLOW_THRESHOLD_MS = 3_000L
 @Composable
 fun CompressionProgress() {
     var isSlow by remember { mutableStateOf(false) }
+    val strings = LocalAppStrings.current
 
     LaunchedEffect(Unit) {
         delay(SLOW_THRESHOLD_MS.milliseconds)
@@ -51,10 +53,10 @@ fun CompressionProgress() {
             CircularProgressIndicator(color = Color(0xFF4A4AFF), strokeWidth = 3.dp)
             Spacer(modifier = Modifier.height(12.dp))
             if (isSlow) {
-                Text("Almost there!", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text("Compressing your PDF...", color = Color(0xFF4A4AFF), fontSize = 14.sp)
+                Text(strings.pdfCompressAlmostThere, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(strings.pdfCompressCompressing, color = Color(0xFF4A4AFF), fontSize = 14.sp)
             } else {
-                Text("Making your PDF file smaller...", fontSize = 15.sp, color = Color(0xFF444444))
+                Text(strings.pdfCompressMakingSmaller, fontSize = 15.sp, color = Color(0xFF444444))
             }
         }
     }

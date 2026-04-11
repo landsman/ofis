@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.i18n.LocalAppStrings
 import ofis.tool.Tool
 import ofis.ui.system.AppButton
 import ofis.ui.system.handClickable
@@ -26,6 +27,8 @@ fun ToolCard(
     tool: Tool,
     onClick: () -> Unit,
 ) {
+    val strings = LocalAppStrings.current
+
     Row(
         modifier =
             Modifier
@@ -38,8 +41,8 @@ fun ToolCard(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = tool.displayName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Text(text = tool.description, color = Color.Gray, fontSize = 14.sp)
+            Text(text = tool.localizedDisplayName(), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(text = tool.localizedDescription(), color = Color.Gray, fontSize = 14.sp)
         }
 
         AppButton(
@@ -47,7 +50,7 @@ fun ToolCard(
             shape = RoundedCornerShape(8.dp),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         ) {
-            Text("Open")
+            Text(strings.open)
         }
     }
 }

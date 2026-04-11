@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import ofis.config.Logger
+import ofis.i18n.LocalAppStrings
 import ofis.tool.Tool
 import ofis.tool.ToolBox
 import ofis.tool.ToolRegistry
@@ -29,6 +30,12 @@ class PdfCompressor : Tool {
     private val service = PdfCompressionService()
 
     @Composable
+    override fun localizedDisplayName(): String = LocalAppStrings.current.pdfCompressName
+
+    @Composable
+    override fun localizedDescription(): String = LocalAppStrings.current.pdfCompressDescription
+
+    @Composable
     override fun Screen(onBack: () -> Unit) {
         val logController = LocalLogController.current
         ToolDetailView(
@@ -38,7 +45,7 @@ class PdfCompressor : Tool {
                 IconButton(onClick = { logController.toggle() }) {
                     Icon(
                         imageVector = Icons.Default.Info,
-                        contentDescription = "Toggle logs",
+                        contentDescription = "Toggle logs", // todo: localize!
                         tint = if (logController.isVisible) MaterialTheme.colorScheme.primary else Color.Gray,
                     )
                 }

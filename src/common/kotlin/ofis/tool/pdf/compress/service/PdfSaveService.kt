@@ -9,6 +9,15 @@ import ofis.ui.system.toast.ToastData
 import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
 
+data class SaveMessages(
+    val saveCancelled: String,
+    val fileSaved: String,
+    val notEnoughSpace: String,
+    val permissionDenied: String,
+    val notEnoughSpaceDetail: (need: String, avail: String) -> String,
+    val failedToSave: (reason: String) -> String,
+)
+
 data class SaveResult(
     val savedPath: String? = null,
     val toast: ToastData,
@@ -17,10 +26,11 @@ data class SaveResult(
 suspend fun saveCompressedFile(
     outputFilePath: String,
     suggestedSaveName: String?,
+    messages: SaveMessages,
 ): SaveResult {
     val dest =
         saveFile(suggestedSaveName ?: "compressed.pdf")
-            ?: return SaveResult(toast = ToastData("Save cancelled.", isSuccess = false))
+            ?: return SaveResult(toast = ToastData(messages.saveCancelled, isSuccess = false))
 
     return withContext(Dispatchers.Default) {
         val srcPath = outputFilePath.toPath()
@@ -33,7 +43,7 @@ suspend fun saveCompressedFile(
             return@withContext SaveResult(
                 toast =
                     ToastData(
-                        "Not enough disk space. Need ${formatSize(fileSize)}, only ${formatSize(freeSpace)} available.",
+                        messages.notEnoughSpaceDetail(formatSize(fileSize), formatSize(freeSpace)),
                         isSuccess = false,
                     ),
             )
@@ -46,16 +56,16 @@ suspend fun saveCompressedFile(
                 fileSystem.copy(srcPath, destPath)
                 fileSystem.delete(srcPath)
             }
-            SaveResult(savedPath = dest, toast = ToastData("File saved successfully.", isSuccess = true))
+            SaveResult(savedPath = dest, toast = ToastData(messages.fileSaved, isSuccess = true))
         } catch (e: Exception) {
             val reason =
                 when {
                     e.message?.contains("No space left", ignoreCase = true) == true ||
-                        e.message?.contains("ENOSPC", ignoreCase = true) == true -> "Not enough disk space."
-                    e.message?.contains("Permission", ignoreCase = true) == true -> "Permission denied."
+                        e.message?.contains("ENOSPC", ignoreCase = true) == true -> messages.notEnoughSpace
+                    e.message?.contains("Permission", ignoreCase = true) == true -> messages.permissionDenied
                     else -> e.message ?: "Unknown error."
                 }
-            SaveResult(toast = ToastData("Failed to save: $reason", isSuccess = false))
+            SaveResult(toast = ToastData(messages.failedToSave(reason), isSuccess = false))
         }
     }
 }

@@ -4,11 +4,11 @@ ARCH := $(shell uname -m)
 
 ifeq ($(OS),Darwin)
     TARGET_SUFFIX  := MacosArm64
-    HOST_TEST_TASK := macosArm64Test
+    HOST_TEST_TASK := macosArm64Test jvmTest
     BIN_DIR        := macosArm64
 else ifeq ($(OS),Linux)
     TARGET_SUFFIX  := LinuxX64
-    HOST_TEST_TASK := linuxX64Test
+    HOST_TEST_TASK := linuxX64Test jvmTest
     BIN_DIR        := linuxX64
 else
     TARGET_SUFFIX  := MingwX64
@@ -85,7 +85,7 @@ debug:
 	$(GRADLE) runDebugExecutable$(TARGET_SUFFIX) -Pargs="--debug $(ARGS)"
 
 # ── Testing & quality ─────────────────────────────────────────────────────────
-.PHONY: test lint format
+.PHONY: test lint format locale locale-test
 
 # Tests: host platform only
 test:
@@ -98,6 +98,30 @@ lint:
 # Code formatting
 format:
 	$(GRADLE) ktlintFormat
+
+# ── Localisation ──────────────────────────────────────────────────────────────
+I18N_DIR := src/common/kotlin/ofis/i18n
+
+# List all supported locales and their string counts
+locale:
+	@echo "Supported locales:"
+	@for f in $(I18N_DIR)/*Strings.kt; do \
+		name=$$(basename $$f .kt); \
+		count=$$(grep -c '^\s' $$f || true); \
+		echo "  $$name  ($$count lines)"; \
+	done
+	@echo ""
+	@echo "To add a new locale:"
+	@echo "  1. Copy $(I18N_DIR)/EnStrings.kt → $(I18N_DIR)/XxStrings.kt"
+	@echo "  2. Translate all string values"
+	@echo "  3. Add LOCALE entry to $(I18N_DIR)/LocalAppStrings.kt (AppLanguage enum)"
+	@echo "  4. Wire it in $(I18N_DIR)/LanguagePreference.kt (toAppStrings)"
+	@echo "  5. Add label strings to AppStrings.kt and all *Strings.kt files"
+
+# Run locale completeness test only (fast — JVM, no native compile)
+locale-test:
+	$(GRADLE) jvmTest --rerun --tests "ofis.i18n.LocaleTest"
+
 
 # ── macOS release ─────────────────────────────────────────────────────────────
 .PHONY: macos_icon macos_dmg macos_sign macos_notarize macos_release
@@ -243,6 +267,8 @@ help:
 	@echo "  test             — run tests for host platform"
 	@echo "  lint             — static analysis + style (detekt + ktlint)"
 	@echo "  format           — auto-fix style issues"
+	@echo "  locale           — list supported locales and instructions for adding new ones"
+	@echo "  locale-test      — run locale completeness test only (fast)"
 	@echo ""
 	@echo "  macos_icon       — convert SVG icon to PNG and ICNS"
 	@echo "  macos_dmg        — package app as DMG (macOS only, requires create-dmg, dylibbundler, qpdf, ghostscript)"

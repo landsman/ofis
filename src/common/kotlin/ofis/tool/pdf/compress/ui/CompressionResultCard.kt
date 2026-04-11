@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.i18n.LocalAppStrings
 import ofis.tool.pdf.compress.model.CompressionProfile
 
 /** Expects info in the format: "259.8 KB → 180.2 KB (31%)" */
@@ -35,6 +36,7 @@ fun CompressionResultCard(
     val compressed = rest.substringBefore(" (")
     val savedPercent = rest.substringAfter("(").substringBefore("%").toIntOrNull()
     val alreadyOptimal = savedPercent != null && savedPercent <= 0
+    val strings = LocalAppStrings.current
 
     Column(
         modifier =
@@ -47,10 +49,10 @@ fun CompressionResultCard(
     ) {
         Text("📊", fontSize = 32.sp)
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Compression Complete", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(strings.pdfCompressComplete, fontWeight = FontWeight.Bold, fontSize = 18.sp)
         if (profile != null) {
             Spacer(modifier = Modifier.height(4.dp))
-            Text(profile.label, color = Color(0xFF888888), fontSize = 13.sp)
+            Text(profile.localizedLabel(), color = Color(0xFF888888), fontSize = 13.sp)
         }
 
         if (alreadyOptimal) {
@@ -63,7 +65,7 @@ fun CompressionResultCard(
                         .padding(12.dp),
             ) {
                 Text(
-                    text = "This PDF is already well-optimized. The compressed version isn't smaller.",
+                    text = strings.pdfCompressAlreadyOptimal,
                     color = Color(0xFF795548),
                     fontSize = 13.sp,
                     textAlign = TextAlign.Center,
@@ -79,11 +81,11 @@ fun CompressionResultCard(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            SizeLabel(value = original, caption = "Original", color = Color(0xFF555555))
+            SizeLabel(value = original, caption = strings.pdfCompressOriginal, color = Color(0xFF555555))
             Text("→", fontSize = 20.sp, color = Color.Gray)
             SizeLabel(
                 value = compressed,
-                caption = "Compressed",
+                caption = strings.pdfCompressCompressed,
                 color = if (alreadyOptimal) Color(0xFFFF5722) else Color(0xFF4CAF50),
             )
         }
@@ -98,7 +100,7 @@ fun CompressionResultCard(
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "$savedPercent% smaller",
+                text = strings.pdfCompressPercentSmaller(savedPercent),
                 color = Color(0xFF4CAF50),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,

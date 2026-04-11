@@ -1,4 +1,4 @@
-package ofis.tool.pdf.compress.ui
+package ofis.ui.view.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,37 +22,64 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.i18n.AppLanguage
 import ofis.i18n.LocalAppStrings
-import ofis.tool.pdf.compress.model.CompressionProfile
-import ofis.ui.system.Badge
+import ofis.ui.component.ScreenLayout
 import ofis.ui.system.handClickable
+import ofis.ui.view.tooldetail.component.ToolDetailHeader
 
 @Composable
-fun ProfileSelector(
-    selected: CompressionProfile,
-    onSelect: (CompressionProfile) -> Unit,
+fun SettingsView(
+    selectedLanguage: AppLanguage,
+    onLanguageSelect: (AppLanguage) -> Unit,
+    onBack: () -> Unit,
 ) {
     val strings = LocalAppStrings.current
-    Text(
-        text = strings.pdfCompressCompressionLevel,
-        fontWeight = FontWeight.Bold,
-        fontSize = 18.sp,
-        color = Color(0xFF1A1A1A),
-    )
-    Spacer(modifier = Modifier.height(12.dp))
-    CompressionProfile.entries.forEach { profile ->
-        ProfileOption(profile = profile, selected = profile == selected, onClick = { onSelect(profile) })
-        Spacer(modifier = Modifier.height(12.dp))
+
+    ScreenLayout(
+        header = {
+            ToolDetailHeader(
+                titleOverride = strings.settingsTitle,
+                onBack = onBack,
+            )
+        },
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 40.dp, vertical = 24.dp),
+        ) {
+            Text(
+                text = strings.settingsLanguageLabel,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = Color(0xFF1A1A1A),
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            listOf(
+                AppLanguage.SYSTEM to strings.settingsLanguageSystem,
+                AppLanguage.ENGLISH to strings.settingsLanguageEnglish,
+                AppLanguage.CZECH to strings.settingsLanguageCzech,
+            ).forEach { (language, label) ->
+                LanguageOption(
+                    label = label,
+                    selected = language == selectedLanguage,
+                    onClick = { onLanguageSelect(language) },
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+        }
     }
 }
 
 @Composable
-private fun ProfileOption(
-    profile: CompressionProfile,
+private fun LanguageOption(
+    label: String,
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    val strings = LocalAppStrings.current
     val borderColor = if (selected) Color(0xFF4A4AFF) else Color(0xFFE0E0E0)
     val bgColor = if (selected) Color(0xFFF0F0FF) else Color.White
 
@@ -63,7 +90,7 @@ private fun ProfileOption(
                 .background(bgColor, RoundedCornerShape(10.dp))
                 .border(1.5.dp, borderColor, RoundedCornerShape(10.dp))
                 .handClickable { onClick() }
-                .padding(horizontal = 16.dp, vertical = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(
@@ -77,15 +104,6 @@ private fun ProfileOption(
                 ),
         )
         Spacer(modifier = Modifier.width(10.dp))
-        Column {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(profile.localizedLabel(), fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                if (profile == CompressionProfile.BALANCED) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Badge(text = strings.pdfCompressRecommended)
-                }
-            }
-            Text(text = profile.localizedDescription(), color = Color.Gray, fontSize = 14.sp, lineHeight = 20.sp)
-        }
+        Text(label, fontWeight = FontWeight.Medium, fontSize = 16.sp)
     }
 }

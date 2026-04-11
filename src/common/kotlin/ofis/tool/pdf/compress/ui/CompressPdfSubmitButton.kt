@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.i18n.LocalAppStrings
 import ofis.ui.system.AppButton
 
 /**
@@ -39,6 +40,6 @@ fun CompressPdfSubmitButton(
                 disabledElevation = 0.dp,
             ),
     ) {
-        Text("Compress PDF", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(LocalAppStrings.current.pdfCompressButton, fontWeight = FontWeight.Bold, fontSize = 18.sp)
     }
 }

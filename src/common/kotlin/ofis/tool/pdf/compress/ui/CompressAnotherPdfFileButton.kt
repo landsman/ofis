@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ofis.i18n.LocalAppStrings
 import ofis.ui.system.AppButton
 
 /**
@@ -28,6 +29,6 @@ fun CompressAnotherPdfFileButton(onClick: () -> Unit) {
                 contentColor = Color(0xFF333333),
             ),
     ) {
-        Text("Compress another file", fontWeight = FontWeight.Medium, fontSize = 15.sp)
+        Text(LocalAppStrings.current.pdfCompressCompressAnother, fontWeight = FontWeight.Medium, fontSize = 15.sp)
     }
 }

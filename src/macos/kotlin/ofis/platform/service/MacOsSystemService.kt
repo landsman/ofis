@@ -2,16 +2,36 @@ package ofis.platform.service
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.toKString
 import kotlinx.cinterop.usePinned
+import platform.Foundation.NSApplicationSupportDirectory
 import platform.Foundation.NSBundle
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileSystemFreeSize
 import platform.Foundation.NSNumber
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSUserDomainMask
 import platform.posix.X_OK
 import platform.posix.access
 import platform.posix.fgets
+import platform.posix.getenv
 import platform.posix.pclose
 import platform.posix.popen
+
+actual fun appDataDir(): String {
+    val paths =
+        NSSearchPathForDirectoriesInDomains(
+            NSApplicationSupportDirectory,
+            NSUserDomainMask,
+            true,
+        )
+    val base =
+        (paths.firstOrNull() as? String)
+            ?: ((getenv("HOME")?.toKString() ?: ".") + "/Library/Application Support")
+    val dir = "$base/Ofis"
+    NSFileManager.defaultManager.createDirectoryAtPath(dir, withIntermediateDirectories = true, attributes = null, error = null)
+    return dir
+}
 
 actual fun availableDiskSpace(dirPath: String): Long {
     val attrs = NSFileManager.defaultManager.attributesOfFileSystemForPath(dirPath, error = null)
