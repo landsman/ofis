@@ -40,6 +40,6 @@ fun CompressPdfSubmitButton(
                 disabledElevation = 0.dp,
             ),
     ) {
-        Text(LocalAppStrings.current.compressPdfButton, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(LocalAppStrings.current.pdfCompress.button, fontWeight = FontWeight.Bold, fontSize = 18.sp)
     }
 }

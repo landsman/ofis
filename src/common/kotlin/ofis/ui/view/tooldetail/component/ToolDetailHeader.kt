@@ -45,7 +45,7 @@ fun ToolDetailHeader(
     ) {
         // Left — back button
         Text(
-            text = strings.back,
+            text = strings.common.back,
             modifier =
                 Modifier
                     .align(Alignment.CenterStart)

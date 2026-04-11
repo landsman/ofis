@@ -26,6 +26,6 @@ fun TryHigherCompressionButton(onClick: () -> Unit) {
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             ),
     ) {
-        Text(LocalAppStrings.current.tryMaximumCompression, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text(LocalAppStrings.current.pdfCompress.tryMaximum, fontWeight = FontWeight.Bold, fontSize = 16.sp)
     }
 }

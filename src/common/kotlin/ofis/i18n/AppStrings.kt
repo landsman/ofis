@@ -1,24 +1,35 @@
 package ofis.i18n
 
 data class AppStrings(
-    // App chrome
+    val common: CommonStrings,
+    val logs: LogStrings,
+    val pdfCompress: PdfCompressStrings,
+    val settings: SettingsStrings,
+)
+
+data class CommonStrings(
     val appSubtitle: String,
     val back: String,
     val open: String,
     val settings: String,
-    // Logs
-    val logsTitle: String,
-    val closeLogs: String,
-    val noLogsYet: String,
-    // File drop zone
     val orDragAndDrop: String,
     val clearSelection: String,
-    // PDF compress — general
-    val compressPdf: String,
-    val compressPdfDescription: String,
-    val tapToSelectPdf: String,
-    val dropPdfHere: String,
-    // PDF compress — profile selector
+)
+
+data class LogStrings(
+    val title: String,
+    val close: String,
+    val empty: String,
+)
+
+data class PdfCompressStrings(
+    // Tool card
+    val name: String,
+    val description: String,
+    // File selection
+    val tapToSelect: String,
+    val dropHere: String,
+    // Profile selector
     val compressionLevel: String,
     val recommended: String,
     val profileHighQuality: String,
@@ -27,30 +38,32 @@ data class AppStrings(
     val profileBalancedDesc: String,
     val profileMaximum: String,
     val profileMaximumDesc: String,
-    // PDF compress — progress
+    // Progress
     val almostThere: String,
-    val compressingPdf: String,
-    val makingPdfSmaller: String,
-    // PDF compress — result
-    val compressionComplete: String,
+    val compressing: String,
+    val makingSmaller: String,
+    // Result
+    val complete: String,
     val alreadyOptimal: String,
     val original: String,
-    val compressedLabel: String,
+    val compressed: String,
     val percentSmaller: (percent: Int) -> String,
-    // PDF compress — buttons
-    val compressPdfButton: String,
-    val saveCompressedPdf: String,
-    val compressAnotherFile: String,
-    val tryMaximumCompression: String,
-    // Save messages
+    // Buttons
+    val button: String,
+    val save: String,
+    val compressAnother: String,
+    val tryMaximum: String,
+    // Save feedback
     val saveCancelled: String,
     val fileSaved: String,
     val notEnoughSpace: String,
     val permissionDenied: String,
     val notEnoughSpaceDetail: (need: String, avail: String) -> String,
     val failedToSave: (reason: String) -> String,
-    // Settings
-    val settingsTitle: String,
+)
+
+data class SettingsStrings(
+    val title: String,
     val languageLabel: String,
     val languageSystem: String,
     val languageEnglish: String,

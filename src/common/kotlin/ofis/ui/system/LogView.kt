@@ -32,7 +32,7 @@ fun LogView(
         LazyColumn {
             item {
                 Text(
-                    text = logs.ifEmpty { LocalAppStrings.current.noLogsYet },
+                    text = logs.ifEmpty { LocalAppStrings.current.logs.empty },
                     fontFamily = FontFamily.Monospace,
                     fontSize = 12.sp,
                     color = Color(0xFF333333),

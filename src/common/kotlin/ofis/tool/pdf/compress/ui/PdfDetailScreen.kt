@@ -51,12 +51,12 @@ fun PdfDetailScreen(tool: Tool) {
     val saveMessages =
         remember(strings) {
             SaveMessages(
-                saveCancelled = strings.saveCancelled,
-                fileSaved = strings.fileSaved,
-                notEnoughSpace = strings.notEnoughSpace,
-                permissionDenied = strings.permissionDenied,
-                notEnoughSpaceDetail = strings.notEnoughSpaceDetail,
-                failedToSave = strings.failedToSave,
+                saveCancelled = strings.pdfCompress.saveCancelled,
+                fileSaved = strings.pdfCompress.fileSaved,
+                notEnoughSpace = strings.pdfCompress.notEnoughSpace,
+                permissionDenied = strings.pdfCompress.permissionDenied,
+                notEnoughSpaceDetail = strings.pdfCompress.notEnoughSpaceDetail,
+                failedToSave = strings.pdfCompress.failedToSave,
             )
         }
 
@@ -135,7 +135,7 @@ fun PdfDetailScreen(tool: Tool) {
             FileDropZone(
                 selectedFilePath = selectedFilePath,
                 selectedFileSize = selectedFileSize,
-                placeholder = strings.tapToSelectPdf,
+                placeholder = strings.pdfCompress.tapToSelect,
                 onSelect = {
                     scope.launch {
                         kotlinx.coroutines.yield()
@@ -229,7 +229,7 @@ private fun DropOverlay() {
             Text(text = "📄", fontSize = 72.sp)
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = strings.dropPdfHere,
+                text = strings.pdfCompress.dropHere,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color(0xFF2A70C2),

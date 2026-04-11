@@ -49,7 +49,7 @@ fun CompressionResultCard(
     ) {
         Text("📊", fontSize = 32.sp)
         Spacer(modifier = Modifier.height(8.dp))
-        Text(strings.compressionComplete, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(strings.pdfCompress.complete, fontWeight = FontWeight.Bold, fontSize = 18.sp)
         if (profile != null) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(profile.localizedLabel(), color = Color(0xFF888888), fontSize = 13.sp)
@@ -65,7 +65,7 @@ fun CompressionResultCard(
                         .padding(12.dp),
             ) {
                 Text(
-                    text = strings.alreadyOptimal,
+                    text = strings.pdfCompress.alreadyOptimal,
                     color = Color(0xFF795548),
                     fontSize = 13.sp,
                     textAlign = TextAlign.Center,
@@ -81,11 +81,11 @@ fun CompressionResultCard(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            SizeLabel(value = original, caption = strings.original, color = Color(0xFF555555))
+            SizeLabel(value = original, caption = strings.pdfCompress.original, color = Color(0xFF555555))
             Text("→", fontSize = 20.sp, color = Color.Gray)
             SizeLabel(
                 value = compressed,
-                caption = strings.compressedLabel,
+                caption = strings.pdfCompress.compressed,
                 color = if (alreadyOptimal) Color(0xFFFF5722) else Color(0xFF4CAF50),
             )
         }
@@ -100,7 +100,7 @@ fun CompressionResultCard(
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = strings.percentSmaller(savedPercent),
+                text = strings.pdfCompress.percentSmaller(savedPercent),
                 color = Color(0xFF4CAF50),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,

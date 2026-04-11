@@ -30,10 +30,10 @@ class PdfCompressor : Tool {
     private val service = PdfCompressionService()
 
     @Composable
-    override fun localizedDisplayName(): String = LocalAppStrings.current.compressPdf
+    override fun localizedDisplayName(): String = LocalAppStrings.current.pdfCompress.name
 
     @Composable
-    override fun localizedDescription(): String = LocalAppStrings.current.compressPdfDescription
+    override fun localizedDescription(): String = LocalAppStrings.current.pdfCompress.description
 
     @Composable
     override fun Screen(onBack: () -> Unit) {
@@ -45,7 +45,7 @@ class PdfCompressor : Tool {
                 IconButton(onClick = { logController.toggle() }) {
                     Icon(
                         imageVector = Icons.Default.Info,
-                        contentDescription = "Toggle logs",
+                        contentDescription = "Toggle logs", // todo: localize!
                         tint = if (logController.isVisible) MaterialTheme.colorScheme.primary else Color.Gray,
                     )
                 }

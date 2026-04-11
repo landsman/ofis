@@ -53,7 +53,7 @@ fun ToolSelectionHeader(onSettingsClick: (() -> Unit)? = null) {
                 color = Color(0xFF000000),
             )
             Text(
-                text = strings.appSubtitle,
+                text = strings.common.appSubtitle,
                 fontSize = subtitleSize,
                 color = Color(0xFF666666),
             )
@@ -67,7 +67,7 @@ fun ToolSelectionHeader(onSettingsClick: (() -> Unit)? = null) {
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = strings.settings,
+                    contentDescription = strings.common.settings,
                     tint = Color(0xFF888888),
                 )
             }
