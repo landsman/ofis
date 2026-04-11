@@ -85,7 +85,7 @@ debug:
 	$(GRADLE) runDebugExecutable$(TARGET_SUFFIX) -Pargs="--debug $(ARGS)"
 
 # ── Testing & quality ─────────────────────────────────────────────────────────
-.PHONY: test lint format
+.PHONY: test lint format locale locale-check
 
 # Tests: host platform only
 test:
@@ -98,6 +98,45 @@ lint:
 # Code formatting
 format:
 	$(GRADLE) ktlintFormat
+
+# ── Localisation ──────────────────────────────────────────────────────────────
+I18N_DIR := src/common/kotlin/ofis/i18n
+
+# List all supported locales and their string counts
+locale:
+	@echo "Supported locales:"
+	@for f in $(I18N_DIR)/*Strings.kt; do \
+		name=$$(basename $$f .kt); \
+		count=$$(grep -c '^\s' $$f || true); \
+		echo "  $$name  ($$count lines)"; \
+	done
+	@echo ""
+	@echo "To add a new locale:"
+	@echo "  1. Copy $(I18N_DIR)/EnStrings.kt → $(I18N_DIR)/XxStrings.kt"
+	@echo "  2. Translate all string values"
+	@echo "  3. Add LOCALE entry to $(I18N_DIR)/LocalAppStrings.kt (AppLanguage enum)"
+	@echo "  4. Wire it in $(I18N_DIR)/LanguagePreference.kt (toAppStrings)"
+	@echo "  5. Add label strings to AppStrings.kt and all *Strings.kt files"
+
+# Check that all locale files define the same set of keys as EnStrings
+locale-check:
+	@echo "Checking locale completeness..."
+	@en_keys=$$(grep -oP '^\s+\K\w+(?=\s*=)' $(I18N_DIR)/EnStrings.kt | sort); \
+	ok=1; \
+	for f in $(I18N_DIR)/*Strings.kt; do \
+		name=$$(basename $$f .kt); \
+		[ "$$name" = "EnStrings" ] && continue; \
+		file_keys=$$(grep -oP '^\s+\K\w+(?=\s*=)' $$f | sort); \
+		missing=$$(comm -23 <(echo "$$en_keys") <(echo "$$file_keys")); \
+		if [ -n "$$missing" ]; then \
+			echo "  ✗ $$name — missing keys:"; \
+			echo "$$missing" | sed 's/^/      /'; \
+			ok=0; \
+		else \
+			echo "  ✓ $$name"; \
+		fi; \
+	done; \
+	[ $$ok -eq 1 ] && echo "All locales complete." || exit 1
 
 # ── macOS release ─────────────────────────────────────────────────────────────
 .PHONY: macos_icon macos_dmg macos_sign macos_notarize macos_release
@@ -243,6 +282,8 @@ help:
 	@echo "  test             — run tests for host platform"
 	@echo "  lint             — static analysis + style (detekt + ktlint)"
 	@echo "  format           — auto-fix style issues"
+	@echo "  locale           — list supported locales and instructions for adding new ones"
+	@echo "  locale-check     — verify all locales define the same keys as English"
 	@echo ""
 	@echo "  macos_icon       — convert SVG icon to PNG and ICNS"
 	@echo "  macos_dmg        — package app as DMG (macOS only, requires create-dmg, dylibbundler, qpdf, ghostscript)"

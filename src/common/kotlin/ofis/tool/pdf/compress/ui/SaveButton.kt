@@ -11,10 +11,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ofis.generated.resources.Res
-import ofis.generated.resources.save_compressed_pdf
+import ofis.i18n.LocalAppStrings
 import ofis.ui.system.AppButton
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SaveButton(onClick: () -> Unit) {
@@ -28,6 +26,6 @@ fun SaveButton(onClick: () -> Unit) {
                 contentColor = Color.White,
             ),
     ) {
-        Text(stringResource(Res.string.save_compressed_pdf), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text(LocalAppStrings.current.saveCompressedPdf, fontWeight = FontWeight.Bold, fontSize = 16.sp)
     }
 }

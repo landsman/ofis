@@ -6,22 +6,18 @@ data class AppStrings(
     val back: String,
     val open: String,
     val settings: String,
-
     // Logs
     val logsTitle: String,
     val closeLogs: String,
     val noLogsYet: String,
-
     // File drop zone
     val orDragAndDrop: String,
     val clearSelection: String,
-
     // PDF compress — general
     val compressPdf: String,
     val compressPdfDescription: String,
     val tapToSelectPdf: String,
     val dropPdfHere: String,
-
     // PDF compress — profile selector
     val compressionLevel: String,
     val recommended: String,
@@ -31,25 +27,21 @@ data class AppStrings(
     val profileBalancedDesc: String,
     val profileMaximum: String,
     val profileMaximumDesc: String,
-
     // PDF compress — progress
     val almostThere: String,
     val compressingPdf: String,
     val makingPdfSmaller: String,
-
     // PDF compress — result
     val compressionComplete: String,
     val alreadyOptimal: String,
     val original: String,
     val compressedLabel: String,
     val percentSmaller: (percent: Int) -> String,
-
     // PDF compress — buttons
     val compressPdfButton: String,
     val saveCompressedPdf: String,
     val compressAnotherFile: String,
     val tryMaximumCompression: String,
-
     // Save messages
     val saveCancelled: String,
     val fileSaved: String,
@@ -57,7 +49,6 @@ data class AppStrings(
     val permissionDenied: String,
     val notEnoughSpaceDetail: (need: String, avail: String) -> String,
     val failedToSave: (reason: String) -> String,
-
     // Settings
     val settingsTitle: String,
     val languageLabel: String,

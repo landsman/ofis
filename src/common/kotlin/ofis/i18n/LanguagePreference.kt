@@ -1,28 +1,11 @@
 package ofis.i18n
 
-import ofis.platform.fileSystem
-import okio.Path.Companion.toPath
+import ofis.storage.AppStorage
+import ofis.storage.StorageKeys
 
-private const val PREF_FILE = "ofis_language.txt"
+fun loadLanguagePreference(): AppLanguage = AppStorage.read(StorageKeys.LANGUAGE)?.let { AppLanguage.fromCode(it) } ?: AppLanguage.SYSTEM
 
-fun loadLanguagePreference(): AppLanguage {
-    return try {
-        val path = PREF_FILE.toPath()
-        val code = fileSystem.read(path) { readUtf8() }.trim()
-        AppLanguage.fromCode(code)
-    } catch (_: Exception) {
-        AppLanguage.SYSTEM
-    }
-}
-
-fun saveLanguagePreference(language: AppLanguage) {
-    try {
-        val path = PREF_FILE.toPath()
-        fileSystem.write(path) { writeUtf8(language.code) }
-    } catch (_: Exception) {
-        // non-critical — preference loss is acceptable
-    }
-}
+fun saveLanguagePreference(language: AppLanguage) = AppStorage.write(StorageKeys.LANGUAGE, language.code)
 
 fun AppLanguage.toAppStrings(): AppStrings =
     when (this) {

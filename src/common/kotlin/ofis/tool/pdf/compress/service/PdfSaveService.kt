@@ -1,23 +1,13 @@
 package ofis.tool.pdf.compress.service
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ofis.generated.resources.Res
-import ofis.generated.resources.failed_to_save
-import ofis.generated.resources.file_saved
-import ofis.generated.resources.not_enough_space
-import ofis.generated.resources.not_enough_space_detail
-import ofis.generated.resources.permission_denied
-import ofis.generated.resources.save_cancelled
 import ofis.platform.fileSystem
 import ofis.platform.service.availableDiskSpace
 import ofis.platform.view.saveFile
 import ofis.ui.system.toast.ToastData
 import ofis.utils.format.formatSize
 import okio.Path.Companion.toPath
-import org.jetbrains.compose.resources.stringResource
 
 data class SaveMessages(
     val saveCancelled: String,
@@ -27,37 +17,6 @@ data class SaveMessages(
     val notEnoughSpaceDetail: (need: String, avail: String) -> String,
     val failedToSave: (reason: String) -> String,
 )
-
-@Composable
-fun rememberSaveMessages(): SaveMessages {
-    val saveCancelledStr = stringResource(Res.string.save_cancelled)
-    val fileSavedStr = stringResource(Res.string.file_saved)
-    val notEnoughSpaceStr = stringResource(Res.string.not_enough_space)
-    val permissionDeniedStr = stringResource(Res.string.permission_denied)
-    val notEnoughSpaceDetailTemplate = stringResource(Res.string.not_enough_space_detail)
-    val failedToSaveTemplate = stringResource(Res.string.failed_to_save)
-    return remember(
-        saveCancelledStr,
-        fileSavedStr,
-        notEnoughSpaceStr,
-        permissionDeniedStr,
-        notEnoughSpaceDetailTemplate,
-        failedToSaveTemplate,
-    ) {
-        SaveMessages(
-            saveCancelled = saveCancelledStr,
-            fileSaved = fileSavedStr,
-            notEnoughSpace = notEnoughSpaceStr,
-            permissionDenied = permissionDeniedStr,
-            notEnoughSpaceDetail = { need, avail ->
-                notEnoughSpaceDetailTemplate
-                        .replace("{need}", need)
-                        .replace("{avail}", avail)
-            },
-            failedToSave = { reason -> failedToSaveTemplate.replace("{reason}", reason) },
-        )
-    }
-}
 
 data class SaveResult(
     val savedPath: String? = null,

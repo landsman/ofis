@@ -17,10 +17,11 @@ import ofis.ui.view.toolselection.component.ToolSelectionHeader
 @Composable
 fun ToolSelectionView(
     onToolSelect: (Tool) -> Unit,
+    onSettingsClick: (() -> Unit)? = null,
     footer: (@Composable () -> Unit)? = null,
 ) {
     ScreenLayout(
-        header = { ToolSelectionHeader() },
+        header = { ToolSelectionHeader(onSettingsClick = onSettingsClick) },
         footer = footer,
     ) {
         val tools = ToolRegistry.list()

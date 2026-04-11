@@ -23,11 +23,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ofis.generated.resources.Res
-import ofis.generated.resources.clear_selection
-import ofis.generated.resources.or_drag_and_drop
+import ofis.i18n.LocalAppStrings
 import ofis.utils.format.formatSize
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun FileDropZone(
@@ -37,6 +34,7 @@ fun FileDropZone(
     onSelect: () -> Unit,
     onClear: () -> Unit,
 ) {
+    val strings = LocalAppStrings.current
     val borderColor = Color(0xFFE0E0E0)
 
     Box(
@@ -54,7 +52,7 @@ fun FileDropZone(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = "📄", fontSize = 40.sp, modifier = Modifier.padding(bottom = 8.dp))
                 Text(placeholder, color = Color(0xFF555555), fontSize = 15.sp, fontWeight = FontWeight.Medium)
-                Text(stringResource(Res.string.or_drag_and_drop), color = Color(0xFFAAAAAA), fontSize = 13.sp)
+                Text(strings.orDragAndDrop, color = Color(0xFFAAAAAA), fontSize = 13.sp)
             }
         } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -73,7 +71,7 @@ fun FileDropZone(
                 }
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(Res.string.clear_selection),
+                    contentDescription = strings.clearSelection,
                     tint = Color.Gray,
                     modifier =
                         Modifier

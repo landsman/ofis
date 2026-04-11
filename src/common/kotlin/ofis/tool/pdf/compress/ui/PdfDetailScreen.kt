@@ -29,28 +29,36 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ofis.generated.resources.Res
-import ofis.generated.resources.drop_pdf_here
-import ofis.generated.resources.tap_to_select_pdf
+import ofis.i18n.LocalAppStrings
 import ofis.platform.fileSystem
 import ofis.platform.view.pickFile
 import ofis.tool.Tool
 import ofis.tool.pdf.compress.model.CompressionProfile
-import ofis.tool.pdf.compress.service.rememberSaveMessages
+import ofis.tool.pdf.compress.service.SaveMessages
 import ofis.tool.pdf.compress.service.saveCompressedFile
 import ofis.ui.system.FileDropBus
 import ofis.ui.system.FileDropZone
 import ofis.ui.system.LocalLogController
 import ofis.ui.system.toast.LocalToastController
 import okio.Path.Companion.toPath
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PdfDetailScreen(tool: Tool) {
     val scope = rememberCoroutineScope()
     val toastController = LocalToastController.current
     val logController = LocalLogController.current
-    val saveMessages = rememberSaveMessages()
+    val strings = LocalAppStrings.current
+    val saveMessages =
+        remember(strings) {
+            SaveMessages(
+                saveCancelled = strings.saveCancelled,
+                fileSaved = strings.fileSaved,
+                notEnoughSpace = strings.notEnoughSpace,
+                permissionDenied = strings.permissionDenied,
+                notEnoughSpaceDetail = strings.notEnoughSpaceDetail,
+                failedToSave = strings.failedToSave,
+            )
+        }
 
     var selectedFilePath by remember { mutableStateOf<String?>(null) }
     var selectedFileSize by remember { mutableStateOf<Long?>(null) }
@@ -127,7 +135,7 @@ fun PdfDetailScreen(tool: Tool) {
             FileDropZone(
                 selectedFilePath = selectedFilePath,
                 selectedFileSize = selectedFileSize,
-                placeholder = stringResource(Res.string.tap_to_select_pdf),
+                placeholder = strings.tapToSelectPdf,
                 onSelect = {
                     scope.launch {
                         kotlinx.coroutines.yield()
@@ -207,6 +215,7 @@ fun PdfDetailScreen(tool: Tool) {
 
 @Composable
 private fun DropOverlay() {
+    val strings = LocalAppStrings.current
     Box(
         modifier =
             Modifier
@@ -220,7 +229,7 @@ private fun DropOverlay() {
             Text(text = "📄", fontSize = 72.sp)
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = stringResource(Res.string.drop_pdf_here),
+                text = strings.dropPdfHere,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color(0xFF2A70C2),

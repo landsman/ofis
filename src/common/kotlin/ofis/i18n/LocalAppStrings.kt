@@ -2,7 +2,9 @@ package ofis.i18n
 
 import androidx.compose.runtime.compositionLocalOf
 
-enum class AppLanguage(val code: String) {
+enum class AppLanguage(
+    val code: String,
+) {
     SYSTEM("system"),
     ENGLISH("en"),
     CZECH("cs"),

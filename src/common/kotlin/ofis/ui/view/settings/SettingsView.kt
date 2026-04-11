@@ -45,9 +45,10 @@ fun SettingsView(
         },
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 40.dp, vertical = 24.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 40.dp, vertical = 24.dp),
         ) {
             Text(
                 text = strings.languageLabel,
@@ -83,22 +84,24 @@ private fun LanguageOption(
     val bgColor = if (selected) Color(0xFFF0F0FF) else Color.White
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(bgColor, RoundedCornerShape(10.dp))
-            .border(1.5.dp, borderColor, RoundedCornerShape(10.dp))
-            .handClickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(bgColor, RoundedCornerShape(10.dp))
+                .border(1.5.dp, borderColor, RoundedCornerShape(10.dp))
+                .handClickable { onClick() }
+                .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(
             selected = selected,
             onClick = onClick,
             modifier = Modifier.pointerHoverIcon(PointerIcon.Hand),
-            colors = RadioButtonDefaults.colors(
-                selectedColor = Color(0xFF4A4AFF),
-                unselectedColor = Color(0xFFCCCCCC),
-            ),
+            colors =
+                RadioButtonDefaults.colors(
+                    selectedColor = Color(0xFF4A4AFF),
+                    unselectedColor = Color(0xFFCCCCCC),
+                ),
         )
         Spacer(modifier = Modifier.width(10.dp))
         Text(label, fontWeight = FontWeight.Medium, fontSize = 16.sp)

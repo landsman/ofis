@@ -1,7 +1,6 @@
 package ofis.tool
 
 import androidx.compose.runtime.Composable
-import ofis.i18n.LocalAppStrings
 
 interface Tool {
     /** CLI key used for invocation, e.g. "pdf-compress". */

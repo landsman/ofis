@@ -19,4 +19,9 @@ object Logger {
             onLog?.invoke("[DEBUG] $msg")
         }
     }
+
+    fun error(msg: String) {
+        println("[ERROR] $msg")
+        onLog?.invoke("[ERROR] $msg")
+    }
 }
