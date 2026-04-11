@@ -9,6 +9,15 @@ interface AppStrings {
     val settings: String
     val orDragAndDrop: String
     val clearSelection: String
+    val dropSuggestSubtitle: String
+    val dropSuggestNoTools: (ext: String) -> String
+    val dropSuggestDismiss: String
+    val dropSuggestRequestSupport: String
+    val dropSuggestRequestSupportNote: String
+    val dropSuggestRequestSupportPlaceholder: String
+    val dropSuggestRequestSupportSend: String
+    val dropSuggestRequestSupportEmailSubject: (ext: String) -> String
+    val dropSuggestRequestSupportEmailBody: (ext: String, note: String) -> String
 
     // ── Settings ──────────────────────────────────────────────────────────────
 
