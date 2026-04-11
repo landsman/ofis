@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -80,6 +81,31 @@ fun FileDropZone(
                             .padding(4.dp),
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun DropOverlay() {
+    val strings = LocalAppStrings.current
+    Box(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Color(0xEEF5FBFF))
+                .border(3.dp, Color(0xFF4A90E2), RoundedCornerShape(12.dp))
+                .padding(24.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = "📄", fontSize = 72.sp)
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = strings.pdfCompressDropHere,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF2A70C2),
+            )
         }
     }
 }

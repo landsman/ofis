@@ -19,6 +19,8 @@ import ofis.i18n.saveLanguagePreference
 import ofis.i18n.toAppStrings
 import ofis.tool.Tool
 import ofis.ui.system.DotGridBackground
+import ofis.ui.system.DropOverlay
+import ofis.ui.system.FileDropBus
 import ofis.ui.system.LocalLogController
 import ofis.ui.system.LogController
 import ofis.ui.system.LogOverlay
@@ -80,6 +82,10 @@ fun App() {
                             )
                         }
                     }
+                }
+
+                if (FileDropBus.isDragging) {
+                    DropOverlay()
                 }
 
                 if (logController.isVisible) {
