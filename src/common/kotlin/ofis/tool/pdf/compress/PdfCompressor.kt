@@ -11,6 +11,7 @@ import ofis.config.Logger
 import ofis.i18n.LocalAppStrings
 import ofis.tool.Tool
 import ofis.tool.ToolBox
+import ofis.tool.ToolInputSpec
 import ofis.tool.ToolRegistry
 import ofis.tool.pdf.compress.model.CompressionProfile
 import ofis.tool.pdf.compress.model.CompressionRequest
@@ -26,6 +27,10 @@ class PdfCompressor : Tool {
     override val name = ToolBox.PDF_COMPRESSOR
     override val displayName = "Compress PDF"
     override val description = "Reduce file size while keeping your document readable."
+    override val inputSpecs =
+        listOf(
+            ToolInputSpec(extensions = setOf("pdf"), label = "PDF document"),
+        )
 
     private val service = PdfCompressionService()
 

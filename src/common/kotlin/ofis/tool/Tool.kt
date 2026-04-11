@@ -12,6 +12,9 @@ interface Tool {
     /** Short description shown in tool cards. */
     val description: String
 
+    /** Input file types this tool accepts. One entry per accepted format. */
+    val inputSpecs: List<ToolInputSpec> get() = emptyList()
+
     /** Localized display name — override to return from LocalAppStrings. */
     @Composable
     fun localizedDisplayName(): String = displayName
