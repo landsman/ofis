@@ -11,3 +11,6 @@ expect suspend fun pickFile(allowedExtensions: List<String>): String?
 /** Opens a native save dialog pre-filled with [suggestedName] and returns the chosen destination path,
  *  or null if the user canceled. */
 expect suspend fun saveFile(suggestedName: String): String?
+
+/** Opens [url] in the system default handler (browser, mail client, etc.). */
+expect fun openUrl(url: String)
