@@ -85,7 +85,7 @@ debug:
 	$(GRADLE) runDebugExecutable$(TARGET_SUFFIX) -Pargs="--debug $(ARGS)"
 
 # ── Testing & quality ─────────────────────────────────────────────────────────
-.PHONY: test lint format locale locale-check
+.PHONY: test lint format locale locale-test
 
 # Tests: host platform only
 test:
@@ -118,25 +118,10 @@ locale:
 	@echo "  4. Wire it in $(I18N_DIR)/LanguagePreference.kt (toAppStrings)"
 	@echo "  5. Add label strings to AppStrings.kt and all *Strings.kt files"
 
-# Check that all locale files define the same set of keys as EnStrings
-locale-check:
-	@echo "Checking locale completeness..."
-	@en_keys=$$(grep -oP '^\s+\K\w+(?=\s*=)' $(I18N_DIR)/EnStrings.kt | sort); \
-	ok=1; \
-	for f in $(I18N_DIR)/*Strings.kt; do \
-		name=$$(basename $$f .kt); \
-		[ "$$name" = "EnStrings" ] && continue; \
-		file_keys=$$(grep -oP '^\s+\K\w+(?=\s*=)' $$f | sort); \
-		missing=$$(comm -23 <(echo "$$en_keys") <(echo "$$file_keys")); \
-		if [ -n "$$missing" ]; then \
-			echo "  ✗ $$name — missing keys:"; \
-			echo "$$missing" | sed 's/^/      /'; \
-			ok=0; \
-		else \
-			echo "  ✓ $$name"; \
-		fi; \
-	done; \
-	[ $$ok -eq 1 ] && echo "All locales complete." || exit 1
+# Run locale completeness test only (fast — JVM, no native compile)
+locale-test:
+	$(GRADLE) jvmTest --rerun --tests "ofis.i18n.LocaleTest"
+
 
 # ── macOS release ─────────────────────────────────────────────────────────────
 .PHONY: macos_icon macos_dmg macos_sign macos_notarize macos_release
@@ -283,7 +268,7 @@ help:
 	@echo "  lint             — static analysis + style (detekt + ktlint)"
 	@echo "  format           — auto-fix style issues"
 	@echo "  locale           — list supported locales and instructions for adding new ones"
-	@echo "  locale-check     — verify all locales define the same keys as English"
+	@echo "  locale-test      — run locale completeness test only (fast)"
 	@echo ""
 	@echo "  macos_icon       — convert SVG icon to PNG and ICNS"
 	@echo "  macos_dmg        — package app as DMG (macOS only, requires create-dmg, dylibbundler, qpdf, ghostscript)"

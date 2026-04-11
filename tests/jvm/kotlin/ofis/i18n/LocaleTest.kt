@@ -3,7 +3,6 @@ package ofis.i18n
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class LocaleTest {
@@ -21,12 +20,13 @@ class LocaleTest {
 
     @Test
     fun noEmptyStrings() {
-        for ((localeName, locale) in allLocales) {
-            for (prop in stringProps) {
-                val value = prop.get(locale) as String
-                assertTrue(value.isNotBlank(), "$localeName.${prop.name} is blank")
+        val failures =
+            allLocales.flatMap { (localeName, locale) ->
+                stringProps
+                    .filter { prop -> (prop.get(locale) as String).isBlank() }
+                    .map { prop -> "$localeName.${prop.name} is blank" }
             }
-        }
+        assertTrue(failures.isEmpty(), "Blank strings found:\n" + failures.joinToString("\n") { "  - $it" })
     }
 
     @Test
@@ -49,18 +49,17 @@ class LocaleTest {
 
     @Test
     fun nonEnglishLocalesHaveNoUntranslatedStrings() {
-        val nonEnglish = allLocales.filter { (_, locale) -> locale !== enStrings }
-        for ((localeName, locale) in nonEnglish) {
-            val untranslated =
-                stringProps
-                    .filter { prop -> prop.get(enStrings) == prop.get(locale) }
-                    .map { it.name }
-
-            assertEquals(
-                emptyList(),
-                untranslated,
-                "$localeName strings identical to EN (likely untranslated): $untranslated",
-            )
-        }
+        val failures =
+            allLocales
+                .filter { (_, locale) -> locale !== enStrings }
+                .flatMap { (localeName, locale) ->
+                    stringProps
+                        .filter { prop -> prop.get(enStrings) == prop.get(locale) }
+                        .map { prop -> "$localeName.${prop.name}" }
+                }
+        assertTrue(
+            failures.isEmpty(),
+            "Strings identical to EN (likely untranslated):\n" + failures.joinToString("\n") { "  - $it" },
+        )
     }
 }
