@@ -4,11 +4,11 @@ ARCH := $(shell uname -m)
 
 ifeq ($(OS),Darwin)
     TARGET_SUFFIX  := MacosArm64
-    HOST_TEST_TASK := macosArm64Test
+    HOST_TEST_TASK := macosArm64Test jvmTest
     BIN_DIR        := macosArm64
 else ifeq ($(OS),Linux)
     TARGET_SUFFIX  := LinuxX64
-    HOST_TEST_TASK := linuxX64Test
+    HOST_TEST_TASK := linuxX64Test jvmTest
     BIN_DIR        := linuxX64
 else
     TARGET_SUFFIX  := MingwX64

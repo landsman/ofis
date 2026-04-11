@@ -42,6 +42,8 @@ repositories {
 }
 
 kotlin {
+    jvm()
+
     linuxX64 {
         binaries.executable {
             baseName = "Ofis"
@@ -83,6 +85,17 @@ kotlin {
             kotlin.srcDirs("tests/common/kotlin")
             dependencies {
                 implementation(kotlin("test"))
+            }
+        }
+        val jvmMain by getting {
+            dependsOn(commonMain)
+            kotlin.srcDirs("src/jvm/kotlin")
+        }
+        val jvmTest by getting {
+            dependsOn(commonTest)
+            kotlin.srcDirs("tests/jvm/kotlin")
+            dependencies {
+                implementation(kotlin("reflect"))
             }
         }
         val nativeMain by creating {
