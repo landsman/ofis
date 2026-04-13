@@ -5,9 +5,24 @@ object CsStrings : AppStrings {
     override val appSubtitle = "Platforma nástrojů"
     override val back = "← Zpět"
     override val open = "Otevřít"
+    override val select = "Vybrat"
     override val settings = "Nastavení"
     override val orDragAndDrop = "nebo přetáhněte soubor sem"
     override val clearSelection = "Zrušit výběr"
+    override val fileSelected = "Soubor vybrán"
+    override val dropSuggestSubtitle = "Vyberte nástroj pro otevření souboru"
+    override val dropSuggestNoTools = { ext: String -> "Pro soubory .$ext zatím není dostupný žádný nástroj." }
+    override val dropSuggestDismiss = "Zavřít"
+    override val dropSuggestRequestSupport = "Požádat o podporu pro tento typ souboru"
+    override val dropSuggestRequestSupportNote = "Poznámka (nepovinné)"
+    override val dropSuggestRequestSupportPlaceholder = "Řekněte nám, jak byste chtěli tento soubor použít…"
+    override val dropSuggestRequestSupportSend = "Odeslat žádost o podporu"
+    override val dropSuggestRequestSupportEmailSubject = { ext: String -> "Žádost o podporu: soubory .$ext" }
+    override val dropSuggestRequestSupportEmailBody = { ext: String, note: String ->
+        "Dobrý den,\n\nrád bych požádal o podporu pro soubory .$ext v aplikaci Ofis." +
+            (if (note.isNotBlank()) "\n\nPoznámka:\n$note" else "") +
+            "\n\nDěkuji"
+    }
 
     // ── Settings ──────────────────────────────────────────────────────────────
     override val settingsTitle = "Nastavení"

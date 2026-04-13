@@ -21,9 +21,11 @@ import platform.AppKit.NSSavePanel
 import platform.AppKit.NSView
 import platform.AppKit.NSViewHeightSizable
 import platform.AppKit.NSViewWidthSizable
+import platform.AppKit.NSWorkspace
 import platform.CoreGraphics.CGRect
 import platform.Foundation.NSBundle
 import platform.Foundation.NSMakeRect
+import platform.Foundation.NSURL
 import platform.darwin.NSObject
 import kotlin.coroutines.resume
 
@@ -127,6 +129,10 @@ actual suspend fun saveFile(suggestedName: String): String? =
             NSApplication.sharedApplication().activateIgnoringOtherApps(true)
         }
     }
+
+actual fun openUrl(url: String) {
+    NSURL.URLWithString(url)?.let { NSWorkspace.sharedWorkspace.openURL(it) }
+}
 
 actual suspend fun pickFile(allowedExtensions: List<String>): String? =
     withContext(Dispatchers.Main) {

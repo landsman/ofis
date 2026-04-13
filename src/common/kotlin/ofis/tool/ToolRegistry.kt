@@ -25,4 +25,10 @@ object ToolRegistry {
         ensureInitialized()
         return tools.values.toList()
     }
+
+    fun findForExtension(ext: String): List<Tool> {
+        ensureInitialized()
+        val lext = ext.lowercase()
+        return tools.values.filter { tool -> tool.inputSpecs.any { lext in it.extensions } }
+    }
 }

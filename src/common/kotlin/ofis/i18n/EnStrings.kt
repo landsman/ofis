@@ -5,9 +5,24 @@ object EnStrings : AppStrings {
     override val appSubtitle = "Tooling Platform"
     override val back = "← Back"
     override val open = "Open"
+    override val select = "Select"
     override val settings = "Settings"
     override val orDragAndDrop = "or drag and drop here"
     override val clearSelection = "Clear selection"
+    override val fileSelected = "File selected"
+    override val dropSuggestSubtitle = "Choose a tool to open this file"
+    override val dropSuggestNoTools = { ext: String -> "No tools available for .$ext files yet." }
+    override val dropSuggestDismiss = "Dismiss"
+    override val dropSuggestRequestSupport = "Request support for this file type"
+    override val dropSuggestRequestSupportNote = "Note (optional)"
+    override val dropSuggestRequestSupportPlaceholder = "Tell us how you'd like to use this file…"
+    override val dropSuggestRequestSupportSend = "Send support request"
+    override val dropSuggestRequestSupportEmailSubject = { ext: String -> "Support request: .$ext files" }
+    override val dropSuggestRequestSupportEmailBody = { ext: String, note: String ->
+        "Hi,\n\nI would like to request support for .$ext files in Ofis." +
+            (if (note.isNotBlank()) "\n\nNote:\n$note" else "") +
+            "\n\nThanks"
+    }
 
     // ── Settings ──────────────────────────────────────────────────────────────
     override val settingsTitle = "Settings"
