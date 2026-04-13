@@ -5,9 +5,11 @@ object EnStrings : AppStrings {
     override val appSubtitle = "Tooling Platform"
     override val back = "← Back"
     override val open = "Open"
+    override val select = "Select"
     override val settings = "Settings"
     override val orDragAndDrop = "or drag and drop here"
     override val clearSelection = "Clear selection"
+    override val fileSelected = "File selected"
     override val dropSuggestSubtitle = "Choose a tool to open this file"
     override val dropSuggestNoTools = { ext: String -> "No tools available for .$ext files yet." }
     override val dropSuggestDismiss = "Dismiss"

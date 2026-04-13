@@ -17,7 +17,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ofis.config.GlobalConfig
@@ -26,22 +34,22 @@ import ofis.platform.view.openUrl
 import ofis.ui.component.AppHeader
 import ofis.ui.component.ScreenLayout
 import ofis.ui.system.AppButton
+import ofis.ui.system.SelectedFileCard
 
 @Composable
 fun UnsupportedFileView(
     filePath: String,
+    fileSize: Long? = null,
     onDismiss: () -> Unit,
 ) {
     val strings = LocalAppStrings.current
-    val fileName = filePath.substringAfterLast("/")
     val ext = filePath.substringAfterLast('.', "").lowercase()
-    var note by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf(TextFieldValue("")) }
 
     ScreenLayout(
         header = {
             AppHeader(
-                title = fileName,
-                subtitle = strings.dropSuggestNoTools(ext),
+                title = strings.fileSelected,
                 onBack = onDismiss,
             )
         },
@@ -53,6 +61,12 @@ fun UnsupportedFileView(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 40.dp, vertical = 8.dp),
         ) {
+            SelectedFileCard(
+                filePath = filePath,
+                fileSize = fileSize,
+                warningText = strings.dropSuggestNoTools(ext),
+            )
+            Spacer(modifier = Modifier.height(20.dp))
             Text(
                 text = strings.dropSuggestRequestSupport,
                 fontSize = 16.sp,
@@ -69,7 +83,18 @@ fun UnsupportedFileView(
             OutlinedTextField(
                 value = note,
                 onValueChange = { note = it },
-                modifier = Modifier.fillMaxWidth().height(120.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(120.dp)
+                        .onPreviewKeyEvent { event ->
+                            if (event.type == KeyEventType.KeyDown && event.isMetaPressed && event.key == Key.A) {
+                                note = note.copy(selection = TextRange(0, note.text.length))
+                                true
+                            } else {
+                                false
+                            }
+                        },
                 placeholder = {
                     Text(strings.dropSuggestRequestSupportPlaceholder, color = Color(0xFFBBBBBB))
                 },
@@ -79,7 +104,7 @@ fun UnsupportedFileView(
             AppButton(
                 onClick = {
                     val subject = strings.dropSuggestRequestSupportEmailSubject(ext)
-                    val body = strings.dropSuggestRequestSupportEmailBody(ext, note)
+                    val body = strings.dropSuggestRequestSupportEmailBody(ext, note.text)
                     val mailto = buildMailto(GlobalConfig.SUPPORT_EMAIL, subject, body)
                     openUrl(mailto)
                 },
@@ -95,14 +120,20 @@ private fun buildMailto(
     to: String,
     subject: String,
     body: String,
-): String {
-    fun encode(s: String) =
-        s
-            .replace("%", "%25")
-            .replace(" ", "%20")
-            .replace("\n", "%0A")
-            .replace("&", "%26")
-            .replace("?", "%3F")
-            .replace("#", "%23")
-    return "mailto:$to?subject=${encode(subject)}&body=${encode(body)}"
+): String = "mailto:$to?subject=${encodeMailtoField(subject)}&body=${encodeMailtoField(body)}"
+
+/**
+ * Percent-encodes a mailto header value per RFC 6068.
+ * Encodes every byte of non-ASCII and reserved characters via UTF-8.
+ * Unreserved characters (RFC 3986) are passed through unchanged.
+ */
+private fun encodeMailtoField(value: String): String {
+    val unreserved = { c: Char -> c.isLetterOrDigit() || c in "-._~" }
+    return buildString {
+        for (byte in value.encodeToByteArray()) {
+            val c = byte.toInt().and(0xFF)
+            val ch = c.toChar()
+            if (unreserved(ch)) append(ch) else append('%').append(c.toString(16).uppercase().padStart(2, '0'))
+        }
+    }
 }

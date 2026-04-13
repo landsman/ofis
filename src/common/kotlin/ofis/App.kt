@@ -18,6 +18,7 @@ import ofis.i18n.LocalAppStrings
 import ofis.i18n.loadLanguagePreference
 import ofis.i18n.saveLanguagePreference
 import ofis.i18n.toAppStrings
+import ofis.platform.fileSystem
 import ofis.tool.Tool
 import ofis.tool.ToolRegistry
 import ofis.ui.system.DotGridBackground
@@ -32,6 +33,7 @@ import ofis.ui.system.toast.ToastHost
 import ofis.ui.view.filesuggestion.FileSuggestView
 import ofis.ui.view.settings.SettingsView
 import ofis.ui.view.toolselection.ToolSelectionView
+import okio.Path.Companion.toPath
 
 private enum class Screen { Tools, Settings, FileSuggestion }
 
@@ -40,6 +42,7 @@ fun App() {
     var currentTool by remember { mutableStateOf<Tool?>(null) }
     var screen by remember { mutableStateOf(Screen.Tools) }
     var droppedFilePath by remember { mutableStateOf<String?>(null) }
+    var droppedFileSize by remember { mutableStateOf<Long?>(null) }
     var droppedFileTools by remember { mutableStateOf<List<Tool>>(emptyList()) }
     val toastController = remember { ToastController() }
     val logController = remember { LogController() }
@@ -52,6 +55,7 @@ fun App() {
         val ext = path.substringAfterLast('.', "").lowercase()
         val tools = ToolRegistry.findForExtension(ext)
         droppedFilePath = path
+        droppedFileSize = fileSystem.metadataOrNull(path.toPath())?.size
         droppedFileTools = tools
         screen = Screen.FileSuggestion
     }
@@ -81,10 +85,12 @@ fun App() {
                         screen == Screen.FileSuggestion && droppedFilePath != null -> {
                             FileSuggestView(
                                 filePath = droppedFilePath!!,
+                                fileSize = droppedFileSize,
                                 matchingTools = droppedFileTools,
                                 onToolSelect = { tool ->
                                     Logger.debug("navigate → ${tool.name} via drop")
                                     droppedFilePath = null
+                                    droppedFileSize = null
                                     droppedFileTools = emptyList()
                                     screen = Screen.Tools
                                     currentTool = tool
@@ -92,6 +98,7 @@ fun App() {
                                 onDismiss = {
                                     FileDropBus.consume()
                                     droppedFilePath = null
+                                    droppedFileSize = null
                                     droppedFileTools = emptyList()
                                     screen = Screen.Tools
                                 },

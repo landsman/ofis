@@ -12,28 +12,29 @@ import ofis.i18n.LocalAppStrings
 import ofis.tool.Tool
 import ofis.ui.component.AppHeader
 import ofis.ui.component.ScreenLayout
+import ofis.ui.icon.ArrowDownIcon
+import ofis.ui.system.SelectedFileCard
 import ofis.ui.view.toolselection.component.ToolCard
 
 @Composable
 fun FileSuggestView(
     filePath: String,
+    fileSize: Long? = null,
     matchingTools: List<Tool>,
     onToolSelect: (Tool) -> Unit,
     onDismiss: () -> Unit,
 ) {
     if (matchingTools.isEmpty()) {
-        UnsupportedFileView(filePath = filePath, onDismiss = onDismiss)
+        UnsupportedFileView(filePath = filePath, fileSize = fileSize, onDismiss = onDismiss)
         return
     }
 
     val strings = LocalAppStrings.current
-    val fileName = filePath.substringAfterLast("/")
 
     ScreenLayout(
         header = {
             AppHeader(
-                title = fileName,
-                subtitle = strings.dropSuggestSubtitle,
+                title = strings.dropSuggestSubtitle,
                 onBack = onDismiss,
             )
         },
@@ -43,8 +44,14 @@ fun FileSuggestView(
             contentPadding = PaddingValues(start = 40.dp, end = 40.dp, bottom = 40.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            item {
+                SelectedFileCard(filePath = filePath, fileSize = fileSize)
+            }
+            item {
+                ArrowDownIcon()
+            }
             items(matchingTools) { tool ->
-                ToolCard(tool = tool, onClick = { onToolSelect(tool) })
+                ToolCard(tool = tool, onClick = { onToolSelect(tool) }, buttonLabel = strings.select)
             }
         }
     }

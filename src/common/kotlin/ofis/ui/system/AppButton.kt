@@ -16,6 +16,10 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 
+// Material3 default is 8dp top + 8dp bottom. Shifting 2dp up (less top, more bottom)
+// corrects the visual baseline drift on desktop font rendering.
+private val DefaultContentPadding = PaddingValues(start = 24.dp, top = 6.dp, end = 24.dp, bottom = 10.dp)
+
 /**
  * App-wide button with hand cursor on hover.
  * Use this instead of Material [Button] everywhere.
@@ -28,7 +32,7 @@ fun AppButton(
     shape: Shape = RoundedCornerShape(8.dp),
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    contentPadding: PaddingValues = DefaultContentPadding,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {

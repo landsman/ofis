@@ -5,9 +5,11 @@ object CsStrings : AppStrings {
     override val appSubtitle = "Platforma nástrojů"
     override val back = "← Zpět"
     override val open = "Otevřít"
+    override val select = "Vybrat"
     override val settings = "Nastavení"
     override val orDragAndDrop = "nebo přetáhněte soubor sem"
     override val clearSelection = "Zrušit výběr"
+    override val fileSelected = "Soubor vybrán"
     override val dropSuggestSubtitle = "Vyberte nástroj pro otevření souboru"
     override val dropSuggestNoTools = { ext: String -> "Pro soubory .$ext zatím není dostupný žádný nástroj." }
     override val dropSuggestDismiss = "Zavřít"

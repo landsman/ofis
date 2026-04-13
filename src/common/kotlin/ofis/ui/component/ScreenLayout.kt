@@ -26,23 +26,33 @@ fun ScreenLayout(
     maxWidth: Dp = DEFAULT_MAX_WIDTH,
     content: @Composable () -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        BoxWithConstraints(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-                    .widthIn(max = maxWidth)
-                    .fillMaxWidth(),
-        ) {
-            val windowWidth = this.maxWidth.toWindowWidth()
-            CompositionLocalProvider(LocalWindowWidth provides windowWidth) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Box(modifier = Modifier.fillMaxWidth()) { header() }
-                    Box(modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 24.dp)) { content() }
-                    if (footer != null) {
-                        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp, vertical = 40.dp)) { footer() }
+    // Measure actual window width to drive responsive breakpoints,
+    // then render the header at full width (white bg spans the window)
+    // while content is capped at maxWidth.
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val windowWidth = this.maxWidth.toWindowWidth()
+        CompositionLocalProvider(LocalWindowWidth provides windowWidth) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                // Header — full window width, no max-width cap
+                Box(modifier = Modifier.fillMaxWidth()) { header() }
+
+                // Content + footer — centred and capped at maxWidth
+                Box(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.CenterHorizontally)
+                            .widthIn(max = maxWidth)
+                            .fillMaxWidth(),
+                ) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Box(modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 24.dp)) { content() }
+                        if (footer != null) {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp, vertical = 40.dp),
+                            ) { footer() }
+                        }
                     }
                 }
             }
