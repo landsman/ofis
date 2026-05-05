@@ -71,7 +71,7 @@ kotlin {
         val commonMain by getting {
             kotlin.srcDirs("src/common/kotlin")
             dependencies {
-                implementation("com.squareup.okio:okio:3.9.1")
+                implementation("com.squareup.okio:okio:3.17.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
                 implementation(compose.runtime)
                 implementation(compose.foundation)
