@@ -30,7 +30,7 @@ jobs:
       - name: Build DMG
         run: make macos_dmg
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: macos-dmg
           path: build/Ofis.dmg
@@ -55,7 +55,7 @@ jobs:
       - name: Build package
         run: make linux_package
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: linux-package
           path: build/ofis-*-linux-x64.tar.gz
