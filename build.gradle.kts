@@ -72,7 +72,7 @@ kotlin {
             kotlin.srcDirs("src/common/kotlin")
             dependencies {
                 implementation("com.squareup.okio:okio:3.17.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material3)
