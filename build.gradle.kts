@@ -3,7 +3,7 @@ import io.gitlab.arturbosch.detekt.Detekt
 
 plugins {
     kotlin("multiplatform") version "2.3.21"
-    id("org.jetbrains.compose") version "1.7.3"
+    id("org.jetbrains.compose") version "1.11.1"
     id("org.jetbrains.kotlin.plugin.compose") version "2.3.21"
     id("io.gitlab.arturbosch.detekt") version "1.23.8"
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
