@@ -68,66 +68,71 @@ kotlin {
             languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
             languageSettings.optIn("kotlinx.cinterop.BetaInteropApi")
         }
-        val commonMain by getting {
-            kotlin.srcDirs("src/common/kotlin")
-            dependencies {
-                implementation("com.squareup.okio:okio:3.18.2")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material3)
-                implementation("org.jetbrains.compose.material:material-icons-core:1.7.3")
-                implementation(compose.components.resources)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation(compose.components.uiToolingPreview)
+        val commonMain =
+            getByName("commonMain") {
+                kotlin.srcDirs("src/common/kotlin")
+                dependencies {
+                    implementation("com.squareup.okio:okio:3.18.2")
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+                    implementation("org.jetbrains.compose.runtime:runtime:1.12.0")
+                    implementation("org.jetbrains.compose.foundation:foundation:1.12.0")
+                    implementation("org.jetbrains.compose.material3:material3:1.9.0")
+                    implementation("org.jetbrains.compose.material:material-icons-core:1.7.3")
+                }
             }
-        }
-        val commonTest by getting {
-            kotlin.srcDirs("tests/common/kotlin")
-            dependencies {
-                implementation(kotlin("test"))
+        val commonTest =
+            getByName("commonTest") {
+                kotlin.srcDirs("tests/common/kotlin")
+                dependencies {
+                    implementation(kotlin("test"))
+                }
             }
-        }
-        val jvmMain by getting {
+        getByName("jvmMain") {
             dependsOn(commonMain)
             kotlin.srcDirs("src/jvm/kotlin")
         }
-        val jvmTest by getting {
+        getByName("jvmTest") {
             dependsOn(commonTest)
             kotlin.srcDirs("tests/jvm/kotlin")
             dependencies {
                 implementation(kotlin("reflect"))
             }
         }
-        val nativeMain by creating {
-            dependsOn(commonMain)
-            kotlin.srcDirs("src/native/kotlin")
-        }
-        val nativeTest by creating {
-            dependsOn(commonTest)
-        }
+        val nativeMain =
+            create("nativeMain") {
+                dependsOn(commonMain)
+                kotlin.srcDirs("src/native/kotlin")
+            }
+        val nativeTest =
+            create("nativeTest") {
+                dependsOn(commonTest)
+            }
 
-        val macosMain by creating {
-            dependsOn(nativeMain)
-            kotlin.srcDirs("src/macos/kotlin")
-        }
-        val linuxMain by creating {
-            dependsOn(nativeMain)
-            kotlin.srcDirs("src/linux/kotlin")
-        }
-        val windowsMain by creating {
-            dependsOn(nativeMain)
-            kotlin.srcDirs("src/windows/kotlin")
-        }
+        val macosMain =
+            create("macosMain") {
+                dependsOn(nativeMain)
+                kotlin.srcDirs("src/macos/kotlin")
+            }
+        val linuxMain =
+            create("linuxMain") {
+                dependsOn(nativeMain)
+                kotlin.srcDirs("src/linux/kotlin")
+            }
+        val windowsMain =
+            create("windowsMain") {
+                dependsOn(nativeMain)
+                kotlin.srcDirs("src/windows/kotlin")
+            }
 
         getByName("linuxX64Main") { dependsOn(linuxMain) }
         getByName("macosArm64Main") { dependsOn(macosMain) }
         getByName("mingwX64Main") { dependsOn(windowsMain) }
 
-        val macosTest by creating {
-            dependsOn(nativeTest)
-            kotlin.srcDirs("tests/platform/macos/kotlin")
-        }
+        val macosTest =
+            create("macosTest") {
+                dependsOn(nativeTest)
+                kotlin.srcDirs("tests/platform/macos/kotlin")
+            }
 
         getByName("linuxX64Test") { dependsOn(nativeTest) }
         getByName("macosArm64Test") { dependsOn(macosTest) }
