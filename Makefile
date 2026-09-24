@@ -114,7 +114,7 @@ locale:
 	@echo "To add a new locale:"
 	@echo "  1. Copy $(I18N_DIR)/EnStrings.kt → $(I18N_DIR)/XxStrings.kt"
 	@echo "  2. Translate all string values"
-	@echo "  3. Add LOCALE entry to $(I18N_DIR)/LocalAppStrings.kt (AppLanguage enum)"
+	@echo "  3. Add LOCALE entry to $(I18N_DIR)/AppLanguage.kt"
 	@echo "  4. Wire it in $(I18N_DIR)/LanguagePreference.kt (toAppStrings)"
 	@echo "  5. Add label strings to AppStrings.kt and all *Strings.kt files"
 

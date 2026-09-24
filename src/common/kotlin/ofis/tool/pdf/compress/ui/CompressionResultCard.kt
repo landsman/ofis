@@ -57,21 +57,7 @@ fun CompressionResultCard(
 
         if (alreadyOptimal) {
             Spacer(modifier = Modifier.height(10.dp))
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFFFF8E1), RoundedCornerShape(8.dp))
-                        .padding(12.dp),
-            ) {
-                Text(
-                    text = strings.pdfCompressAlreadyOptimal,
-                    color = Color(0xFF795548),
-                    fontSize = 13.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
+            AlreadyOptimalNotice(strings.pdfCompressAlreadyOptimal)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -92,21 +78,48 @@ fun CompressionResultCard(
 
         if (savedPercent != null && savedPercent > 0) {
             Spacer(modifier = Modifier.height(16.dp))
-            LinearProgressIndicator(
-                progress = { savedPercent / 100f },
-                modifier = Modifier.fillMaxWidth().height(6.dp),
-                color = Color(0xFF4CAF50),
-                trackColor = Color(0xFFE0E0E0),
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = strings.pdfCompressPercentSmaller(savedPercent),
-                color = Color(0xFF4CAF50),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-            )
+            SavedBar(savedPercent, strings.pdfCompressPercentSmaller(savedPercent))
         }
     }
+}
+
+@Composable
+private fun AlreadyOptimalNotice(text: String) {
+    Box(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFFFF8E1), RoundedCornerShape(8.dp))
+                .padding(12.dp),
+    ) {
+        Text(
+            text = text,
+            color = Color(0xFF795548),
+            fontSize = 13.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+private fun SavedBar(
+    savedPercent: Int,
+    caption: String,
+) {
+    LinearProgressIndicator(
+        progress = { savedPercent / 100f },
+        modifier = Modifier.fillMaxWidth().height(6.dp),
+        color = Color(0xFF4CAF50),
+        trackColor = Color(0xFFE0E0E0),
+    )
+    Spacer(modifier = Modifier.height(6.dp))
+    Text(
+        text = caption,
+        color = Color(0xFF4CAF50),
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+    )
 }
 
 @Composable
