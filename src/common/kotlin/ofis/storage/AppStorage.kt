@@ -3,6 +3,7 @@ package ofis.storage
 import ofis.config.Logger
 import ofis.platform.fileSystem
 import ofis.platform.service.appDataDir
+import okio.IOException
 import okio.Path.Companion.toPath
 
 /**
@@ -17,7 +18,7 @@ object AppStorage {
     fun read(key: String): String? =
         try {
             fileSystem.read("$dir/$key.txt".toPath()) { readUtf8() }.trim().takeIf { it.isNotEmpty() }
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             Logger.debug("AppStorage: read($key) failed — ${e.message}")
             null
         }
@@ -29,7 +30,7 @@ object AppStorage {
         try {
             fileSystem.write("$dir/$key.txt".toPath()) { writeUtf8(value) }
             Logger.debug("AppStorage: write($key) → $dir/$key.txt")
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             Logger.error("AppStorage: write($key) failed — ${e.message}")
         }
     }

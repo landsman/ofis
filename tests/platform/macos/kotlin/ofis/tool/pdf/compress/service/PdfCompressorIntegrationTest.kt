@@ -138,9 +138,8 @@ class PdfCompressorIntegrationTest {
         fixture: Fixture,
     ) {
         assertIs<CompressionResult.Success>(result, "Expected success, got: $result")
-        println(
-            "[integration] $label: ${result.originalBytes / 1024}KB → ${result.compressedBytes / 1024}KB (${result.savedPercent}% saved)",
-        )
+        val sizes = "${result.originalBytes / 1024}KB → ${result.compressedBytes / 1024}KB"
+        println("[integration] $label: $sizes (${result.savedPercent}% saved)")
         assertTrue(fs.exists(result.outputPath), "Output file must exist at ${result.outputPath}")
         assertEquals(
             result.originalBytes,

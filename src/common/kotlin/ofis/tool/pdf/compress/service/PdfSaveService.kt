@@ -7,6 +7,7 @@ import ofis.platform.service.availableDiskSpace
 import ofis.platform.view.saveFile
 import ofis.ui.system.toast.ToastData
 import ofis.utils.format.formatSize
+import okio.IOException
 import okio.Path.Companion.toPath
 
 data class SaveMessages(
@@ -57,7 +58,7 @@ suspend fun saveCompressedFile(
                 fileSystem.delete(srcPath)
             }
             SaveResult(savedPath = dest, toast = ToastData(messages.fileSaved, isSuccess = true))
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             val reason =
                 when {
                     e.message?.contains("No space left", ignoreCase = true) == true ||

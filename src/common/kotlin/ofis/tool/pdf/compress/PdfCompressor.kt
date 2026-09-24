@@ -93,9 +93,8 @@ class PdfCompressor : Tool {
                     Logger.info("OUTPUT_PATH: ${result.outputPath}")
                     Logger.info("SUGGESTED_NAME: ${suggestedName(inputStr, profile)}")
                 }
-                Logger.info(
-                    "RESIZE_INFO: ${formatSize(result.originalBytes)} → ${formatSize(result.compressedBytes)} (${result.savedPercent}%)",
-                )
+                val sizes = "${formatSize(result.originalBytes)} → ${formatSize(result.compressedBytes)}"
+                Logger.info("RESIZE_INFO: $sizes (${result.savedPercent}%)")
             }
             is CompressionResult.Failure -> {
                 Logger.info("Error: ${result.reason}")

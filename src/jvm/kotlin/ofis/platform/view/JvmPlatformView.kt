@@ -1,9 +1,11 @@
 package ofis.platform.view
 
-actual fun platformGui(): Unit = throw UnsupportedOperationException("JVM target is test-only")
+private const val TEST_ONLY = "JVM target is test-only"
 
-actual suspend fun pickFile(allowedExtensions: List<String>): String? = throw UnsupportedOperationException("JVM target is test-only")
+actual fun platformGui(): Unit = throw UnsupportedOperationException(TEST_ONLY)
 
-actual suspend fun saveFile(suggestedName: String): String? = throw UnsupportedOperationException("JVM target is test-only")
+actual suspend fun pickFile(allowedExtensions: List<String>): String? = throw UnsupportedOperationException(TEST_ONLY)
 
-actual fun openUrl(url: String): Unit = throw UnsupportedOperationException("JVM target is test-only")
+actual suspend fun saveFile(suggestedName: String): String? = throw UnsupportedOperationException(TEST_ONLY)
+
+actual fun openUrl(url: String): Unit = throw UnsupportedOperationException(TEST_ONLY)
