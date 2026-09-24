@@ -1,16 +1,17 @@
 
-import io.gitlab.arturbosch.detekt.Detekt
+import dev.detekt.gradle.Detekt
 
 plugins {
     kotlin("multiplatform") version "2.4.20"
     id("org.jetbrains.compose") version "1.12.0"
     id("org.jetbrains.kotlin.plugin.compose") version "2.4.20"
-    id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    id("dev.detekt") version "2.0.0-alpha.6"
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
 }
 
 detekt {
     buildUponDefaultConfig = true
+    source.setFrom("src", "tests")
     allRules = false
     config.setFrom(files("$projectDir/config/detekt/detekt.yml"))
 }
@@ -19,9 +20,8 @@ tasks.withType(Detekt::class.java).configureEach {
     reports {
         html.required.set(true)
         sarif.required.set(true)
-        txt.required.set(true)
-        xml.required.set(false)
-        md.required.set(false)
+        checkstyle.required.set(false)
+        markdown.required.set(false)
     }
 }
 
@@ -136,7 +136,10 @@ kotlin {
         targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().all {
             binaries.all {
                 if (this is org.jetbrains.kotlin.gradle.plugin.mpp.Executable) {
-                    val runTaskName = "run${name.replaceFirstChar { it.uppercase() }}${targetName.replaceFirstChar { it.uppercase() }}"
+                    val runTaskName = "run${name.replaceFirstChar { it.uppercase() }}${targetName.replaceFirstChar {
+                        it
+                            .uppercase()
+                    }}"
                     tasks.matching { it.name == runTaskName }.configureEach {
                         val runTask = this as? Exec
                         runTask?.let {
