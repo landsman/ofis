@@ -35,12 +35,6 @@ ktlint {
     }
 }
 
-repositories {
-    mavenCentral()
-    google()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/stable")
-}
-
 kotlin {
     jvm()
 
