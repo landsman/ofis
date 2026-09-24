@@ -67,7 +67,9 @@ sealed interface CompressionError {
             when {
                 exitCode == ProcessResult.EXIT_COMMAND_NOT_FOUND ->
                     "$tool is not installed or could not be launched. Run: brew install $tool"
+
                 stderr.isNotBlank() -> "$tool failed: ${stderr.trim()}"
+
                 else -> "$tool failed with exit code $exitCode."
             }
     }

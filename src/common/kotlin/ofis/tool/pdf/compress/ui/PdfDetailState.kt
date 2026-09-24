@@ -66,8 +66,11 @@ class PdfDetailState {
                 completedProfile = selectedProfile
                 isRunning = false
             }
+
             msg.startsWith(OUTPUT_PATH) -> outputFilePath = msg.substringAfter(OUTPUT_PATH)
+
             msg.startsWith(SUGGESTED_NAME) -> suggestedSaveName = msg.substringAfter(SUGGESTED_NAME)
+
             msg.startsWith(ERROR) -> {
                 isRunning = false
                 return msg.substringAfter(ERROR)

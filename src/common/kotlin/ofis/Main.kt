@@ -16,13 +16,13 @@ fun commonMain(argList: List<String>): Int {
     val toolArgs = argList.filter { it !in FLAGS }
 
     return when {
-        /** GUI */
+        // GUI
         GUI_FLAG in argList || (argList.isEmpty() && defaultToGui) -> {
             platformGui()
             0
         }
 
-        /** CLI it is, let's offer the user the available tools */
+        // CLI it is, let's offer the user the available tools
         argList.isEmpty() -> {
             println("Welcome to Ofis!")
             println("Available tools:")
@@ -35,7 +35,7 @@ fun commonMain(argList: List<String>): Int {
             1
         }
 
-        /** CLI: user has specified a tool, let's run it */
+        // CLI: user has specified a tool, let's run it
         else -> runTool(toolArgs.first(), toolArgs.drop(1))
     }
 }
