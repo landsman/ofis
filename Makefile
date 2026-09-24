@@ -230,16 +230,7 @@ linux_release:
 	@echo "Released v$(VERSION) to GitHub."
 
 # ── Maintenance ───────────────────────────────────────────────────────────────
-.PHONY: deps sec clean help
-
-# Dependency updates report
-deps:
-	$(GRADLE) dependencyUpdates
-
-# Security scan (OWASP)
-sec:
-	$(GRADLE) dependencyCheckAnalyze
-	@echo "Report: build/reports/dependency-check-report.html"
+.PHONY: clean help
 
 # Clean
 clean:
@@ -279,6 +270,4 @@ help:
 	@echo "  linux_package    — create tar.gz archive of binary (Linux only)"
 	@echo "  linux_release    — publish tar.gz to GitHub Releases (requires gh)"
 	@echo ""
-	@echo "  deps             — check for outdated dependencies"
-	@echo "  sec              — OWASP vulnerability scan"
 	@echo "  clean            — remove build artifacts"
