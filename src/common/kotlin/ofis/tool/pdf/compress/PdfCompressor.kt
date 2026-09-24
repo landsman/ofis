@@ -96,6 +96,7 @@ class PdfCompressor : Tool {
                 val sizes = "${formatSize(result.originalBytes)} → ${formatSize(result.compressedBytes)}"
                 Logger.info("RESIZE_INFO: $sizes (${result.savedPercent}%)")
             }
+
             is CompressionResult.Failure -> {
                 Logger.info("Error: ${result.reason}")
             }

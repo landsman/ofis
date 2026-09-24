@@ -68,7 +68,9 @@ class PdfCompressionService(
         val result = runTimed("qpdf", buildQpdfCommand(qpdf, request.inputPath, tmp, request.profile))
         when (result.exitCode) {
             0 -> Unit
+
             QPDF_EXIT_WARNINGS -> warnings += "qpdf: completed with warnings"
+
             else -> {
                 cleanupQuiet(tmp)
                 abort(CompressionError.ProcessFailed("qpdf", result.exitCode, result.stderr))

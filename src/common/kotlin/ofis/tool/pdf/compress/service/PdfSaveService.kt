@@ -63,7 +63,9 @@ suspend fun saveCompressedFile(
                 when {
                     e.message?.contains("No space left", ignoreCase = true) == true ||
                         e.message?.contains("ENOSPC", ignoreCase = true) == true -> messages.notEnoughSpace
+
                     e.message?.contains("Permission", ignoreCase = true) == true -> messages.permissionDenied
+
                     else -> e.message ?: "Unknown error."
                 }
             SaveResult(toast = ToastData(messages.failedToSave(reason), isSuccess = false))

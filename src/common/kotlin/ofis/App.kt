@@ -95,6 +95,7 @@ private fun CurrentScreen(
     val dropped = nav.droppedFile
     when {
         tool != null -> tool.Screen(onBack = { nav.closeTool() })
+
         nav.screen == Screen.FileSuggestion && dropped != null ->
             FileSuggestView(
                 filePath = dropped.path,
@@ -106,12 +107,14 @@ private fun CurrentScreen(
                     nav.dismissDroppedFile()
                 },
             )
+
         nav.screen == Screen.Settings ->
             SettingsView(
                 selectedLanguage = selectedLanguage,
                 onLanguageSelect = onLanguageSelect,
                 onBack = { nav.home() },
             )
+
         else ->
             ToolSelectionView(
                 onToolSelect = { nav.openTool(it) },
