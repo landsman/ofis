@@ -14,12 +14,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import ofis.config.Logger
+import ofis.i18n.AppLanguage
 import ofis.i18n.LocalAppStrings
 import ofis.i18n.loadLanguagePreference
 import ofis.i18n.saveLanguagePreference
 import ofis.i18n.toAppStrings
 import ofis.platform.fileSystem
-import ofis.tool.Tool
 import ofis.tool.ToolRegistry
 import ofis.ui.system.DotGridBackground
 import ofis.ui.system.DropOverlay
@@ -35,15 +35,9 @@ import ofis.ui.view.settings.SettingsView
 import ofis.ui.view.toolselection.ToolSelectionView
 import okio.Path.Companion.toPath
 
-private enum class Screen { Tools, Settings, FileSuggestion }
-
 @Composable
 fun App() {
-    var currentTool by remember { mutableStateOf<Tool?>(null) }
-    var screen by remember { mutableStateOf(Screen.Tools) }
-    var droppedFilePath by remember { mutableStateOf<String?>(null) }
-    var droppedFileSize by remember { mutableStateOf<Long?>(null) }
-    var droppedFileTools by remember { mutableStateOf<List<Tool>>(emptyList()) }
+    val nav = remember { AppNavigator() }
     val toastController = remember { ToastController() }
     val logController = remember { LogController() }
     var selectedLanguage by remember { mutableStateOf(loadLanguagePreference()) }
@@ -51,13 +45,15 @@ fun App() {
     // Intercept global file drops when no tool screen is active.
     LaunchedEffect(FileDropBus.pendingFilePath) {
         val path = FileDropBus.pendingFilePath ?: return@LaunchedEffect
-        if (currentTool != null) return@LaunchedEffect
+        if (nav.currentTool != null) return@LaunchedEffect
         val ext = path.substringAfterLast('.', "").lowercase()
-        val tools = ToolRegistry.findForExtension(ext)
-        droppedFilePath = path
-        droppedFileSize = fileSystem.metadataOrNull(path.toPath())?.size
-        droppedFileTools = tools
-        screen = Screen.FileSuggestion
+        nav.showDroppedFile(
+            DroppedFile(
+                path = path,
+                size = fileSystem.metadataOrNull(path.toPath())?.size,
+                tools = ToolRegistry.findForExtension(ext),
+            ),
+        )
     }
 
     DisposableEffect(Unit) {
@@ -73,75 +69,75 @@ fun App() {
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 DotGridBackground()
-
                 Column(modifier = Modifier.fillMaxSize()) {
-                    when {
-                        currentTool != null -> {
-                            currentTool!!.Screen(onBack = {
-                                Logger.debug("navigate → home")
-                                currentTool = null
-                            })
-                        }
-                        screen == Screen.FileSuggestion && droppedFilePath != null -> {
-                            FileSuggestView(
-                                filePath = droppedFilePath!!,
-                                fileSize = droppedFileSize,
-                                matchingTools = droppedFileTools,
-                                onToolSelect = { tool ->
-                                    Logger.debug("navigate → ${tool.name} via drop")
-                                    droppedFilePath = null
-                                    droppedFileSize = null
-                                    droppedFileTools = emptyList()
-                                    screen = Screen.Tools
-                                    currentTool = tool
-                                },
-                                onDismiss = {
-                                    FileDropBus.consume()
-                                    droppedFilePath = null
-                                    droppedFileSize = null
-                                    droppedFileTools = emptyList()
-                                    screen = Screen.Tools
-                                },
-                            )
-                        }
-                        screen == Screen.Settings -> {
-                            SettingsView(
-                                selectedLanguage = selectedLanguage,
-                                onLanguageSelect = { lang ->
-                                    selectedLanguage = lang
-                                    saveLanguagePreference(lang)
-                                },
-                                onBack = { screen = Screen.Tools },
-                            )
-                        }
-                        else -> {
-                            ToolSelectionView(
-                                onToolSelect = {
-                                    Logger.debug("navigate → ${it.name}")
-                                    currentTool = it
-                                },
-                                onSettingsClick = { screen = Screen.Settings },
-                            )
-                        }
-                    }
-                }
-
-                if (FileDropBus.isDragging) {
-                    DropOverlay()
-                }
-
-                if (logController.isVisible) {
-                    LogOverlay(
-                        logs = logController.logs,
-                        onClose = { logController.hide() },
+                    CurrentScreen(
+                        nav = nav,
+                        selectedLanguage = selectedLanguage,
+                        onLanguageSelect = { lang ->
+                            selectedLanguage = lang
+                            saveLanguagePreference(lang)
+                        },
                     )
                 }
-
-                ToastHost(
-                    toast = toastController.current,
-                    onDismiss = { toastController.dismiss() },
-                )
+                Overlays(logController, toastController)
             }
         }
     }
+}
+
+@Composable
+private fun CurrentScreen(
+    nav: AppNavigator,
+    selectedLanguage: AppLanguage,
+    onLanguageSelect: (AppLanguage) -> Unit,
+) {
+    val tool = nav.currentTool
+    val dropped = nav.droppedFile
+    when {
+        tool != null -> tool.Screen(onBack = { nav.closeTool() })
+        nav.screen == Screen.FileSuggestion && dropped != null ->
+            FileSuggestView(
+                filePath = dropped.path,
+                fileSize = dropped.size,
+                matchingTools = dropped.tools,
+                onToolSelect = { nav.openTool(it, via = " via drop") },
+                onDismiss = {
+                    FileDropBus.consume()
+                    nav.dismissDroppedFile()
+                },
+            )
+        nav.screen == Screen.Settings ->
+            SettingsView(
+                selectedLanguage = selectedLanguage,
+                onLanguageSelect = onLanguageSelect,
+                onBack = { nav.home() },
+            )
+        else ->
+            ToolSelectionView(
+                onToolSelect = { nav.openTool(it) },
+                onSettingsClick = { nav.openSettings() },
+            )
+    }
+}
+
+@Composable
+private fun Overlays(
+    logController: LogController,
+    toastController: ToastController,
+) {
+    if (FileDropBus.isDragging) {
+        DropOverlay()
+    }
+
+    if (logController.isVisible) {
+        LogOverlay(
+            logs = logController.logs,
+            onClose = { logController.hide() },
+        )
+    }
+
+    ToastHost(
+        toast = toastController.current,
+        onDismiss = { toastController.dismiss() },
+    )
 }

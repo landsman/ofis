@@ -21,18 +21,9 @@ import platform.Foundation.NSURL
  * Avoids fork() complications in multi-threaded GUI apps.
  * Safe: arguments are passed as an NSArray, never shell-interpolated.
  */
+@OptIn(ExperimentalForeignApi::class)
 actual fun runProcess(command: NativeCommand): ProcessResult {
     Logger.info("[runProcess] ${command.executable} ${command.arguments.joinToString(" ")}")
-    return try {
-        runProcessInternal(command)
-    } catch (e: Exception) {
-        Logger.info("[runProcess] exception: ${e.message}")
-        ProcessResult(exitCode = -1, stdout = "", stderr = e.message ?: "unknown error")
-    }
-}
-
-@OptIn(ExperimentalForeignApi::class)
-private fun runProcessInternal(command: NativeCommand): ProcessResult {
     val task = NSTask()
     task.executableURL = NSURL.fileURLWithPath(command.executable)
     task.arguments = command.arguments
@@ -53,12 +44,13 @@ private fun runProcessInternal(command: NativeCommand): ProcessResult {
         launchError = errorPtr.value?.localizedDescription
     }
 
-    Logger.info("[runProcess] launched=$launched pid=${if (launched) task.processIdentifier else -1} error=$launchError")
+    val pid = if (launched) task.processIdentifier else -1
+    Logger.info("[runProcess] launched=$launched pid=$pid error=$launchError")
 
     if (!launched) {
         // ARC releases the NSPipe objects here, closing both ends — no deadlock.
         return ProcessResult(
-            exitCode = 127,
+            exitCode = ProcessResult.EXIT_COMMAND_NOT_FOUND,
             stdout = "",
             stderr = launchError ?: "Failed to launch: ${command.executable}",
         )

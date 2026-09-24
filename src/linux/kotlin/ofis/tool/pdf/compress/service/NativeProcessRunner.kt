@@ -61,7 +61,7 @@ actual fun runProcess(command: NativeCommand): ProcessResult =
             close(stderrPipe[1])
 
             execvp(command.executable, argv)
-            _exit(127) // execvp failed
+            _exit(ProcessResult.EXIT_COMMAND_NOT_FOUND) // execvp failed
         }
 
         // ── parent process ─────────────────────────────────────────────────────

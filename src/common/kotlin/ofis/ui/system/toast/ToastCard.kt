@@ -14,11 +14,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-open class ToastData(
-    val message: String,
-    val isSuccess: Boolean,
-)
-
 @Composable
 fun ToastCard(toast: ToastData) {
     val bgColor = if (toast.isSuccess) Color(0xFF2E7D32) else Color(0xFFC62828)

@@ -17,5 +17,6 @@ expect fun availableDiskSpace(dirPath: String): Long
  *  - macOS: .app bundle → PATH (`which`) → Homebrew fallback paths
  *  - Linux:  executable directory → PATH (`which`) → /usr/bin, /usr/local/bin
  *  - Windows: executable directory → PATH (`where`)
- *  Returns null if the binary cannot be found, which should surface as a [ofis.tool.pdf.compress.model.CompressionError.BinaryNotFound] error. */
+ *  Returns null if the binary cannot be found, which should surface as a
+ *  [ofis.tool.pdf.compress.model.CompressionError.BinaryNotFound] error. */
 expect fun findHelperBinary(name: String): String?

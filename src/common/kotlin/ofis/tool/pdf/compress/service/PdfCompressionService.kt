@@ -10,220 +10,168 @@ import ofis.tool.pdf.compress.model.CompressionRequest
 import ofis.tool.pdf.compress.model.CompressionResult
 import ofis.tool.pdf.compress.model.NativeCommand
 import ofis.tool.pdf.compress.model.ProcessResult
+import okio.FileSystem
+import okio.IOException
 import okio.Path
-import kotlin.time.measureTime
+import kotlin.time.measureTimedValue
 
 class PdfCompressionService(
     private val binaryFinder: (String) -> String? = ::findHelperBinary,
     private val processRunner: (NativeCommand) -> ProcessResult = ::runProcess,
 ) {
-    fun compress(request: CompressionRequest): CompressionResult {
-        val fs = fileSystem
-        var result: CompressionResult? = null
-        return try {
-            val total =
-                measureTime {
-                    result = doCompress(request, fs)
-                }
+    fun compress(request: CompressionRequest): CompressionResult =
+        try {
+            val (result, total) = measureTimedValue { doCompress(request, fileSystem) }
             Logger.info("[timing] total: $total")
-            result!!
-        } catch (e: Exception) {
-            Logger.info("[compress] unexpected exception: ${e.message}")
-            CompressionResult.Failure(CompressionError.InvalidInput("Unexpected error: ${e.message}"))
+            result
+        } catch (e: IOException) {
+            unexpected(e)
+        } catch (e: IllegalStateException) {
+            unexpected(e)
         }
+
+    private fun unexpected(e: Exception): CompressionResult {
+        Logger.info("[compress] unexpected exception: ${e.message}")
+        return CompressionResult.Failure(CompressionError.InvalidInput("Unexpected error: ${e.message}"))
     }
 
     private fun doCompress(
         request: CompressionRequest,
-        fs: okio.FileSystem,
-    ): CompressionResult {
-        // ── validate input ─────────────────────────────────────────────────
-        if (!fs.exists(request.inputPath)) {
-            return CompressionResult.Failure(CompressionError.InvalidInput("File not found: ${request.inputPath}"))
-        }
-
-        val originalBytes = fs.metadata(request.inputPath).size ?: 0L
-
-        // ── resolve binaries ───────────────────────────────────────────────
-        lateinit var qpdf: String
-        val tFindQpdf =
-            measureTime {
-                qpdf =
-                    binaryFinder("qpdf") ?: return CompressionResult.Failure(CompressionError.BinaryNotFound("qpdf"))
+        fs: FileSystem,
+    ): CompressionResult =
+        try {
+            if (!fs.exists(request.inputPath)) {
+                abort(CompressionError.InvalidInput("File not found: ${request.inputPath}"))
             }
-        Logger.info("[timing] find qpdf: $tFindQpdf → $qpdf")
+            val originalBytes = fs.metadata(request.inputPath).size ?: 0L
+            val warnings = mutableListOf<String>()
 
-        val tmpQpdf: Path = request.outputPath.parent!! / "${request.outputPath.name}.qpdf.tmp"
-
-        // ── qpdf pass (always runs) ────────────────────────────────────────
-        lateinit var qpdfResult: ProcessResult
-        val tQpdf = measureTime { qpdfResult = processRunner(buildQpdfCommand(qpdf, request.inputPath, tmpQpdf, request.profile)) }
-        Logger.info("[timing] qpdf: $tQpdf (exit=${qpdfResult.exitCode})")
-
-        if (qpdfResult.exitCode != 0 && qpdfResult.exitCode != 3) {
-            cleanupQuiet(tmpQpdf)
-            return CompressionResult.Failure(
-                CompressionError.ProcessFailed("qpdf", qpdfResult.exitCode, qpdfResult.stderr),
-            )
-        }
-        val warnings =
-            buildList {
-                if (qpdfResult.exitCode == 3) add("qpdf: completed with warnings")
-            }.toMutableList()
-
-        // ── ghostscript pass (BALANCED and MAXIMUM only) ───────────────────
-        val finalTmp: Path =
-            when (request.profile) {
-                CompressionProfile.HIGH_QUALITY -> tmpQpdf
-
-                CompressionProfile.BALANCED, CompressionProfile.MAXIMUM -> {
-                    lateinit var gs: String
-                    val tFindGs =
-                        measureTime {
-                            gs =
-                                binaryFinder("gs")
-                                    ?: return run {
-                                        cleanupQuiet(tmpQpdf)
-                                        CompressionResult.Failure(CompressionError.BinaryNotFound("gs (ghostscript)"))
-                                    }
-                        }
-                    Logger.info("[timing] find gs: $tFindGs → $gs")
-
-                    val tmpGs: Path = request.outputPath.parent!! / "${request.outputPath.name}.gs.tmp"
-                    lateinit var gsResult: ProcessResult
-                    val tGs = measureTime { gsResult = processRunner(buildGhostscriptCommand(gs, tmpQpdf, tmpGs, request.profile)) }
-                    Logger.info("[timing] gs: $tGs (exit=${gsResult.exitCode})")
-                    cleanupQuiet(tmpQpdf)
-
-                    if (gsResult.exitCode != 0) {
-                        cleanupQuiet(tmpGs)
-                        return CompressionResult.Failure(
-                            CompressionError.ProcessFailed("gs", gsResult.exitCode, gsResult.stderr),
-                        )
-                    }
-                    tmpGs
+            val qpdfOutput = runQpdf(request, warnings)
+            val finalTmp =
+                when (request.profile) {
+                    CompressionProfile.HIGH_QUALITY -> qpdfOutput
+                    CompressionProfile.BALANCED, CompressionProfile.MAXIMUM -> runGhostscript(request, qpdfOutput)
                 }
+            finish(request, fs, finalTmp, originalBytes, warnings)
+        } catch (e: Abort) {
+            CompressionResult.Failure(e.reason)
+        }
+
+    // ── qpdf pass (always runs) ────────────────────────────────────────────────
+
+    private fun runQpdf(
+        request: CompressionRequest,
+        warnings: MutableList<String>,
+    ): Path {
+        val qpdf = findBinary("qpdf") ?: abort(CompressionError.BinaryNotFound("qpdf"))
+        val tmp = tmpPath(request, "qpdf")
+        val result = runTimed("qpdf", buildQpdfCommand(qpdf, request.inputPath, tmp, request.profile))
+        when (result.exitCode) {
+            0 -> Unit
+            QPDF_EXIT_WARNINGS -> warnings += "qpdf: completed with warnings"
+            else -> {
+                cleanupQuiet(tmp)
+                abort(CompressionError.ProcessFailed("qpdf", result.exitCode, result.stderr))
             }
+        }
+        return tmp
+    }
 
+    // ── ghostscript pass (BALANCED and MAXIMUM only) ───────────────────────────
+
+    private fun runGhostscript(
+        request: CompressionRequest,
+        input: Path,
+    ): Path {
+        val gs =
+            findBinary("gs") ?: run {
+                cleanupQuiet(input)
+                abort(CompressionError.BinaryNotFound("gs (ghostscript)"))
+            }
+        val tmp = tmpPath(request, "gs")
+        val result = runTimed("gs", buildGhostscriptCommand(gs, input, tmp, request.profile))
+        cleanupQuiet(input)
+        if (result.exitCode != 0) {
+            cleanupQuiet(tmp)
+            abort(CompressionError.ProcessFailed("gs", result.exitCode, result.stderr))
+        }
+        return tmp
+    }
+
+    // ── keep-smaller policy, then atomic move to final destination ─────────────
+
+    private fun finish(
+        request: CompressionRequest,
+        fs: FileSystem,
+        finalTmp: Path,
+        originalBytes: Long,
+        warnings: MutableList<String>,
+    ): CompressionResult.Success {
         val compressedBytes = fs.metadata(finalTmp).size ?: 0L
-
-        // ── keep-smaller policy ────────────────────────────────────────────
-        if (request.keepSmallerOnly && compressedBytes >= originalBytes) {
+        val keepOriginal = request.keepSmallerOnly && compressedBytes >= originalBytes
+        if (keepOriginal) {
             cleanupQuiet(finalTmp)
             warnings += "Compressed output is not smaller than original — keeping original"
-            return CompressionResult.Success(
-                inputPath = request.inputPath,
-                outputPath = request.inputPath,
-                originalBytes = originalBytes,
-                compressedBytes = originalBytes,
-                profile = request.profile,
-                warnings = warnings,
-            )
+        } else {
+            moveToOutput(request, fs, finalTmp, originalBytes)
         }
-
-        // ── atomic move to final destination ───────────────────────────────
-        try {
-            request.outputPath.parent?.let { fs.createDirectories(it) }
-            fs.atomicMove(finalTmp, request.outputPath)
-        } catch (e: Exception) {
-            cleanupQuiet(finalTmp)
-            val outputDir = request.outputPath.parent?.toString() ?: "."
-            val freeBytes = availableDiskSpace(outputDir)
-            val requiredBytes = originalBytes * 2
-            return if (freeBytes < requiredBytes) {
-                Logger.warn(
-                    "Not enough disk space: need ${requiredBytes / 1_048_576}MB, " +
-                        "only ${freeBytes / 1_048_576}MB free in $outputDir",
-                )
-                CompressionResult.Failure(
-                    CompressionError.FileSystemError("Not enough disk space to save the compressed file."),
-                )
-            } else {
-                Logger.warn("Failed to write output to ${request.outputPath}: ${e.message}")
-                CompressionResult.Failure(
-                    CompressionError.FileSystemError("Could not save the file. Check folder permissions."),
-                )
-            }
-        }
-
         return CompressionResult.Success(
             inputPath = request.inputPath,
-            outputPath = request.outputPath,
+            outputPath = if (keepOriginal) request.inputPath else request.outputPath,
             originalBytes = originalBytes,
-            compressedBytes = compressedBytes,
+            compressedBytes = if (keepOriginal) originalBytes else compressedBytes,
             profile = request.profile,
             warnings = warnings,
         )
     }
 
-    // ── command builders ───────────────────────────────────────────────────────
-
-    private fun buildQpdfCommand(
-        binary: String,
-        input: Path,
-        output: Path,
-        profile: CompressionProfile,
-    ): NativeCommand {
-        val level =
-            when (profile) {
-                CompressionProfile.HIGH_QUALITY -> "9"
-                CompressionProfile.BALANCED -> "6"
-                CompressionProfile.MAXIMUM -> "9"
+    private fun moveToOutput(
+        request: CompressionRequest,
+        fs: FileSystem,
+        finalTmp: Path,
+        originalBytes: Long,
+    ) {
+        try {
+            request.outputPath.parent?.let { fs.createDirectories(it) }
+            fs.atomicMove(finalTmp, request.outputPath)
+        } catch (e: IOException) {
+            cleanupQuiet(finalTmp)
+            val outputDir = request.outputPath.parent?.toString() ?: "."
+            val freeBytes = availableDiskSpace(outputDir)
+            val requiredBytes = originalBytes * 2
+            if (freeBytes < requiredBytes) {
+                Logger.warn(
+                    "Not enough disk space: need ${requiredBytes / BYTES_PER_MB}MB, " +
+                        "only ${freeBytes / BYTES_PER_MB}MB free in $outputDir",
+                )
+                abort(CompressionError.FileSystemError("Not enough disk space to save the compressed file."))
             }
-        return NativeCommand(
-            executable = binary,
-            arguments =
-                listOf(
-                    input.toString(),
-                    "--compress-streams=y",
-                    "--object-streams=generate",
-                    "--recompress-flate",
-                    "--compression-level=$level",
-                    output.toString(),
-                ),
-        )
+            Logger.warn("Failed to write output to ${request.outputPath}: ${e.message}")
+            abort(CompressionError.FileSystemError("Could not save the file. Check folder permissions."))
+        }
     }
 
-    private fun buildGhostscriptCommand(
-        binary: String,
-        input: Path,
-        output: Path,
-        profile: CompressionProfile,
-    ): NativeCommand {
-        val preset =
-            when (profile) {
-                CompressionProfile.BALANCED -> "/ebook"
-                CompressionProfile.MAXIMUM -> "/screen"
-                CompressionProfile.HIGH_QUALITY -> error("gs not used for HIGH_QUALITY")
-            }
-        val dpi =
-            when (profile) {
-                CompressionProfile.BALANCED -> 144
-                CompressionProfile.MAXIMUM -> 96
-                CompressionProfile.HIGH_QUALITY -> error("gs not used for HIGH_QUALITY")
-            }
-        return NativeCommand(
-            executable = binary,
-            arguments =
-                listOf(
-                    "-q",
-                    "-dNOPAUSE",
-                    "-dBATCH",
-                    "-dSAFER",
-                    "-sDEVICE=pdfwrite",
-                    "-dCompatibilityLevel=1.4",
-                    "-dPDFSETTINGS=$preset",
-                    "-dColorImageDownsampleType=/Bicubic",
-                    "-dColorImageResolution=$dpi",
-                    "-dGrayImageDownsampleType=/Bicubic",
-                    "-dGrayImageResolution=$dpi",
-                    "-dMonoImageDownsampleType=/Bicubic",
-                    "-dMonoImageResolution=$dpi",
-                    "-sOutputFile=$output",
-                    input.toString(),
-                ),
-        )
+    // ── step helpers ───────────────────────────────────────────────────────────
+
+    private fun findBinary(name: String): String? {
+        val (path, took) = measureTimedValue { binaryFinder(name) }
+        Logger.info("[timing] find $name: $took → $path")
+        return path
     }
+
+    private fun runTimed(
+        label: String,
+        command: NativeCommand,
+    ): ProcessResult {
+        val (result, took) = measureTimedValue { processRunner(command) }
+        Logger.info("[timing] $label: $took (exit=${result.exitCode})")
+        return result
+    }
+
+    private fun tmpPath(
+        request: CompressionRequest,
+        pass: String,
+    ): Path = request.outputPath.parent!! / "${request.outputPath.name}.$pass.tmp"
 
     // ── helpers ────────────────────────────────────────────────────────────────
 
@@ -233,4 +181,17 @@ class PdfCompressionService(
         } catch (_: Exception) {
         }
     }
+
+    private companion object {
+        /** qpdf finished but reported warnings; the output is usable. */
+        const val QPDF_EXIT_WARNINGS = 3
+        const val BYTES_PER_MB = 1_048_576L
+    }
 }
+
+/** A step failed in an expected way; `doCompress` turns it into a [CompressionResult.Failure]. */
+private class Abort(
+    val reason: CompressionError,
+) : Exception(reason.toString())
+
+private fun abort(reason: CompressionError): Nothing = throw Abort(reason)

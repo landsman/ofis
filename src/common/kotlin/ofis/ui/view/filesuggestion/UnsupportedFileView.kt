@@ -80,25 +80,10 @@ fun UnsupportedFileView(
                 color = Color(0xFF888888),
             )
             Spacer(modifier = Modifier.height(6.dp))
-            OutlinedTextField(
+            NoteField(
                 value = note,
                 onValueChange = { note = it },
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(120.dp)
-                        .onPreviewKeyEvent { event ->
-                            if (event.type == KeyEventType.KeyDown && event.isMetaPressed && event.key == Key.A) {
-                                note = note.copy(selection = TextRange(0, note.text.length))
-                                true
-                            } else {
-                                false
-                            }
-                        },
-                placeholder = {
-                    Text(strings.dropSuggestRequestSupportPlaceholder, color = Color(0xFFBBBBBB))
-                },
-                maxLines = 6,
+                placeholder = strings.dropSuggestRequestSupportPlaceholder,
             )
             Spacer(modifier = Modifier.height(20.dp))
             AppButton(
@@ -114,6 +99,30 @@ fun UnsupportedFileView(
             }
         }
     }
+}
+
+/** Multi-line note with ⌘A select-all, which the desktop text field lacks by default. */
+@Composable
+private fun NoteField(
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    placeholder: String,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(120.dp)
+                .onPreviewKeyEvent { event ->
+                    val selectAll = event.type == KeyEventType.KeyDown && event.isMetaPressed && event.key == Key.A
+                    if (selectAll) onValueChange(value.copy(selection = TextRange(0, value.text.length)))
+                    selectAll
+                },
+        placeholder = { Text(placeholder, color = Color(0xFFBBBBBB)) },
+        maxLines = 6,
+    )
 }
 
 private fun buildMailto(

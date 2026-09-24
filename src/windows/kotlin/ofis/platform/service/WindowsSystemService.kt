@@ -17,14 +17,13 @@ actual fun appDataDir(): String {
     return dir
 }
 
-actual fun availableDiskSpace(dirPath: String): Long = Long.MAX_VALUE // TODO: GetDiskFreeSpaceEx
+/** Not measured on Windows yet (GetDiskFreeSpaceEx); reporting unlimited skips the pre-write space check. */
+actual fun availableDiskSpace(dirPath: String): Long = Long.MAX_VALUE
 
 @OptIn(ExperimentalForeignApi::class)
 actual fun findHelperBinary(name: String): String? {
-    // 1. Next to the executable (for self-contained Windows builds)
-    // TODO: implement via GetModuleFileNameW when needed
-
-    // 2. System PATH via `where` — Windows equivalent of `which`
+    // Only PATH is searched: a binary next to the executable (GetModuleFileNameW) is not supported yet.
+    // System PATH via `where` — Windows equivalent of `which`
     val result = _popen("where $name", "r")
     if (result != null) {
         val buf = ByteArray(512)

@@ -8,6 +8,7 @@ import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,10 +44,6 @@ fun AppHeader(
     onBack: (() -> Unit)? = null,
     actions: (@Composable () -> Unit)? = null,
 ) {
-    val strings = LocalAppStrings.current
-    val window = LocalWindowWidth.current
-    val isDetail = onBack != null
-
     Box(
         modifier =
             Modifier
@@ -54,68 +51,88 @@ fun AppHeader(
                 .background(Color.White)
                 .padding(start = 40.dp, end = 40.dp, top = 40.dp, bottom = 24.dp),
     ) {
-        if (isDetail) {
-            val titleSize =
+        if (onBack != null) {
+            DetailHeader(title, onBack, actions)
+        } else {
+            HomeHeader(title, subtitle, actions)
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.DetailHeader(
+    title: String,
+    onBack: () -> Unit,
+    actions: (@Composable () -> Unit)?,
+) {
+    val window = LocalWindowWidth.current
+    val titleSize =
+        when (window) {
+            WindowWidth.Compact -> 14.sp
+            WindowWidth.Medium -> 16.sp
+            WindowWidth.Expanded -> 20.sp
+        }
+    val backSize =
+        when (window) {
+            WindowWidth.Compact -> 13.sp
+            WindowWidth.Medium -> 14.sp
+            WindowWidth.Expanded -> 16.sp
+        }
+
+    BackButton(
+        text = LocalAppStrings.current.back,
+        fontSize = backSize,
+        onClick = onBack,
+        modifier = Modifier.align(Alignment.CenterStart),
+    )
+    Text(
+        text = title,
+        modifier = Modifier.align(Alignment.Center),
+        fontSize = titleSize,
+        fontWeight = FontWeight.ExtraBold,
+        color = Color(0xFF1A1A1A),
+    )
+    if (actions != null) {
+        Row(modifier = Modifier.align(Alignment.CenterEnd)) { actions() }
+    }
+}
+
+@Composable
+private fun BoxScope.HomeHeader(
+    title: String,
+    subtitle: String?,
+    actions: (@Composable () -> Unit)?,
+) {
+    val window = LocalWindowWidth.current
+    val titleSize =
+        when (window) {
+            WindowWidth.Compact -> 28.sp
+            WindowWidth.Medium -> 36.sp
+            WindowWidth.Expanded -> 42.sp
+        }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            fontSize = titleSize,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF000000),
+        )
+        if (subtitle != null) {
+            val subtitleSize =
                 when (window) {
                     WindowWidth.Compact -> 14.sp
                     WindowWidth.Medium -> 16.sp
-                    WindowWidth.Expanded -> 20.sp
+                    WindowWidth.Expanded -> 18.sp
                 }
-            val backSize =
-                when (window) {
-                    WindowWidth.Compact -> 13.sp
-                    WindowWidth.Medium -> 14.sp
-                    WindowWidth.Expanded -> 16.sp
-                }
-
-            BackButton(
-                text = strings.back,
-                fontSize = backSize,
-                onClick = onBack!!,
-                modifier = Modifier.align(Alignment.CenterStart),
-            )
             Text(
-                text = title,
-                modifier = Modifier.align(Alignment.Center),
-                fontSize = titleSize,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFF1A1A1A),
+                text = subtitle,
+                fontSize = subtitleSize,
+                color = Color(0xFF666666),
             )
-            if (actions != null) {
-                Row(modifier = Modifier.align(Alignment.CenterEnd)) { actions() }
-            }
-        } else {
-            val titleSize =
-                when (window) {
-                    WindowWidth.Compact -> 28.sp
-                    WindowWidth.Medium -> 36.sp
-                    WindowWidth.Expanded -> 42.sp
-                }
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = title,
-                    fontSize = titleSize,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF000000),
-                )
-                if (subtitle != null) {
-                    val subtitleSize =
-                        when (window) {
-                            WindowWidth.Compact -> 14.sp
-                            WindowWidth.Medium -> 16.sp
-                            WindowWidth.Expanded -> 18.sp
-                        }
-                    Text(
-                        text = subtitle,
-                        fontSize = subtitleSize,
-                        color = Color(0xFF666666),
-                    )
-                }
-            }
-            if (actions != null) {
-                Row(modifier = Modifier.align(Alignment.TopEnd)) { actions() }
-            }
         }
+    }
+    if (actions != null) {
+        Row(modifier = Modifier.align(Alignment.TopEnd)) { actions() }
     }
 }
 

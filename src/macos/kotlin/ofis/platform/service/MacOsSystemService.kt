@@ -29,7 +29,12 @@ actual fun appDataDir(): String {
         (paths.firstOrNull() as? String)
             ?: ((getenv("HOME")?.toKString() ?: ".") + "/Library/Application Support")
     val dir = "$base/Ofis"
-    NSFileManager.defaultManager.createDirectoryAtPath(dir, withIntermediateDirectories = true, attributes = null, error = null)
+    NSFileManager.defaultManager.createDirectoryAtPath(
+        dir,
+        withIntermediateDirectories = true,
+        attributes = null,
+        error = null,
+    )
     return dir
 }
 
@@ -39,36 +44,34 @@ actual fun availableDiskSpace(dirPath: String): Long {
     return free?.longValue ?: Long.MAX_VALUE
 }
 
-@OptIn(ExperimentalForeignApi::class)
-actual fun findHelperBinary(name: String): String? {
+actual fun findHelperBinary(name: String): String? =
     // 1. Inside the .app bundle (Contents/MacOS/) — used in distributed DMG builds
+    bundledBinary(name)
+        // 2. System PATH via `which` — works in `make dev` / CLI context
+        ?: whichBinary(name)
+        // 3. Common Homebrew locations (fallback)
+        ?: listOf(
+            "/opt/homebrew/bin/$name", // Apple Silicon
+            "/usr/local/bin/$name", // Intel
+            "/usr/bin/$name",
+        ).firstOrNull { access(it, X_OK) == 0 }
+
+private fun bundledBinary(name: String): String? =
     NSBundle.mainBundle.executablePath
         ?.substringBeforeLast("/")
         ?.takeIf { it.contains(".app/") }
-        ?.let { dir ->
-            val candidate = "$dir/$name"
-            if (access(candidate, X_OK) == 0) return candidate
-        }
+        ?.let { dir -> "$dir/$name" }
+        ?.takeIf { access(it, X_OK) == 0 }
 
-    // 2. System PATH via `which` — works in `make dev` / CLI context
-    val result = popen("which $name", "r")
-    if (result != null) {
-        val buf = ByteArray(256)
-        buf.usePinned { pinned -> fgets(pinned.addressOf(0), buf.size, result) }
-        pclose(result)
-        val path =
-            buf
-                .decodeToString()
-                .substringBefore('\u0000')
-                .trim()
-                .takeIf { it.isNotEmpty() && !it.startsWith("not found") }
-        if (path != null) return path
-    }
-
-    // 3. Common Homebrew locations (fallback)
-    return listOf(
-        "/opt/homebrew/bin/$name", // Apple Silicon
-        "/usr/local/bin/$name", // Intel
-        "/usr/bin/$name",
-    ).firstOrNull { access(it, X_OK) == 0 }
+@OptIn(ExperimentalForeignApi::class)
+private fun whichBinary(name: String): String? {
+    val result = popen("which $name", "r") ?: return null
+    val buf = ByteArray(256)
+    buf.usePinned { pinned -> fgets(pinned.addressOf(0), buf.size, result) }
+    pclose(result)
+    return buf
+        .decodeToString()
+        .substringBefore('\u0000')
+        .trim()
+        .takeIf { it.isNotEmpty() && !it.startsWith("not found") }
 }
