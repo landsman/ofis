@@ -3,7 +3,7 @@ import dev.detekt.gradle.Detekt
 
 plugins {
     kotlin("multiplatform") version "2.4.20"
-    id("org.jetbrains.compose") version "1.12.0"
+    id("org.jetbrains.compose") version "1.12.1"
     id("org.jetbrains.kotlin.plugin.compose") version "2.4.20"
     id("dev.detekt") version "2.0.0-alpha.6"
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
