@@ -187,3 +187,11 @@ tasks.register<Exec>("icon") {
     description = "Generates application icons"
     commandLine("make", "icon")
 }
+
+// A lockfile for what ships, so the dependency scan (trivy) has something to
+// read: it cannot resolve build.gradle.kts itself. Only the JVM runtime
+// classpath — detekt, ktlint, hot reload and the tests never reach a user, and
+// the native targets ship the same libraries. `make lock` rewrites it.
+configurations.named("jvmRuntimeClasspath") {
+    resolutionStrategy.activateDependencyLocking()
+}

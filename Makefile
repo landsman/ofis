@@ -20,11 +20,15 @@ GRADLE  := ./gradlew
 VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "1.0.0")
 
 # ── Setup ─────────────────────────────────────────────────────────────────────
-.PHONY: install install-bins uninstall-bins
+.PHONY: install install-bins uninstall-bins lock
 
 # Download all Kotlin/Gradle dependencies into the local cache
 install:
 	$(GRADLE) dependencies --configuration commonMainImplementation
+
+# Rewrite gradle.lockfile after changing a dependency by hand
+lock:
+	$(GRADLE) dependencies --configuration jvmRuntimeClasspath --write-locks
 
 # Install binary dependencies (macOS: Homebrew — Ubuntu/Debian: apt)
 install-bins:
