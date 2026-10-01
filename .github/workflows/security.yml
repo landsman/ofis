@@ -1,0 +1,23 @@
+name: Security
+
+# Both scans live in landsman/config and are called, not copied, so a new
+# scanner version or an extra default pack reaches this repo on its next run.
+on:
+  workflow_dispatch:
+  pull_request:
+  # A lockfile nobody touches still collects new advisories; only a run on an
+  # unchanged commit sees them.
+  schedule:
+    - cron: '0 6 * * 1'
+
+jobs:
+  # p/kotlin is the only language pack: there is no .java here, and p/gradle
+  # does not exist in the registry. p/secrets and p/ci come from the baseline.
+  semgrep:
+    uses: landsman/config/.github/workflows/semgrep.yml@main
+    with:
+      packs: p/kotlin
+
+  # Reads gradle.lockfile — trivy cannot resolve build.gradle.kts on its own.
+  dependencies:
+    uses: landsman/config/.github/workflows/dependencies.yml@main
