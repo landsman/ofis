@@ -171,7 +171,10 @@ macos_dmg: macos_icon
 	@cp $$(which qpdf) build/Ofis.app/Contents/MacOS/qpdf
 	@cp $$(which gs) build/Ofis.app/Contents/MacOS/gs
 	@echo "Bundling dylib dependencies..."
-	dylibbundler -od -b \
+# qpdf links @rpath/libqpdf, whose rpath (@loader_path/../lib) points nowhere once copied, so
+# Homebrew's lib/ is searched. A library still not found makes dylibbundler ask on stdin, and
+# with no terminal it asks forever; `yes quit` answers, so it fails at once instead.
+	yes quit | dylibbundler -od -b -s "$$(brew --prefix)/lib" \
 		-x build/Ofis.app/Contents/MacOS/qpdf \
 		-x build/Ofis.app/Contents/MacOS/gs \
 		-d build/Ofis.app/Contents/Frameworks/ \
