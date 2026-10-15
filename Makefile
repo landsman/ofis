@@ -99,7 +99,7 @@ test:
 # rc rather than `|| exit 1`, so one run reports every failing test, not just the first.
 scripts-test:
 	shellcheck $$(git ls-files '*.sh')
-	@rc=0; for t in $$(git ls-files '*.test.sh'); do echo "== $$t"; "./$$t" || rc=1; done; exit $$rc
+	@rc=0; for t in $$(git ls-files '*.test.sh'); do echo "== $$t"; "./$$t" || { echo "FAIL $$t"; rc=1; }; done; exit $$rc
 
 # Linting (separate from build — run in CI or on demand)
 lint:
