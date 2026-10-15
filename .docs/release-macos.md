@@ -2,7 +2,7 @@
 
 Ofis is distributed as a DMG file hosted on GitHub Releases. This guide covers two phases: a quick unsigned release you can do right now, and a properly signed + notarized release for when you need a frictionless user experience.
 
-The automated path (GitHub Actions) handles everything on a tag push — the sections below also describe how to do each step manually from your Mac.
+The automated path is the **Release** workflow, run by hand from the Actions tab (see [Steps in CI](#steps-in-ci)). A pushed tag on its own publishes nothing. The sections below also describe how to do each step manually from your Mac.
 
 ---
 
@@ -15,7 +15,17 @@ Unsigned apps work fine, but macOS Gatekeeper blocks them by default. Users can 
 
 This is acceptable for early distribution. The friction increases with newer macOS versions, which is why Phase 2 exists.
 
-> **Note on ad-hoc signing:** `codesign -s -` (ad-hoc) does *not* help here. Ad-hoc signatures are tied to the build machine and are rejected on any other Mac.
+`make macos_dmg` ad-hoc signs the bundle (`codesign -s -`). Without that signature, a downloaded copy is reported as *damaged*, and macOS does not offer **Open Anyway** at all. The linker's own signature seals neither `Info.plist` nor the resources.
+
+### Steps in CI
+
+1. Bump `CFBundleShortVersionString` in `src/macos/resources/Info.plist` and merge it. Then tag `main` and push the tag:
+   ```sh
+   git tag v0.1.0 && git push origin v0.1.0
+   ```
+2. Draft a release for that tag on GitHub, with its notes.
+3. Actions → **Release** → **Run workflow**, with the tag. This builds the DMG on a macOS runner, attaches it to the release and marks the release a pre-release. With no tag, it builds the selected branch and keeps the DMG as a run artifact.
+4. Publish the release.
 
 ### Prerequisites (one-time)
 
@@ -28,9 +38,9 @@ This is acceptable for early distribution. The friction increases with newer mac
    gh auth login
    ```
 
-### Steps
+### Steps from your Mac
 
-1. Bump the version in `src/macosMain/resources/Info.plist`:
+1. Bump the version in `src/macos/resources/Info.plist`:
    ```xml
    <key>CFBundleShortVersionString</key>
    <string>1.2.0</string>
@@ -38,10 +48,10 @@ This is acceptable for early distribution. The friction increases with newer mac
 
 2. Commit and create a version tag:
    ```sh
-   git add src/macosMain/resources/Info.plist
+   git add src/macos/resources/Info.plist
    git commit -m "bump version to 1.2.0"
    git tag v1.2.0
-   git push origin master --tags
+   git push origin main --tags
    ```
 
 3. Build the DMG:
