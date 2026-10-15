@@ -11,16 +11,19 @@ release="$(cd "$(dirname "$0")" && pwd)/release.sh"
 t=$(mktemp -d)
 trap 'rm -rf "$t"' EXIT
 fails=0
-check() { # check <what> <command...>: ok when the command succeeds
-	local what=$1
+check() { # check <what> [!] <command...>: ok when the command succeeds, or fails after a !
+	local what=$1 want=0 got=0
 	shift
-	if "$@" >/dev/null 2>&1; then echo "ok   $what"; else
+	if [ "$1" = "!" ]; then
+		want=1
+		shift
+	fi
+	"$@" >/dev/null 2>&1 || got=1
+	if [ "$got" = "$want" ]; then echo "ok   $what"; else
 		echo "FAIL $what"
 		fails=$((fails + 1))
 	fi
 }
-# shellcheck disable=SC2329 # called through check, which shellcheck does not follow
-not() { ! "$@"; }
 
 # origin has beta-1 on the first commit and main one commit later. The clone is the
 # runner's: main only, shallow, no tags.
@@ -41,7 +44,7 @@ check "an existing tag is checked out as it is" test "$(git rev-parse HEAD)" = "
 
 git checkout -q main
 git remote set-url origin "file://$t/gone.git"
-check "an unreachable origin stops the run, not taken for a new tag" not "$release" checkout beta-1
+check "an unreachable origin stops the run, not taken for a new tag" ! "$release" checkout beta-1
 
 mkdir "$t/bin"
 cat >"$t/bin/gh" <<'STUB'
@@ -60,7 +63,7 @@ check "and gets the file" grep -qx "release upload beta-2 Ofis.dmg --clobber" "$
 
 : >"$CALLS"
 RELEASE=exists "$release" publish beta-1 Ofis.dmg >/dev/null
-check "an existing release is not created again" not grep -q "release create" "$CALLS"
+check "an existing release is not created again" ! grep -q "release create" "$CALLS"
 check "its file is replaced" grep -qx "release upload beta-1 Ofis.dmg --clobber" "$CALLS"
 
 exit $((fails > 0))
