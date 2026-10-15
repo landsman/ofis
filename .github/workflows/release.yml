@@ -15,6 +15,10 @@ jobs:
     # Kotlin/Native cannot cross-compile a macOS target, and create-dmg needs hdiutil.
     # The runner is Apple Silicon, the only target the Makefile packages (MacosArm64).
     runs-on: macos-latest
+    # Shows each build in the Environments sidebar, as in adminer-desktop. Named after the
+    # platform and not the runner image, which changes at the next bump, and renaming an
+    # environment loses its deployment history.
+    environment: macos-arm64
     permissions:
       contents: write
     steps:
