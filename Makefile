@@ -170,6 +170,10 @@ macos_dmg: macos_icon
 		-x build/Ofis.app/Contents/MacOS/gs \
 		-d build/Ofis.app/Contents/Frameworks/ \
 		-p @executable_path/../Frameworks/
+# Last, once nothing in the bundle changes. The linker's own signature seals no Info.plist and
+# no resources, so a downloaded copy is "damaged" with no way past it; an ad-hoc one (no account)
+# turns that into the ordinary not-notarized prompt. macos_sign replaces it with the real one.
+	codesign --force --deep --sign - build/Ofis.app
 	@rm -f build/Ofis.dmg
 	create-dmg \
 		--volname "Ofis" \
