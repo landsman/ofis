@@ -22,6 +22,17 @@ jobs:
     permissions:
       contents: write
     steps:
+      # Before the build, not after: a missing tag otherwise fails checkout with a bare git
+      # error, and a missing release fails the upload after ten minutes of macOS runner.
+      - name: Check the tag and its release exist
+        if: inputs.tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" --silent || { echo "::error::No tag $TAG. Push it first."; exit 1; }
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null || { echo "::error::No release for $TAG. Draft one on GitHub first."; exit 1; }
+
       # An empty ref is the branch the run was started from.
       - uses: actions/checkout@v7
         with:
