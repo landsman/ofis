@@ -5,6 +5,14 @@ on:
   pull_request:
 
 jobs:
+  # On Linux: it needs only git and shellcheck, and the macOS runner bills at 10x.
+  release-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - run: make release-test
+
   test-macos-arm:
     runs-on: macos-latest
     steps:

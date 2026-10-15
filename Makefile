@@ -89,11 +89,16 @@ debug:
 	$(GRADLE) runDebugExecutable$(TARGET_SUFFIX) -Pargs="--debug $(ARGS)"
 
 # ── Testing & quality ─────────────────────────────────────────────────────────
-.PHONY: test lint format locale locale-test
+.PHONY: test release-test lint format locale locale-test
 
 # Tests: host platform only
 test:
 	$(GRADLE) $(HOST_TEST_TASK) --rerun
+
+# The Release workflow's script: shellcheck, then its decisions against a local origin and a fake gh
+release-test:
+	shellcheck scripts/*.sh
+	scripts/release-test.sh
 
 # Linting (separate from build — run in CI or on demand)
 lint:
@@ -264,6 +269,7 @@ help:
 	@echo "  cli              — launch CLI  (ARGS='pdf-compress input.pdf')"
 	@echo "  debug            — run with --debug flag"
 	@echo "  test             — run tests for host platform"
+	@echo "  release-test     — shellcheck and test the Release workflow's script (no network)"
 	@echo "  lint             — static analysis + style (detekt + ktlint)"
 	@echo "  format           — auto-fix style issues"
 	@echo "  locale           — list supported locales and instructions for adding new ones"

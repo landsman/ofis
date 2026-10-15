@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: New tag for the selected commit, e.g. beta-0.1.0, to publish the DMG under. Empty builds an artifact only.
+        description: Tag to publish the DMG under, e.g. beta-0.1.0. An existing tag is built as it is, a new one is created on the selected branch. Empty builds an artifact only.
         type: string
 
 jobs:
@@ -22,18 +22,14 @@ jobs:
     permissions:
       contents: write
     steps:
-      # Before the build: a tag already on another commit would otherwise get a DMG built
-      # from this one. To rebuild an existing tag, start the run from the tag itself.
-      - name: Check the tag is new or already on this commit
+      - uses: actions/checkout@v7
+
+      # A tag that already exists is built as it is, whichever branch the run started from.
+      - name: Check out the tag if it exists
         if: inputs.tag != ''
         env:
-          GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag }}
-        run: |
-          sha=$(gh api "repos/$GITHUB_REPOSITORY/commits/tags/$TAG" --jq .sha 2>/dev/null) || exit 0
-          [ "$sha" = "$GITHUB_SHA" ] || { echo "::error::$TAG is already on $sha. Start the run from that tag, or pick a new one."; exit 1; }
-
-      - uses: actions/checkout@v7
+        run: scripts/release.sh checkout "$TAG"
 
       - uses: actions/setup-java@v6
         with:
@@ -58,14 +54,11 @@ jobs:
           path: build/Ofis.dmg
           if-no-files-found: error
 
-      # Last, so a failed build leaves no tag behind. `gh release create` makes the tag on
-      # this commit; a re-run finds the release and only replaces the DMG. Drop --prerelease
-      # at the first stable tag.
+      # Last, so a failed build leaves no tag behind. Drop --prerelease in the script at the
+      # first stable tag.
       - name: Tag and publish the DMG
         if: inputs.tag != ''
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag }}
-        run: |
-          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --target "$GITHUB_SHA" --title "Ofis $TAG" --prerelease --generate-notes
-          gh release upload "$TAG" build/Ofis.dmg --clobber
+        run: scripts/release.sh publish "$TAG" build/Ofis.dmg

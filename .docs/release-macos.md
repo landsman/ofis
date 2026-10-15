@@ -20,10 +20,10 @@ This is acceptable for early distribution. The friction increases with newer mac
 ### Steps in CI
 
 1. Bump `CFBundleShortVersionString` in `src/macos/resources/Info.plist` and merge it.
-2. Actions → **Release** → **Run workflow** from `main`, with a new tag such as `beta-0.1.0`. The run builds the DMG on a macOS runner. Once the build passes, it tags that commit and publishes a pre-release with generated notes and the DMG attached. Without a tag, the run keeps the DMG as a run artifact only.
+2. Actions → **Release** → **Run workflow** from `main`, with a tag such as `beta-0.1.0`. The run builds the DMG on a macOS runner. Once the build passes, it tags that commit and publishes a pre-release with generated notes and the DMG attached. Without a tag, the run keeps the DMG as a run artifact only.
 3. Edit the release notes on GitHub if the generated ones are not enough.
 
-To rebuild a tag that already exists, start the run from that tag (**Use workflow from** → Tags) and enter the same tag. The run replaces the DMG on the release.
+If the tag already exists, the run builds that tag as it is, whichever branch it was started from. It then creates the release, or replaces the DMG on a release that already exists.
 
 ### Prerequisites (one-time)
 
