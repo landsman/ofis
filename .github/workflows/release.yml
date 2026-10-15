@@ -1,13 +1,13 @@
 name: Release
 
-# Manual on purpose while Ofis is in beta: the release and its notes are written by hand
-# on GitHub, and this only builds the DMG and attaches it. A pushed tag publishes nothing,
-# and the macOS runner, billed at 10x, stays off every `git push --tags`.
+# Manual on purpose while Ofis is in beta, so the macOS runner, billed at 10x, stays off
+# every push. A run builds the commit it was started from. Given a tag, it then tags that
+# commit and publishes the DMG as a pre-release with generated notes.
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing tag — build it and attach the DMG to its release. Empty builds the selected branch into an artifact only.
+        description: New tag for the selected commit, e.g. beta-0.1.0, to publish the DMG under. Empty builds an artifact only.
         type: string
 
 jobs:
@@ -22,21 +22,18 @@ jobs:
     permissions:
       contents: write
     steps:
-      # Before the build, not after: a missing tag otherwise fails checkout with a bare git
-      # error, and a missing release fails the upload after ten minutes of macOS runner.
-      - name: Check the tag and its release exist
+      # Before the build: a tag already on another commit would otherwise get a DMG built
+      # from this one. To rebuild an existing tag, start the run from the tag itself.
+      - name: Check the tag is new or already on this commit
         if: inputs.tag != ''
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag }}
         run: |
-          gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" --silent || { echo "::error::No tag $TAG. Push it first."; exit 1; }
-          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null || { echo "::error::No release for $TAG. Draft one on GitHub first."; exit 1; }
+          sha=$(gh api "repos/$GITHUB_REPOSITORY/commits/tags/$TAG" --jq .sha 2>/dev/null) || exit 0
+          [ "$sha" = "$GITHUB_SHA" ] || { echo "::error::$TAG is already on $sha. Start the run from that tag, or pick a new one."; exit 1; }
 
-      # An empty ref is the branch the run was started from.
       - uses: actions/checkout@v7
-        with:
-          ref: ${{ inputs.tag }}
 
       - uses: actions/setup-java@v6
         with:
@@ -61,15 +58,14 @@ jobs:
           path: build/Ofis.dmg
           if-no-files-found: error
 
-      # Upload, never create: gh finds a draft or a published release by its tag, and
-      # --clobber lets a re-run replace the DMG. The prerelease flag is held here rather
-      # than trusted to a checkbox, so a beta never shows as "Latest". Delete that line at
-      # the first stable tag.
-      - name: Attach the DMG to the release
+      # Last, so a failed build leaves no tag behind. `gh release create` makes the tag on
+      # this commit; a re-run finds the release and only replaces the DMG. Drop --prerelease
+      # at the first stable tag.
+      - name: Tag and publish the DMG
         if: inputs.tag != ''
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag }}
         run: |
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --target "$GITHUB_SHA" --title "Ofis $TAG" --prerelease --generate-notes
           gh release upload "$TAG" build/Ofis.dmg --clobber
-          gh release edit "$TAG" --prerelease
