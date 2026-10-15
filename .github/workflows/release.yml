@@ -1,16 +1,27 @@
 name: Release
 
+# Manual on purpose while Ofis is in beta: the release and its notes are written by hand
+# on GitHub, and this only builds the DMG and attaches it. A pushed tag publishes nothing,
+# and the macOS runner, billed at 10x, stays off every `git push --tags`.
 on:
-  push:
-    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag — build it and attach the DMG to its release. Empty builds the selected branch into an artifact only.
+        type: string
 
 jobs:
-  build-macos:
+  macos:
+    # Kotlin/Native cannot cross-compile a macOS target, and create-dmg needs hdiutil.
+    # The runner is Apple Silicon, the only target the Makefile packages (MacosArm64).
     runs-on: macos-latest
-    # Kotlin Native macOS targets cannot be cross-compiled from Linux.
-    # hdiutil and create-dmg are macOS-only. A macOS runner is required.
+    permissions:
+      contents: write
     steps:
+      # An empty ref is the branch the run was started from.
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
 
       - uses: actions/setup-java@v6
         with:
@@ -24,59 +35,26 @@ jobs:
           key: konan-macos-${{ hashFiles('**/*.gradle.kts', '**/gradle.properties') }}
           restore-keys: konan-macos-
 
-      - name: Install tools
-        run: make install bins
+      # create-dmg and dylibbundler, plus the qpdf and gs that go inside the bundle.
+      - run: make install-bins
 
-      - name: Build DMG
-        run: make macos_dmg
+      - run: make macos_dmg
 
       - uses: actions/upload-artifact@v7
         with:
-          name: macos-dmg
+          name: ofis-macos-arm64
           path: build/Ofis.dmg
+          if-no-files-found: error
 
-  build-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-java@v6
-        with:
-          distribution: temurin
-          java-version: 25
-
-      - name: Cache Kotlin Native toolchain
-        uses: actions/cache@v6
-        with:
-          path: ~/.konan
-          key: konan-linux-${{ hashFiles('**/*.gradle.kts', '**/gradle.properties') }}
-          restore-keys: konan-linux-
-
-      - name: Build package
-        run: make linux_package
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: linux-package
-          path: build/ofis-*-linux-x64.tar.gz
-
-  release:
-    needs: [build-macos, build-linux]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/download-artifact@v8
-        with:
-          name: macos-dmg
-          path: dist/
-
-      - uses: actions/download-artifact@v8
-        with:
-          name: linux-package
-          path: dist/
-
-      - uses: softprops/action-gh-release@v3
-        with:
-          files: dist/*
-          generate_release_notes: true
+      # Upload, never create: gh finds a draft or a published release by its tag, and
+      # --clobber lets a re-run replace the DMG. The prerelease flag is held here rather
+      # than trusted to a checkbox, so a beta never shows as "Latest". Delete that line at
+      # the first stable tag.
+      - name: Attach the DMG to the release
+        if: inputs.tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          gh release upload "$TAG" build/Ofis.dmg --clobber
+          gh release edit "$TAG" --prerelease
