@@ -15,6 +15,9 @@ jobs:
     # Kotlin/Native cannot cross-compile a macOS target, and create-dmg needs hdiutil.
     # The runner is Apple Silicon, the only target the Makefile packages (MacosArm64).
     runs-on: macos-latest
+    # A cold build took 10 minutes to the DMG step. The default limit is 6 hours, which is
+    # how long a tool waiting for an answer on stdin would otherwise bill at 10x.
+    timeout-minutes: 15
     # Shows each build in the Environments sidebar, as in adminer-desktop. Named after the
     # platform and not the runner image, which changes at the next bump, and renaming an
     # environment loses its deployment history.
