@@ -98,7 +98,7 @@ test:
 # The Release workflow's script: shellcheck, then its decisions against a local origin and a fake gh
 release-test:
 	shellcheck scripts/*.sh
-	scripts/release-test.sh
+	scripts/release.test.sh
 
 # Linting (separate from build — run in CI or on demand)
 lint:

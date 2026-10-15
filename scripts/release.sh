@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# The decisions of the Release workflow, kept out of the YAML so release-test.sh can
+# The decisions of the Release workflow, kept out of the YAML so release.test.sh can
 # check them against a local origin and a fake gh.
 #
 #   release.sh checkout <tag>        check out <tag> if origin has it; otherwise stay put
