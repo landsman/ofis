@@ -5,6 +5,20 @@ on:
   pull_request:
 
 jobs:
+  # On Linux: it needs only git and shellcheck, and the macOS runner bills at 10x.
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # The shellcheck pinned in mise.toml, not the runner's. Only that one: the rest of
+      # mise.toml is the JDK, which this job never uses.
+      - uses: jdx/mise-action@v5
+        with:
+          install_args: shellcheck
+
+      - run: make scripts-test
+
   test-macos-arm:
     runs-on: macos-latest
     steps:

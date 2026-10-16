@@ -2,7 +2,7 @@
 
 Ofis is distributed as a DMG file hosted on GitHub Releases. This guide covers two phases: a quick unsigned release you can do right now, and a properly signed + notarized release for when you need a frictionless user experience.
 
-The automated path is the **Release** workflow, run by hand from the Actions tab (see [Steps in CI](#steps-in-ci)). A pushed tag on its own publishes nothing. The sections below also describe how to do each step manually from your Mac.
+The automated path is the **Release** workflow, run by hand from the Actions tab (see [Steps in CI](#steps-in-ci)). It creates the tag itself. A tag pushed by hand publishes nothing. The sections below also describe how to do each step manually from your Mac.
 
 ---
 
@@ -19,13 +19,11 @@ This is acceptable for early distribution. The friction increases with newer mac
 
 ### Steps in CI
 
-1. Bump `CFBundleShortVersionString` in `src/macos/resources/Info.plist` and merge it. Then tag `main` and push the tag:
-   ```sh
-   git tag v0.1.0 && git push origin v0.1.0
-   ```
-2. Draft a release for that tag on GitHub, with its notes.
-3. Actions → **Release** → **Run workflow**, with the tag. This builds the DMG on a macOS runner, attaches it to the release and marks the release a pre-release. With no tag, it builds the selected branch and keeps the DMG as a run artifact.
-4. Publish the release.
+1. Bump `CFBundleShortVersionString` in `src/macos/resources/Info.plist` and merge it.
+2. Actions → **Release** → **Run workflow** from `main`, with a tag such as `beta-0.1.0`. The run builds the DMG on a macOS runner. Once the build passes, it tags that commit and publishes a pre-release with generated notes and the DMG attached. Without a tag, the run keeps the DMG as a run artifact only.
+3. Edit the release notes on GitHub if the generated ones are not enough.
+
+If the tag already exists, the run builds that tag as it is, whichever branch it was started from. It then creates the release, or replaces the DMG on a release that already exists.
 
 ### Prerequisites (one-time)
 

@@ -1,13 +1,13 @@
 name: Release
 
-# Manual on purpose while Ofis is in beta: the release and its notes are written by hand
-# on GitHub, and this only builds the DMG and attaches it. A pushed tag publishes nothing,
-# and the macOS runner, billed at 10x, stays off every `git push --tags`.
+# Manual on purpose while Ofis is in beta, so the macOS runner, billed at 10x, stays off
+# every push. A run builds the commit it was started from. Given a tag, it then tags that
+# commit and publishes the DMG as a pre-release with generated notes.
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing tag — build it and attach the DMG to its release. Empty builds the selected branch into an artifact only.
+        description: Tag to publish the DMG under, e.g. beta-0.1.0. An existing tag is built as it is, a new one is created on the selected branch. Empty builds an artifact only.
         type: string
 
 jobs:
@@ -15,6 +15,9 @@ jobs:
     # Kotlin/Native cannot cross-compile a macOS target, and create-dmg needs hdiutil.
     # The runner is Apple Silicon, the only target the Makefile packages (MacosArm64).
     runs-on: macos-latest
+    # A cold build took 10 minutes to the DMG step. The default limit is 6 hours, which is
+    # how long a tool waiting for an answer on stdin would otherwise bill at 10x.
+    timeout-minutes: 15
     # Shows each build in the Environments sidebar, as in adminer-desktop. Named after the
     # platform and not the runner image, which changes at the next bump, and renaming an
     # environment loses its deployment history.
@@ -22,10 +25,14 @@ jobs:
     permissions:
       contents: write
     steps:
-      # An empty ref is the branch the run was started from.
       - uses: actions/checkout@v7
-        with:
-          ref: ${{ inputs.tag }}
+
+      # A tag that already exists is built as it is, whichever branch the run started from.
+      - name: Check out the tag if it exists
+        if: inputs.tag != ''
+        env:
+          TAG: ${{ inputs.tag }}
+        run: scripts/release.sh checkout "$TAG"
 
       - uses: actions/setup-java@v6
         with:
@@ -50,15 +57,11 @@ jobs:
           path: build/Ofis.dmg
           if-no-files-found: error
 
-      # Upload, never create: gh finds a draft or a published release by its tag, and
-      # --clobber lets a re-run replace the DMG. The prerelease flag is held here rather
-      # than trusted to a checkbox, so a beta never shows as "Latest". Delete that line at
-      # the first stable tag.
-      - name: Attach the DMG to the release
+      # Last, so a failed build leaves no tag behind. Drop --prerelease in the script at the
+      # first stable tag.
+      - name: Tag and publish the DMG
         if: inputs.tag != ''
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag }}
-        run: |
-          gh release upload "$TAG" build/Ofis.dmg --clobber
-          gh release edit "$TAG" --prerelease
+        run: scripts/release.sh publish "$TAG" build/Ofis.dmg

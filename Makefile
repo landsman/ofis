@@ -89,11 +89,17 @@ debug:
 	$(GRADLE) runDebugExecutable$(TARGET_SUFFIX) -Pargs="--debug $(ARGS)"
 
 # ── Testing & quality ─────────────────────────────────────────────────────────
-.PHONY: test lint format locale locale-test
+.PHONY: test scripts-test lint format locale locale-test
 
 # Tests: host platform only
 test:
 	$(GRADLE) $(HOST_TEST_TASK) --rerun
+
+# Every tracked *.test.sh, found by git rather than listed, so a new test needs no new target.
+# rc rather than `|| exit 1`, so one run reports every failing test, not just the first.
+scripts-test:
+	mise exec shellcheck -- shellcheck $$(git ls-files '*.sh')
+	@rc=0; for t in $$(git ls-files '*.test.sh'); do echo "== $$t"; "./$$t" || { echo "FAIL $$t"; rc=1; }; done; exit $$rc
 
 # Linting (separate from build — run in CI or on demand)
 lint:
@@ -165,7 +171,10 @@ macos_dmg: macos_icon
 	@cp $$(which qpdf) build/Ofis.app/Contents/MacOS/qpdf
 	@cp $$(which gs) build/Ofis.app/Contents/MacOS/gs
 	@echo "Bundling dylib dependencies..."
-	dylibbundler -od -b \
+# qpdf links @rpath/libqpdf, whose rpath (@loader_path/../lib) points nowhere once copied, so
+# Homebrew's lib/ is searched. A library still not found makes dylibbundler ask on stdin, and
+# with no terminal it asks forever; `yes quit` answers, so it fails at once instead.
+	yes quit | dylibbundler -od -b -s "$$(brew --prefix)/lib" \
 		-x build/Ofis.app/Contents/MacOS/qpdf \
 		-x build/Ofis.app/Contents/MacOS/gs \
 		-d build/Ofis.app/Contents/Frameworks/ \
@@ -264,6 +273,7 @@ help:
 	@echo "  cli              — launch CLI  (ARGS='pdf-compress input.pdf')"
 	@echo "  debug            — run with --debug flag"
 	@echo "  test             — run tests for host platform"
+	@echo "  scripts-test     — shellcheck every shell script, run every *.test.sh (no network)"
 	@echo "  lint             — static analysis + style (detekt + ktlint)"
 	@echo "  format           — auto-fix style issues"
 	@echo "  locale           — list supported locales and instructions for adding new ones"

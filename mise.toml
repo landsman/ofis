@@ -1,2 +1,5 @@
 [tools]
 java = "temurin-25"
+# Pinned rather than taken from the runner: the same finding gets a different code from one
+# version to the next, and the runner's older one failed a suppression written for 0.11.
+shellcheck = "0.11.0"
