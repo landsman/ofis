@@ -34,10 +34,13 @@ jobs:
           TAG: ${{ inputs.tag }}
         run: scripts/release.sh checkout "$TAG"
 
+      # A cache is visible only to its own ref and to main, and Test runs on pull requests
+      # only, so a run of this from main is the one that saves the caches every PR restores.
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 25
+          cache: gradle
 
       - name: Cache Kotlin Native toolchain
         uses: actions/cache@v6
