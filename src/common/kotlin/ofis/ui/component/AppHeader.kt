@@ -146,8 +146,10 @@ private fun BackButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
+    // Transparent is transparent black, so fading from it passes through grey; fade the alpha of the blue instead.
+    val hoverColor = Color(0xFFEEF4FF)
     val bgColor by animateColorAsState(
-        targetValue = if (isHovered) Color(0xFFEEF4FF) else Color.Transparent,
+        targetValue = if (isHovered) hoverColor else hoverColor.copy(alpha = 0f),
         animationSpec = tween(150),
     )
 
