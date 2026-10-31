@@ -90,4 +90,6 @@ object EnStrings : AppStrings {
     override val pngOptimizeAlreadyOptimal = "This PNG is already well-optimized. The optimized version isn't smaller."
     override val pngOptimizeButton = "Optimize PNG"
     override val pngOptimizeSave = "Save optimized PNG"
+    override val pngOptimizeErrorUnreadableFile =
+        "This PNG couldn't be optimized. The file may be damaged or not a real PNG."
 }

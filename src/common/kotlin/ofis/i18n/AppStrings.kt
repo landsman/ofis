@@ -84,4 +84,5 @@ interface AppStrings {
     val pngOptimizeAlreadyOptimal: String
     val pngOptimizeButton: String
     val pngOptimizeSave: String
+    val pngOptimizeErrorUnreadableFile: String
 }

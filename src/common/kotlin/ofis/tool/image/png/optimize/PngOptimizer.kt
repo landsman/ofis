@@ -88,7 +88,8 @@ class PngOptimizer : Tool {
             }
 
             is CompressionResult.Failure -> {
-                Logger.info("Error: ${result.reason}")
+                Logger.error(result.reason.toString())
+                Logger.info("FAILURE_KIND: ${result.reason.kind}")
             }
         }
     }

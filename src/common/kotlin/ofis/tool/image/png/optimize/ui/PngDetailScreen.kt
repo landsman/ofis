@@ -20,6 +20,7 @@ import ofis.i18n.LocalAppStrings
 import ofis.platform.fileSystem
 import ofis.platform.view.pickFile
 import ofis.tool.Tool
+import ofis.tool.pdf.compress.model.CompressionFailureKind
 import ofis.tool.pdf.compress.service.saveCompressedFile
 import ofis.tool.pdf.compress.ui.CompressAnotherPdfFileButton
 import ofis.tool.pdf.compress.ui.CompressPdfSubmitButton
@@ -28,6 +29,7 @@ import ofis.tool.pdf.compress.ui.CompressionProgress
 import ofis.tool.pdf.compress.ui.CompressionResultCard
 import ofis.tool.pdf.compress.ui.PdfDetailState
 import ofis.tool.pdf.compress.ui.SaveButton
+import ofis.tool.pdf.compress.ui.compressionFailureMessage
 import ofis.tool.pdf.compress.ui.toSaveMessages
 import ofis.ui.system.FileDropZone
 import ofis.ui.system.LocalLogController
@@ -42,7 +44,15 @@ fun PngDetailScreen(tool: Tool) {
     val strings = LocalAppStrings.current
     val state = remember { PdfDetailState() }
 
-    CompressionEvents(state)
+    CompressionEvents(state) { kind ->
+        if (kind ==
+            CompressionFailureKind.UNREADABLE_FILE
+        ) {
+            pngOptimizeErrorUnreadableFile
+        } else {
+            compressionFailureMessage(kind)
+        }
+    }
 
     Column(
         modifier =

@@ -91,4 +91,6 @@ object CsStrings : AppStrings {
     override val pngOptimizeAlreadyOptimal = "Toto PNG je již dobře optimalizované. Optimalizovaná verze není menší."
     override val pngOptimizeButton = "Optimalizovat PNG"
     override val pngOptimizeSave = "Uložit optimalizované PNG"
+    override val pngOptimizeErrorUnreadableFile =
+        "Toto PNG se nepodařilo optimalizovat. Soubor může být poškozený nebo to není skutečné PNG."
 }

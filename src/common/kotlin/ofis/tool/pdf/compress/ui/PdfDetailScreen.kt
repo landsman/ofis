@@ -24,6 +24,7 @@ import ofis.i18n.LocalAppStrings
 import ofis.platform.fileSystem
 import ofis.platform.view.pickFile
 import ofis.tool.Tool
+import ofis.tool.pdf.compress.model.CompressionFailureKind
 import ofis.tool.pdf.compress.model.CompressionProfile
 import ofis.tool.pdf.compress.service.SaveMessages
 import ofis.tool.pdf.compress.service.saveCompressedFile
@@ -86,7 +87,10 @@ fun PdfDetailScreen(tool: Tool) {
 
 /** Feeds dropped files and the tool's structured log lines into [state]. */
 @Composable
-internal fun CompressionEvents(state: PdfDetailState) {
+internal fun CompressionEvents(
+    state: PdfDetailState,
+    failureMessage: AppStrings.(CompressionFailureKind) -> String = AppStrings::compressionFailureMessage,
+) {
     val scope = rememberCoroutineScope()
     val toastController = LocalToastController.current
     val logController = LocalLogController.current
@@ -104,7 +108,7 @@ internal fun CompressionEvents(state: PdfDetailState) {
         val observer: (String) -> Unit = { msg ->
             scope.launch(Dispatchers.Main) {
                 state.onLogMessage(msg)?.let {
-                    toastController.show(strings.compressionFailureMessage(it), isSuccess = false)
+                    toastController.show(strings.failureMessage(it), isSuccess = false)
                 }
             }
         }
