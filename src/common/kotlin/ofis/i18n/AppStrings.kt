@@ -67,4 +67,10 @@ interface AppStrings {
     val pdfCompressPermissionDenied: String
     val pdfCompressNotEnoughSpaceDetail: (need: String, avail: String) -> String
     val pdfCompressFailedToSave: (reason: String) -> String
+    val pdfCompressSaveTryAnotherFolder: String
+    val pdfCompressErrorUnreadableFile: String
+    val pdfCompressErrorFileNotFound: String
+    val pdfCompressErrorToolMissing: String
+    val pdfCompressErrorCannotWrite: String
+    val pdfCompressErrorUnexpected: String
 }

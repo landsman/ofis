@@ -1,5 +1,6 @@
 package ofis.tool.pdf.compress.ui
 
+import ofis.tool.pdf.compress.model.CompressionFailureKind
 import ofis.tool.pdf.compress.model.CompressionProfile
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -34,11 +35,21 @@ class PdfDetailStateTest {
     }
 
     @Test
-    fun `error line stops the run and returns the message`() {
+    fun `failure line stops the run and returns the kind`() {
         val state = PdfDetailState()
         state.startCompression(CompressionProfile.BALANCED)
-        assertEquals("qpdf failed", state.onLogMessage("Error: qpdf failed"))
+        assertEquals(CompressionFailureKind.UNREADABLE_FILE, state.onLogMessage("FAILURE_KIND: UNREADABLE_FILE"))
         assertFalse(state.isRunning)
+    }
+
+    @Test
+    fun `unknown failure kind falls back to unexpected`() {
+        assertEquals(CompressionFailureKind.UNEXPECTED, PdfDetailState().onLogMessage("FAILURE_KIND: NOPE"))
+    }
+
+    @Test
+    fun `tool diagnostics in the logs are not reported as failures`() {
+        assertNull(PdfDetailState().onLogMessage("[ERROR] qpdf failed: can't find PDF header"))
     }
 
     @Test

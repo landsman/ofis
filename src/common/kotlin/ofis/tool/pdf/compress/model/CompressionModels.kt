@@ -51,10 +51,15 @@ sealed interface CompressionResult {
 
 // ── Error model ───────────────────────────────────────────────────────────────
 
+/** [toString] is the technical detail for the logs; users are shown only [kind]'s localized message. */
 sealed interface CompressionError {
+    val kind: CompressionFailureKind
+
     data class BinaryNotFound(
         val name: String,
     ) : CompressionError {
+        override val kind get() = CompressionFailureKind.TOOL_MISSING
+
         override fun toString() = "$name is not installed. Run: brew install $name"
     }
 
@@ -63,6 +68,14 @@ sealed interface CompressionError {
         val exitCode: Int,
         val stderr: String,
     ) : CompressionError {
+        override val kind
+            get() =
+                if (exitCode == ProcessResult.EXIT_COMMAND_NOT_FOUND) {
+                    CompressionFailureKind.TOOL_MISSING
+                } else {
+                    CompressionFailureKind.UNREADABLE_FILE
+                }
+
         override fun toString() =
             when {
                 exitCode == ProcessResult.EXIT_COMMAND_NOT_FOUND ->
@@ -77,12 +90,32 @@ sealed interface CompressionError {
     data class InvalidInput(
         val message: String,
     ) : CompressionError {
+        override val kind get() = CompressionFailureKind.FILE_NOT_FOUND
+
+        override fun toString() = message
+    }
+
+    data class NotEnoughDiskSpace(
+        val message: String,
+    ) : CompressionError {
+        override val kind get() = CompressionFailureKind.NOT_ENOUGH_SPACE
+
         override fun toString() = message
     }
 
     data class FileSystemError(
         val message: String,
     ) : CompressionError {
+        override val kind get() = CompressionFailureKind.CANNOT_WRITE
+
+        override fun toString() = message
+    }
+
+    data class Unexpected(
+        val message: String,
+    ) : CompressionError {
+        override val kind get() = CompressionFailureKind.UNEXPECTED
+
         override fun toString() = message
     }
 }

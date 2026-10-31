@@ -90,6 +90,7 @@ private fun CompressionEvents(state: PdfDetailState) {
     val scope = rememberCoroutineScope()
     val toastController = LocalToastController.current
     val logController = LocalLogController.current
+    val strings = LocalAppStrings.current
 
     // Consume file drops from the AppKit drag-and-drop layer.
     LaunchedEffect(FileDropBus.pendingFilePath) {
@@ -99,10 +100,12 @@ private fun CompressionEvents(state: PdfDetailState) {
         logController.clear()
     }
 
-    DisposableEffect(logController) {
+    DisposableEffect(logController, strings) {
         val observer: (String) -> Unit = { msg ->
             scope.launch(Dispatchers.Main) {
-                state.onLogMessage(msg)?.let { toastController.show(it, isSuccess = false) }
+                state.onLogMessage(msg)?.let {
+                    toastController.show(strings.compressionFailureMessage(it), isSuccess = false)
+                }
             }
         }
         logController.addObserver(observer)
@@ -191,4 +194,5 @@ private fun AppStrings.toSaveMessages() =
         permissionDenied = pdfCompressPermissionDenied,
         notEnoughSpaceDetail = pdfCompressNotEnoughSpaceDetail,
         failedToSave = pdfCompressFailedToSave,
+        unknownSaveFailure = pdfCompressSaveTryAnotherFolder,
     )
