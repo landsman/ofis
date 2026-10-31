@@ -1,4 +1,5 @@
 package ofis.tool
+import ofis.tool.image.png.optimize.PngOptimizer
 import ofis.tool.pdf.compress.PdfCompressor
 
 object ToolRegistry {
@@ -8,6 +9,7 @@ object ToolRegistry {
     private fun ensureInitialized() {
         if (!initialized) {
             PdfCompressor().register()
+            PngOptimizer().register()
             initialized = true
         }
     }

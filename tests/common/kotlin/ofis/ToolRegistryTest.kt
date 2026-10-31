@@ -19,6 +19,11 @@ class ToolRegistryTest {
     }
 
     @Test
+    fun testPngResolvesToOptimizer() {
+        assertTrue(ToolRegistry.findForExtension("PNG").any { it.name == ToolBox.PNG_OPTIMIZER })
+    }
+
+    @Test
     fun testListTools() {
         val tools = ToolRegistry.list()
         assertTrue(tools.isNotEmpty(), "ToolRegistry should not be empty")

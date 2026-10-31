@@ -32,7 +32,10 @@ private const val SLOW_THRESHOLD_MS = 3_000L
  * Progress indicator for the compression process.
  */
 @Composable
-fun CompressionProgress() {
+fun CompressionProgress(
+    making: String = LocalAppStrings.current.pdfCompressMakingSmaller,
+    working: String = LocalAppStrings.current.pdfCompressCompressing,
+) {
     var isSlow by remember { mutableStateOf(false) }
     val strings = LocalAppStrings.current
 
@@ -54,9 +57,9 @@ fun CompressionProgress() {
             Spacer(modifier = Modifier.height(12.dp))
             if (isSlow) {
                 Text(strings.pdfCompressAlmostThere, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(strings.pdfCompressCompressing, color = Color(0xFF4A4AFF), fontSize = 14.sp)
+                Text(working, color = Color(0xFF4A4AFF), fontSize = 14.sp)
             } else {
-                Text(strings.pdfCompressMakingSmaller, fontSize = 15.sp, color = Color(0xFF444444))
+                Text(making, fontSize = 15.sp, color = Color(0xFF444444))
             }
         }
     }

@@ -86,7 +86,7 @@ fun PdfDetailScreen(tool: Tool) {
 
 /** Feeds dropped files and the tool's structured log lines into [state]. */
 @Composable
-private fun CompressionEvents(state: PdfDetailState) {
+internal fun CompressionEvents(state: PdfDetailState) {
     val scope = rememberCoroutineScope()
     val toastController = LocalToastController.current
     val logController = LocalLogController.current
@@ -186,7 +186,7 @@ private fun PdfActions(
     CompressAnotherPdfFileButton(onClick = onReset)
 }
 
-private fun AppStrings.toSaveMessages() =
+internal fun AppStrings.toSaveMessages() =
     SaveMessages(
         saveCancelled = pdfCompressSaveCancelled,
         fileSaved = pdfCompressFileSaved,

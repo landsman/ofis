@@ -105,6 +105,7 @@ All platform ops are `expect`/`actual`. Common code never calls platform APIs di
 | Windows | Fixed paths: `C:\Program Files\...` stubs                                                                  | ❌ not implemented              |
 
 ### Phase 3: Image Transformations
+- [x] Lossless PNG optimization (`png-optimize`, oxipng)
 - [ ] Image conversion (PNG ↔ JPEG ↔ WebP)
 - [ ] Image resizing and optimization
 - [ ] Batch processing
