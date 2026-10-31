@@ -15,7 +15,10 @@ import ofis.i18n.LocalAppStrings
 import ofis.ui.system.AppButton
 
 @Composable
-fun SaveButton(onClick: () -> Unit) {
+fun SaveButton(
+    label: String = LocalAppStrings.current.pdfCompressSave,
+    onClick: () -> Unit,
+) {
     AppButton(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth().height(48.dp),
@@ -26,6 +29,6 @@ fun SaveButton(onClick: () -> Unit) {
                 contentColor = Color.White,
             ),
     ) {
-        Text(LocalAppStrings.current.pdfCompressSave, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text(label, fontWeight = FontWeight.Bold, fontSize = 16.sp)
     }
 }

@@ -17,6 +17,11 @@ else
 endif
 
 GRADLE  := ./gradlew
+
+# Not in Ubuntu's archive, so Linux takes the upstream package. Its digest is the one GitHub lists.
+OXIPNG_DEB        := oxipng_10.2.1-1_amd64.deb
+OXIPNG_DEB_URL    := https://github.com/oxipng/oxipng/releases/download/v10.2.1/$(OXIPNG_DEB)
+OXIPNG_DEB_SHA256 := 4c3e7440c3ebf94b0d5a67d3add25b9a40897c7f14678ecdb5db3c7b77ff816f
 VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "1.0.0")
 
 # ── Setup ─────────────────────────────────────────────────────────────────────
@@ -36,6 +41,8 @@ ifeq ($(OS),Darwin)
 	@command -v brew >/dev/null || { echo "Error: Homebrew not found - install from https://brew.sh"; exit 1; }
 	# pdf compression
 	brew install qpdf ghostscript librsvg
+	# png optimization
+	brew install oxipng
 	# bundler
 	brew install create-dmg dylibbundler
 else ifeq ($(OS),Linux)
@@ -44,6 +51,10 @@ else ifeq ($(OS),Linux)
 	apt-get update -qq
 	# pdf compression
 	apt-get install -y qpdf ghostscript librsvg2-bin
+	# png optimization
+	curl -fsSL -o /tmp/$(OXIPNG_DEB) $(OXIPNG_DEB_URL)
+	echo "$(OXIPNG_DEB_SHA256)  /tmp/$(OXIPNG_DEB)" | sha256sum -c -
+	apt-get install -y /tmp/$(OXIPNG_DEB)
 else
 	@echo "Error: install-bins is not supported on $(OS)"; exit 1
 endif
@@ -52,11 +63,11 @@ endif
 uninstall-bins:
 ifeq ($(OS),Darwin)
 	@command -v brew >/dev/null || { echo "Error: Homebrew not found"; exit 1; }
-	brew uninstall --ignore-dependencies qpdf ghostscript librsvg create-dmg dylibbundler || true
+	brew uninstall --ignore-dependencies qpdf ghostscript librsvg oxipng create-dmg dylibbundler || true
 else ifeq ($(OS),Linux)
 	@command -v apt-get >/dev/null || { echo "Error: apt-get not found - only Ubuntu/Debian is supported"; exit 1; }
 	@[ "$$(id -u)" = "0" ] || { echo "Error: run with sudo: sudo make uninstall-bins"; exit 1; }
-	apt-get remove -y qpdf ghostscript librsvg2-bin || true
+	apt-get remove -y qpdf ghostscript librsvg2-bin oxipng || true
 else
 	@echo "Error: uninstall-bins is not supported on $(OS)"; exit 1
 endif
@@ -160,6 +171,7 @@ macos_dmg: macos_icon
 	@command -v dylibbundler >/dev/null || { echo "Error: install dylibbundler: brew install dylibbundler"; exit 1; }
 	@command -v qpdf >/dev/null 2>&1 || { echo "Error: install qpdf: brew install qpdf"; exit 1; }
 	@command -v gs >/dev/null 2>&1 || { echo "Error: install ghostscript: brew install ghostscript"; exit 1; }
+	@[ -x "$$(brew --prefix)/bin/oxipng" ] || { echo "Error: install oxipng: brew install oxipng"; exit 1; }
 	$(GRADLE) linkReleaseExecutable$(TARGET_SUFFIX)
 	@rm -rf build/Ofis.app
 	@mkdir -p build/Ofis.app/Contents/MacOS build/Ofis.app/Contents/Resources build/Ofis.app/Contents/Frameworks
@@ -167,9 +179,11 @@ macos_dmg: macos_icon
 		build/Ofis.app/Contents/MacOS/Ofis
 	@cp src/macos/resources/Info.plist build/Ofis.app/Contents/Info.plist
 	@cp build/AppIcon.icns build/Ofis.app/Contents/Resources/AppIcon.icns
-	@echo "Bundling helper binaries (qpdf, gs)..."
+	@echo "Bundling helper binaries (qpdf, gs, oxipng)..."
 	@cp $$(which qpdf) build/Ofis.app/Contents/MacOS/qpdf
 	@cp $$(which gs) build/Ofis.app/Contents/MacOS/gs
+# From Homebrew by path: with mise.toml pinning oxipng, `which` finds mise's shim, a script.
+	@cp "$$(brew --prefix)/bin/oxipng" build/Ofis.app/Contents/MacOS/oxipng
 	@echo "Bundling dylib dependencies..."
 # qpdf links @rpath/libqpdf, whose rpath (@loader_path/../lib) points nowhere once copied, so
 # Homebrew's lib/ is searched. A library still not found makes dylibbundler ask on stdin, and
@@ -177,6 +191,7 @@ macos_dmg: macos_icon
 	yes quit | dylibbundler -od -b -s "$$(brew --prefix)/lib" \
 		-x build/Ofis.app/Contents/MacOS/qpdf \
 		-x build/Ofis.app/Contents/MacOS/gs \
+		-x build/Ofis.app/Contents/MacOS/oxipng \
 		-d build/Ofis.app/Contents/Frameworks/ \
 		-p @executable_path/../Frameworks/
 # Last, once nothing in the bundle changes. The linker's own signature seals no Info.plist and

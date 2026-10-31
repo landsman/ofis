@@ -73,4 +73,16 @@ interface AppStrings {
     val pdfCompressErrorToolMissing: String
     val pdfCompressErrorCannotWrite: String
     val pdfCompressErrorUnexpected: String
+
+    // ── PNG Optimize ──────────────────────────────────────────────────────────
+
+    val pngOptimizeName: String
+    val pngOptimizeDescription: String
+    val pngOptimizeTapToSelect: String
+    val pngOptimizeMakingSmaller: String
+    val pngOptimizeOptimizing: String
+    val pngOptimizeAlreadyOptimal: String
+    val pngOptimizeButton: String
+    val pngOptimizeSave: String
+    val pngOptimizeErrorUnreadableFile: String
 }
