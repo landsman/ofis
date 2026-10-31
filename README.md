@@ -1,6 +1,6 @@
 # Ofis
 
-Multiplatform toolset for office tasks (PDF compression, and more). 
+Multiplatform toolset for office tasks (PDF compression, PNG optimization, and more). 
 Runs as a native binary on macOS, Linux, and Windows, with a Compose GUI on desktop.
 
 ## Quick start
@@ -13,6 +13,6 @@ make help      # list all commands
 
 ## Docs
 
-- [Dependencies](.docs/dependencies.md) — all libraries and binary tools (qpdf, ghostscript, etc.)
+- [Dependencies](.docs/dependencies.md) — all libraries and binary tools (qpdf, ghostscript, oxipng, etc.)
 - [Releasing for macOS](.docs/release-macos.md) — unsigned and signed/notarized DMG release guide
 - [Architecture & roadmap](.docs/plan/PLANNER.md) — project vision, tech decisions, and feature roadmap

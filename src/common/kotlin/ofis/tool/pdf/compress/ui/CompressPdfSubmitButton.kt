@@ -20,6 +20,7 @@ import ofis.ui.system.AppButton
 @Composable
 fun CompressPdfSubmitButton(
     enabled: Boolean,
+    label: String = LocalAppStrings.current.pdfCompressButton,
     onClick: () -> Unit,
 ) {
     AppButton(
@@ -40,6 +41,6 @@ fun CompressPdfSubmitButton(
                 disabledElevation = 0.dp,
             ),
     ) {
-        Text(LocalAppStrings.current.pdfCompressButton, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(label, fontWeight = FontWeight.Bold, fontSize = 18.sp)
     }
 }

@@ -24,6 +24,15 @@ Must be installed on the host for development (`make dev`) and are bundled insid
   - Releases: https://github.com/ArtifexSoftware/ghostpdl/releases
   - Install: `brew install ghostscript`
 
+## Binary dependencies (PNG optimization)
+
+Same as above: on the host for development, bundled inside the `.app` for distribution.
+
+- **oxipng** — lossless PNG optimization
+  - https://github.com/oxipng/oxipng
+  - Releases: https://github.com/oxipng/oxipng/releases
+  - Install: `brew install oxipng`; not in Ubuntu's archive, so `make install-bins` installs the pinned upstream `.deb` on Linux
+
 ## macOS packaging tools (dev machine only)
 
 - **create-dmg** — builds the `.dmg` installer with custom layout — https://github.com/create-dmg/create-dmg — `brew install create-dmg`

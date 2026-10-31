@@ -80,4 +80,17 @@ object CsStrings : AppStrings {
     override val pdfCompressErrorCannotWrite =
         "Komprimovaný soubor se nepodařilo zapsat. Zkontrolujte oprávnění složky."
     override val pdfCompressErrorUnexpected = "Něco se pokazilo. Zkuste to prosím znovu."
+
+    // ── PNG Optimize ──────────────────────────────────────────────────────────
+
+    override val pngOptimizeName = "Optimalizovat PNG"
+    override val pngOptimizeDescription = "Zmenšete PNG, aniž by se změnil jediný pixel."
+    override val pngOptimizeTapToSelect = "Klikněte pro výběr PNG"
+    override val pngOptimizeMakingSmaller = "Zmenšuji vaše PNG..."
+    override val pngOptimizeOptimizing = "Optimalizuji PNG..."
+    override val pngOptimizeAlreadyOptimal = "Toto PNG je již dobře optimalizované. Optimalizovaná verze není menší."
+    override val pngOptimizeButton = "Optimalizovat PNG"
+    override val pngOptimizeSave = "Uložit optimalizované PNG"
+    override val pngOptimizeErrorUnreadableFile =
+        "Toto PNG se nepodařilo optimalizovat. Soubor může být poškozený nebo to není skutečné PNG."
 }

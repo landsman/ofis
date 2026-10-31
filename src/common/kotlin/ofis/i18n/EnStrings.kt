@@ -79,4 +79,17 @@ object EnStrings : AppStrings {
     override val pdfCompressErrorToolMissing = "A required component is missing. Please reinstall Ofis."
     override val pdfCompressErrorCannotWrite = "Could not write the compressed file. Check folder permissions."
     override val pdfCompressErrorUnexpected = "Something went wrong. Please try again."
+
+    // ── PNG Optimize ──────────────────────────────────────────────────────────
+
+    override val pngOptimizeName = "Optimize PNG"
+    override val pngOptimizeDescription = "Make a PNG smaller without changing a single pixel."
+    override val pngOptimizeTapToSelect = "Tap to select a PNG"
+    override val pngOptimizeMakingSmaller = "Making your PNG smaller..."
+    override val pngOptimizeOptimizing = "Optimizing your PNG..."
+    override val pngOptimizeAlreadyOptimal = "This PNG is already well-optimized. The optimized version isn't smaller."
+    override val pngOptimizeButton = "Optimize PNG"
+    override val pngOptimizeSave = "Save optimized PNG"
+    override val pngOptimizeErrorUnreadableFile =
+        "This PNG couldn't be optimized. The file may be damaged or not a real PNG."
 }

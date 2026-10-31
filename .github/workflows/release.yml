@@ -49,7 +49,7 @@ jobs:
           key: konan-macos-${{ hashFiles('**/*.gradle.kts', '**/gradle.properties') }}
           restore-keys: konan-macos-
 
-      # create-dmg and dylibbundler, plus the qpdf and gs that go inside the bundle.
+      # create-dmg and dylibbundler, plus the qpdf, gs and oxipng that go inside the bundle.
       - run: make install-bins
 
       - run: make macos_dmg

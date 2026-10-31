@@ -29,6 +29,7 @@ import ofis.tool.pdf.compress.model.CompressionProfile
 fun CompressionResultCard(
     info: String,
     profile: CompressionProfile? = null,
+    alreadyOptimalText: String = LocalAppStrings.current.pdfCompressAlreadyOptimal,
 ) {
     val parts = info.split(" → ")
     val original = parts.getOrNull(0) ?: ""
@@ -57,7 +58,7 @@ fun CompressionResultCard(
 
         if (alreadyOptimal) {
             Spacer(modifier = Modifier.height(10.dp))
-            AlreadyOptimalNotice(strings.pdfCompressAlreadyOptimal)
+            AlreadyOptimalNotice(alreadyOptimalText)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
