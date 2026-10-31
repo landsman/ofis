@@ -1,6 +1,7 @@
 package ofis.tool.pdf.compress.service
 
 import ofis.tool.pdf.compress.model.CompressionError
+import ofis.tool.pdf.compress.model.CompressionFailureKind
 import ofis.tool.pdf.compress.model.CompressionProfile
 import ofis.tool.pdf.compress.model.CompressionRequest
 import ofis.tool.pdf.compress.model.CompressionResult
@@ -79,12 +80,14 @@ class PdfCompressionServiceTest {
         val err = assertIs<CompressionError.ProcessFailed>(result.reason)
         assertEquals("qpdf", err.tool)
         assertEquals(1, err.exitCode)
+        assertEquals(CompressionFailureKind.UNREADABLE_FILE, err.kind)
     }
 
     @Test
     fun `exit code 127 renders as not-installed message`() {
         val err = CompressionError.ProcessFailed("qpdf", 127, "")
         assertTrue(err.toString().contains("not installed"))
+        assertEquals(CompressionFailureKind.TOOL_MISSING, err.kind)
     }
 
     // ── success paths ──────────────────────────────────────────────────────────

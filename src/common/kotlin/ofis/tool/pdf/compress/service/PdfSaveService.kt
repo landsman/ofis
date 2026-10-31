@@ -2,6 +2,7 @@ package ofis.tool.pdf.compress.service
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import ofis.config.Logger
 import ofis.platform.fileSystem
 import ofis.platform.service.availableDiskSpace
 import ofis.platform.view.saveFile
@@ -17,6 +18,7 @@ data class SaveMessages(
     val permissionDenied: String,
     val notEnoughSpaceDetail: (need: String, avail: String) -> String,
     val failedToSave: (reason: String) -> String,
+    val unknownSaveFailure: String,
 )
 
 data class SaveResult(
@@ -59,6 +61,7 @@ suspend fun saveCompressedFile(
             }
             SaveResult(savedPath = dest, toast = ToastData(messages.fileSaved, isSuccess = true))
         } catch (e: IOException) {
+            Logger.error("Failed to save to $dest: ${e.message}")
             val reason =
                 when {
                     e.message?.contains("No space left", ignoreCase = true) == true ||
@@ -66,7 +69,7 @@ suspend fun saveCompressedFile(
 
                     e.message?.contains("Permission", ignoreCase = true) == true -> messages.permissionDenied
 
-                    else -> e.message ?: "Unknown error."
+                    else -> messages.unknownSaveFailure
                 }
             SaveResult(toast = ToastData(messages.failedToSave(reason), isSuccess = false))
         }

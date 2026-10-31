@@ -72,4 +72,11 @@ object EnStrings : AppStrings {
         "Not enough disk space. Need $need, only $avail available."
     }
     override val pdfCompressFailedToSave = { reason: String -> "Failed to save: $reason" }
+    override val pdfCompressSaveTryAnotherFolder = "Try a different folder."
+    override val pdfCompressErrorUnreadableFile =
+        "This PDF couldn't be compressed. The file may be damaged or password-protected."
+    override val pdfCompressErrorFileNotFound = "The file could not be found."
+    override val pdfCompressErrorToolMissing = "A required component is missing. Please reinstall Ofis."
+    override val pdfCompressErrorCannotWrite = "Could not write the compressed file. Check folder permissions."
+    override val pdfCompressErrorUnexpected = "Something went wrong. Please try again."
 }

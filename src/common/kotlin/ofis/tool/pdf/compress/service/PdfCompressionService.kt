@@ -30,10 +30,8 @@ class PdfCompressionService(
             unexpected(e)
         }
 
-    private fun unexpected(e: Exception): CompressionResult {
-        Logger.info("[compress] unexpected exception: ${e.message}")
-        return CompressionResult.Failure(CompressionError.InvalidInput("Unexpected error: ${e.message}"))
-    }
+    private fun unexpected(e: Exception): CompressionResult =
+        CompressionResult.Failure(CompressionError.Unexpected("Unexpected error: ${e.message}"))
 
     private fun doCompress(
         request: CompressionRequest,
@@ -146,7 +144,7 @@ class PdfCompressionService(
                     "Not enough disk space: need ${requiredBytes / BYTES_PER_MB}MB, " +
                         "only ${freeBytes / BYTES_PER_MB}MB free in $outputDir",
                 )
-                abort(CompressionError.FileSystemError("Not enough disk space to save the compressed file."))
+                abort(CompressionError.NotEnoughDiskSpace("Not enough disk space to save the compressed file."))
             }
             Logger.warn("Failed to write output to ${request.outputPath}: ${e.message}")
             abort(CompressionError.FileSystemError("Could not save the file. Check folder permissions."))

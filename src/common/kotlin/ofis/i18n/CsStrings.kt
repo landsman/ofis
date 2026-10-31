@@ -72,4 +72,12 @@ object CsStrings : AppStrings {
         "Nedostatek místa. Potřeba $need, k dispozici pouze $avail."
     }
     override val pdfCompressFailedToSave = { reason: String -> "Nepodařilo se uložit: $reason" }
+    override val pdfCompressSaveTryAnotherFolder = "Zkuste jinou složku."
+    override val pdfCompressErrorUnreadableFile =
+        "Toto PDF se nepodařilo zkomprimovat. Soubor může být poškozený nebo chráněný heslem."
+    override val pdfCompressErrorFileNotFound = "Soubor se nepodařilo najít."
+    override val pdfCompressErrorToolMissing = "Chybí potřebná součást. Přeinstalujte prosím Ofis."
+    override val pdfCompressErrorCannotWrite =
+        "Komprimovaný soubor se nepodařilo zapsat. Zkontrolujte oprávnění složky."
+    override val pdfCompressErrorUnexpected = "Něco se pokazilo. Zkuste to prosím znovu."
 }

@@ -3,11 +3,12 @@ package ofis.tool.pdf.compress.ui
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import ofis.tool.pdf.compress.model.CompressionFailureKind
 import ofis.tool.pdf.compress.model.CompressionProfile
 
 /**
  * Screen state for [PdfDetailScreen], driven by the structured lines the tool logs
- * (`RESIZE_INFO:`, `OUTPUT_PATH:`, `SUGGESTED_NAME:`, `Error:`).
+ * (`RESIZE_INFO:`, `OUTPUT_PATH:`, `SUGGESTED_NAME:`, `FAILURE_KIND:`).
  */
 class PdfDetailState {
     var selectedFilePath by mutableStateOf<String?>(null)
@@ -58,8 +59,8 @@ class PdfDetailState {
         isRunning = true
     }
 
-    /** Applies one log line; returns an error message to show, if the line reports one. */
-    fun onLogMessage(msg: String): String? {
+    /** Applies one log line; returns the failure to show, if the line reports one. */
+    fun onLogMessage(msg: String): CompressionFailureKind? {
         when {
             msg.startsWith(RESIZE_INFO) -> {
                 resizeInfo = msg.substringAfter(RESIZE_INFO)
@@ -71,9 +72,11 @@ class PdfDetailState {
 
             msg.startsWith(SUGGESTED_NAME) -> suggestedSaveName = msg.substringAfter(SUGGESTED_NAME)
 
-            msg.startsWith(ERROR) -> {
+            msg.startsWith(FAILURE_KIND) -> {
                 isRunning = false
-                return msg.substringAfter(ERROR)
+                val name = msg.substringAfter(FAILURE_KIND)
+                return CompressionFailureKind.entries.firstOrNull { it.name == name }
+                    ?: CompressionFailureKind.UNEXPECTED
             }
         }
         return null
@@ -89,6 +92,6 @@ class PdfDetailState {
         const val RESIZE_INFO = "RESIZE_INFO: "
         const val OUTPUT_PATH = "OUTPUT_PATH: "
         const val SUGGESTED_NAME = "SUGGESTED_NAME: "
-        const val ERROR = "Error: "
+        const val FAILURE_KIND = "FAILURE_KIND: "
     }
 }
